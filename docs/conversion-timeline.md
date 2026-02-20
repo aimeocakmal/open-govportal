@@ -151,48 +151,82 @@ The original portal uses **MyDS (Malaysian Government Design System)**. Key desi
 
 ### Phase 1: Foundation (Weeks 1–2)
 
-#### Week 1: Project Setup & Design System
+#### Week 1: Project Initialization & Tooling
+
+Get the full stack bootstrapped with all required packages before writing any application code.
 
 **Tasks:**
 - [ ] Initialize Laravel 12 project
-- [ ] Install and configure Laravel Octane with FrankenPHP (`composer require laravel/octane dunglas/frankenphp-caddy`)
+- [ ] Install Laravel Octane with FrankenPHP
+- [ ] Install Filament v5 admin panel, create admin user, publish config
+- [ ] Install Laravel Boost (agentic coding support)
+- [ ] Install Filament Blueprint (AI-powered scaffolding)
 - [ ] Set up PostgreSQL database + Redis
 - [ ] Configure Laravel multi-language (`ms`, `en`) with locale URL prefix
-- [ ] Set up Tailwind CSS with MyDS design tokens (colors, fonts, spacing)
-- [ ] Create base Blade layouts (app.blade.php, guest.blade.php)
-- [ ] Build navigation component with language switcher (ms/en)
-- [ ] Build footer component
+- [ ] Run initial migrations and seed super admin user
+
+**Installation Commands:**
+
+```bash
+# 1. Create Laravel 12 project
+composer create-project laravel/laravel govportal
+cd govportal
+
+# 2. Laravel Octane + FrankenPHP
+composer require laravel/octane
+php artisan octane:install --server=frankenphp
+
+# 3. Filament v5 Admin Panel
+composer require filament/filament:"^5.0"
+php artisan filament:install --panels
+php artisan make:filament-user
+php artisan vendor:publish --tag=filament-config
+
+# 4. Laravel Boost (agentic coding support)
+composer require laravel/boost --dev
+php artisan boost:install
+
+# 5. Filament Blueprint (AI-powered model scaffolding)
+# Requires a Filament license — replace placeholders with your credentials
+composer config repositories.filament composer https://packages.filamentphp.com/composer
+composer config --auth http-basic.packages.filamentphp.com "akmalakhpah@gmail.com" "0e847ae6-1e02-4c63-8a96-6622d569ec8b"
+composer require filament/blueprint --dev
+```
 
 **Deliverables:**
-- Running Laravel skeleton with Octane + FrankenPHP (`php artisan octane:frankenphp --port=8000`)
-- MyDS Tailwind config
-- Base layout with header + footer
-- Language switcher working
+- Laravel 12 boots without errors (`php artisan serve` returns 200)
+- Octane FrankenPHP starts: `php artisan octane:start`
+- Filament admin accessible at `/admin` with seeded super_admin user
+- `php artisan boost:install` completes without errors
+- Filament Blueprint available for AI-assisted scaffolding
 
-**Effort:** 40 hours
+**Effort:** 16 hours
 
-#### Week 2: Core Infrastructure
+#### Week 2: Design System & Base Infrastructure
 
 **Tasks:**
-- [ ] Install Filament 5.x admin panel (Livewire 4 comes bundled — no separate install needed)
-- [ ] Configure FrankenPHP: set `'server' => 'frankenphp'` in `config/octane.php`; build Docker image from `dunglas/frankenphp:latest-php8.3`
-- [ ] Verify Livewire 4 + Octane compatibility configuration (`config/octane.php`, `config/livewire.php`)
-- [ ] Install and configure Spatie Laravel Permission (RBAC)
-- [ ] Configure AWS S3 for media storage (matching kd-portal's S3 setup)
+- [ ] Install Tailwind CSS v4.x; configure MyDS design tokens via `@theme` in `resources/css/app.css`
+- [ ] Configure Vite for asset bundling (`npm install && npm run build`)
+- [ ] Create base Blade layouts (`resources/views/layouts/app.blade.php`, `guest.blade.php`)
+- [ ] Build navigation component with language switcher (`ms`/`en`)
+- [ ] Build footer component
+- [ ] Configure FrankenPHP: set `'server' => 'frankenphp'` in `config/octane.php`
+- [ ] Verify Livewire 4 + Octane compatibility (`config/livewire.php`)
+- [ ] Install and configure Spatie Laravel Permission (RBAC); seed roles
+- [ ] Configure AWS S3 filesystem disk for media storage
 - [ ] Set up full-page caching middleware (Redis, skip for Livewire-embedded pages)
 - [ ] Configure CI/CD pipeline (GitHub Actions)
-- [ ] Write base tests (include Livewire test helpers via `use Livewire\Volt\Volt` or `Livewire::test()`)
-- [ ] Set up Laravel Scout for search
+- [ ] Write base feature tests + Livewire test helpers (`Livewire::test()`)
+- [ ] Set up Laravel Scout (PostgreSQL FTS driver)
 
 **Deliverables:**
-- Filament admin accessible at `/admin`
-- RBAC roles and permissions seeded
-- S3 media storage working
-- Caching middleware active
-- FrankenPHP starts without error: `php artisan octane:frankenphp --port=8000 --workers=8`
-- Livewire works correctly under Octane FrankenPHP (verified with `php artisan octane:frankenphp --watch`)
+- Octane FrankenPHP starts with workers: `php artisan octane:start --workers=8`
+- MyDS Tailwind v4 tokens resolve in browser (`@theme` variables active)
+- Base layout with header + footer, language switcher working
+- RBAC roles seeded: `super_admin`, `content_editor`, `publisher`, `viewer`
+- Livewire verified working under Octane: `php artisan octane:start --watch`
 
-**Effort:** 40 hours
+**Effort:** 24 hours
 
 **FrankenPHP + Livewire config notes:**
 ```php
@@ -530,7 +564,8 @@ class QuickLink extends Model {
 
 | Week | Milestone | Success Criteria |
 |------|-----------|-----------------|
-| 2 | Foundation Complete | Laravel + Octane (FrankenPHP) running, Filament accessible |
+| 1 | Tooling Bootstrap | Laravel 12 + Octane + Filament + Boost + Blueprint all installed and verified |
+| 2 | Foundation Complete | FrankenPHP running, Tailwind v4 active, base layouts built, RBAC seeded |
 | 5 | CMS Complete | All 12 collections manageable in Filament |
 | 9 | All Pages Complete | All 10 public pages functional in ms/en |
 | 11 | QA Complete | 90+ Lighthouse, WCAG AA, load test passed |
