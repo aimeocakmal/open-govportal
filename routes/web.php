@@ -1,14 +1,13 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Root redirect
 |--------------------------------------------------------------------------
-| Detect browser locale and redirect to the appropriate locale prefix.
-| Falls back to the app default locale (ms).
+| Detect browser locale and redirect to the locale-prefixed homepage.
+| Falls back to the app default (ms) if the browser preference is unrecognised.
 */
 Route::get('/', function () {
     $browser = request()->getPreferredLanguage(['ms', 'en']);
@@ -18,19 +17,10 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Locale-prefixed public routes
+| Sub-route files
 |--------------------------------------------------------------------------
-| All public-facing pages live under /{locale}/...
-| The SetLocale middleware reads the {locale} segment and calls App::setLocale().
+| Split by concern so each file stays focused and easy to navigate.
+| All files below run inside the `web` middleware group (session, CSRF, etc.).
 */
-Route::prefix('{locale}')
-    ->where(['locale' => 'ms|en'])
-    ->middleware('setlocale')
-    ->group(function () {
-        Route::get('/', [HomeController::class, 'index'])->name('home');
-
-        // Phase 3 routes will be added here:
-        // Route::get('/siaran', ...)
-        // Route::get('/siaran/{slug}', ...)
-        // etc.
-    });
+require __DIR__.'/public.php';
+require __DIR__.'/admin.php';

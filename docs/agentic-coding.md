@@ -136,7 +136,28 @@ Consistent names are required. Agents must not invent alternatives.
 | QuickLink | `QuickLink` | `app/Models/QuickLink.php` |
 | Search-Overrides | `SearchOverride` | `app/Models/SearchOverride.php` |
 
+### Route Files (`routes/`)
+
+The route system is split into four focused files. Always add new routes to the correct file — never add public page routes directly to `web.php`.
+
+| File | Middleware group | URL prefix | Purpose |
+|------|-----------------|------------|---------|
+| `routes/web.php` | `web` | — | Root `/` redirect only; `require`s `public.php` and `admin.php` |
+| `routes/public.php` | `web` + `setlocale` | `/{locale}` | All 10 public pages + `/carian` search |
+| `routes/admin.php` | `web` + `auth` (when needed) | `/admin` | Custom admin actions beyond Filament |
+| `routes/api.php` | `api` (stateless, `throttle:api`) | `/api/v1` | REST API endpoints; Sanctum auth in Phase 4 |
+
+**Rules:**
+- Adding a new public page route → `routes/public.php` only. Uncomment the prepared stub for that page.
+- Adding a custom admin endpoint → `routes/admin.php` with `middleware(['auth', 'role:...'])`.
+- Adding an API endpoint → `routes/api.php`. Use `Route::apiResource()` or explicit `Route::get/post`.
+- Never put a public route in `web.php`. Never put a page route in `api.php`.
+
+Both `routes/public.php` and `routes/admin.php` are loaded via `require` inside `web.php` and therefore inherit the `web` middleware group (session, CSRF, `ApplyTheme`). The `api.php` file is loaded separately in `bootstrap/app.php` with its own `api` group.
+
 ### Controllers (`app/Http/Controllers/`)
+
+**Public controllers** (`app/Http/Controllers/` — registered in `routes/public.php`):
 
 | Route | Controller | Method |
 |-------|-----------|--------|
@@ -151,11 +172,21 @@ Consistent names are required. Agents must not invent alternatives.
 | `GET /{locale}/dasar/{id}/muat-turun` | `DasarController` | `download` |
 | `GET /{locale}/profil-kementerian` | `ProfilKementerianController` | `index` |
 | `GET /{locale}/hubungi-kami` | `HubungiKamiController` | `index` |
-| `POST /{locale}/hubungi-kami` | `HubungiKamiController` | `submit` |
 | `GET /{locale}/penafian` | `StaticPageController` | `penafian` |
 | `GET /{locale}/dasar-privasi` | `StaticPageController` | `dasarPrivasi` |
 | `GET /{locale}/carian` | `SearchController` | `index` |
-| `GET /api/direktori` | `Api\DirectoriController` | `search` |
+
+**API controllers** (`app/Http/Controllers/Api/` — registered in `routes/api.php`, Phase 4):
+
+| Route | Controller | Method |
+|-------|-----------|--------|
+| `GET /api/v1/broadcasts` | `Api\BroadcastController` | `index` |
+| `GET /api/v1/broadcasts/{slug}` | `Api\BroadcastController` | `show` |
+| `GET /api/v1/achievements` | `Api\AchievementController` | `index` |
+| `GET /api/v1/staff-directory` | `Api\StaffDirectoryController` | `index` |
+| `GET /api/v1/policies` | `Api\PolicyController` | `index` |
+| `GET /api/v1/search` | `Api\SearchController` | `index` |
+| `POST /api/v1/feedback` | `Api\FeedbackController` | `store` |
 
 ### Filament Resources (`app/Filament/Resources/`)
 
@@ -191,13 +222,14 @@ One class per interactive component. Naming: `PascalCase`, file: `app/Livewire/{
 
 ```
 resources/views/
-  layouts/
-    app.blade.php               ← main public layout (wraps all public pages)
-    admin.blade.php             ← Filament overrides (if needed)
   components/
-    layout/
-      navbar.blade.php
+    layouts/                    ← Blade layout components (used as <x-layouts.app>)
+      app.blade.php             ← main public layout; sets <html data-theme="...">
+      guest.blade.php           ← minimal layout (no nav/footer)
+    layout/                     ← shared UI components (used as <x-layout.nav> etc.)
+      nav.blade.php             ← sticky header, hamburger (Alpine.js), language switcher
       footer.blade.php
+      theme-switcher.blade.php  ← Alpine.js cookie-based theme switcher
     home/
       hero-banner.blade.php
       quick-links.blade.php
@@ -344,10 +376,10 @@ php artisan filament:check-translations
 php artisan test --filter=BroadcastControllerTest
 # Expect: all assertions pass
 
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/ms/siaran
+curl -s -o /dev/null -w "%{http_code}" http://govportal.test/ms/siaran
 # Expect: 200
 
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/en/siaran
+curl -s -o /dev/null -w "%{http_code}" http://govportal.test/en/siaran
 # Expect: 200
 ```
 
@@ -356,8 +388,8 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/en/siaran
 ```bash
 php artisan cache:clear
 
-curl -s http://localhost:8000/ms/siaran > /dev/null  # cold request
-curl -s http://localhost:8000/ms/siaran > /dev/null  # should hit cache
+curl -s http://govportal.test/ms/siaran > /dev/null  # cold request
+curl -s http://govportal.test/ms/siaran > /dev/null  # should hit cache
 
 php artisan tinker --execute="Cache::has('page:/ms/siaran')"
 # Expect: true
@@ -386,6 +418,25 @@ php artisan test --filter=ComponentNameTest
 # Verify with Octane running (not just artisan serve):
 php artisan octane:start --watch
 # Navigate to /{locale}/page — check for Livewire hydration errors in browser console
+```
+
+### API Endpoint
+
+```bash
+# Health check (no auth)
+curl -s http://govportal.test/api/v1/health
+# Expect: {"status":"ok"}
+
+# Authenticated endpoint (Phase 4 — Sanctum token required)
+curl -s -H "Authorization: Bearer {token}" http://govportal.test/api/v1/broadcasts
+# Expect: paginated JSON with data[], links{}, meta{}
+
+php artisan test --filter=BroadcastApiTest
+# Expect: all assertions pass
+
+# Rate limit smoke test
+for i in {1..5}; do curl -s -o /dev/null -w "%{http_code}\n" http://govportal.test/api/v1/health; done
+# Expect: all 200 (rate limit is 60/min by default for /api/v1/)
 ```
 
 ### Contact Form (Email + Livewire)

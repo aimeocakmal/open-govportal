@@ -102,6 +102,18 @@ Follow the Payload collection → Laravel model mapping exactly:
 ### Controllers
 Match the route-to-controller table in [docs/agentic-coding.md](docs/agentic-coding.md) exactly. Do not rename.
 
+### Route files
+Add new routes to the correct file — never mix concerns:
+
+| File | For |
+|------|-----|
+| `routes/public.php` | All `/{locale}/...` public pages |
+| `routes/admin.php` | Custom admin endpoints beyond Filament |
+| `routes/api.php` | REST API under `/api/v1/` |
+| `routes/web.php` | Root redirect only — do not add routes here |
+
+Full rules: [docs/agentic-coding.md → Route Files](docs/agentic-coding.md).
+
 ### Blade views
 Match the view directory structure in [docs/agentic-coding.md](docs/agentic-coding.md) exactly.
 
@@ -148,8 +160,8 @@ php artisan test --filter=Feature
 php artisan test --filter=Unit
 
 # Check both locales respond 200
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/ms/{route}
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/en/{route}
+curl -s -o /dev/null -w "%{http_code}" http://govportal.test/ms/{route}
+curl -s -o /dev/null -w "%{http_code}" http://govportal.test/en/{route}
 
 # Check migration status
 php artisan migrate:status
