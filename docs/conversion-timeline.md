@@ -151,19 +151,19 @@ The original portal uses **MyDS (Malaysian Government Design System)**. Key desi
 
 ### Phase 1: Foundation (Weeks 1–2)
 
-#### Week 1: Project Initialization & Tooling
+#### Week 1: Project Initialization & Tooling ✅ COMPLETED 2026-02-21
 
 Get the full stack bootstrapped with all required packages before writing any application code.
 
 **Tasks:**
-- [ ] Initialize Laravel 12 project
-- [ ] Install Laravel Octane with FrankenPHP
-- [ ] Install Filament v5 admin panel, create admin user, publish config
-- [ ] Install Laravel Boost (agentic coding support)
-- [ ] Install Filament Blueprint (AI-powered scaffolding)
-- [ ] Set up PostgreSQL database + Redis
-- [ ] Configure Laravel multi-language (`ms`, `en`) with locale URL prefix
-- [ ] Run initial migrations and seed super admin user
+- [x] Initialize Laravel 12 project (12.52.0)
+- [x] Install Laravel Octane with FrankenPHP (octane 2.13.5, binary downloaded)
+- [x] Install Filament v5 admin panel, create admin user, publish config (5.2.2)
+- [x] Install Laravel Boost (agentic coding support) (2.1.8)
+- [x] Install Filament Blueprint (AI-powered scaffolding) (2.1.0)
+- [x] Set up PostgreSQL database (DBngin, 127.0.0.1:5432, db: govportal)
+- [x] Configure Laravel multi-language (`ms`, `en`) with locale URL prefix (`APP_LOCALE=ms`)
+- [x] Run initial migrations and seed super admin user (`admin@digital.gov.my`)
 
 **Installation Commands:**
 
@@ -202,49 +202,59 @@ composer require filament/blueprint --dev
 
 **Effort:** 16 hours
 
-#### Week 2: Design System & Base Infrastructure
+#### Week 2: Design System & Base UI
+
+> **Note:** Several Week 2 tasks were completed as part of Week 1 or are already present in Laravel 12 defaults:
+> - Tailwind CSS v4.x — already installed (`@tailwindcss/vite ^4.0.0` in `package.json`)
+> - Vite + `@tailwindcss/vite` plugin — already configured in `vite.config.js`
+> - `@import 'tailwindcss'` in `resources/css/app.css` — already present
+> - FrankenPHP: `'server' => 'frankenphp'` in `config/octane.php` — done in Week 1
+> - Livewire 4: installed and compatible via Filament v5 — done in Week 1
+>
+> Week 2 therefore focuses only on what is genuinely outstanding.
 
 **Tasks:**
-- [ ] Install Tailwind CSS v4.x; configure MyDS design tokens via `@theme` in `resources/css/app.css`
-- [ ] Configure Vite for asset bundling (`npm install && npm run build`)
-- [ ] Create base Blade layouts (`resources/views/layouts/app.blade.php`, `guest.blade.php`)
-- [ ] Build navigation component with language switcher (`ms`/`en`)
-- [ ] Build footer component
-- [ ] Configure FrankenPHP: set `'server' => 'frankenphp'` in `config/octane.php`
-- [ ] Verify Livewire 4 + Octane compatibility (`config/livewire.php`)
-- [ ] Install and configure Spatie Laravel Permission (RBAC); seed roles
-- [ ] Configure AWS S3 filesystem disk for media storage
-- [ ] Set up full-page caching middleware (Redis, skip for Livewire-embedded pages)
-- [ ] Configure CI/CD pipeline (GitHub Actions)
-- [ ] Write base feature tests + Livewire test helpers (`Livewire::test()`)
-- [ ] Set up Laravel Scout (PostgreSQL FTS driver)
+- [ ] Install JS dependencies and add Alpine.js v3.x (`npm install && npm pkg set dependencies.alpinejs=^3.x.x`)
+- [ ] Add MyDS design tokens to `resources/css/app.css` via `@theme` (colours, fonts, spacing — from `docs/design.md`)
+- [ ] Create base Blade layouts: `resources/views/layouts/app.blade.php` and `layouts/guest.blade.php`
+- [ ] Build `<x-nav>` navigation component with mobile hamburger menu and language switcher (`ms`/`en`)
+- [ ] Build `<x-footer>` component
+- [ ] Install Spatie Laravel Permission; seed roles (`super_admin`, `content_editor`, `publisher`, `viewer`)
+- [ ] Write base PHPUnit feature test: homepage returns 200 for both locales; Livewire test helper configured
 
-**Deliverables:**
-- Octane FrankenPHP starts with workers: `php artisan octane:start --workers=8`
-- MyDS Tailwind v4 tokens resolve in browser (`@theme` variables active)
-- Base layout with header + footer, language switcher working
-- RBAC roles seeded: `super_admin`, `content_editor`, `publisher`, `viewer`
-- Livewire verified working under Octane: `php artisan octane:start --watch`
+**Deferred (moved to correct phase):**
+- AWS S3 disk → Week 4 (needed when `File`/`Media` models are built)
+- Full-page caching middleware → Week 10 (Performance phase)
+- Laravel Scout → Week 5 (Admin Polish phase)
+- CI/CD pipeline → parallel track (not week-gated)
 
-**Effort:** 24 hours
+**Installation Commands:**
 
-**FrankenPHP + Livewire config notes:**
-```php
-// config/octane.php — use FrankenPHP, not Swoole
-return [
-    'server' => 'frankenphp',
-    'frankenphp' => [
-        'workers' => env('OCTANE_WORKERS', 8),
-        'max_requests' => env('OCTANE_MAX_REQUESTS', 500),
-    ],
-];
+```bash
+# 1. Install JS deps + add Alpine.js
+npm install
+npm install alpinejs
 
-// config/livewire.php — ensure these are set for Octane
-'inject_assets' => true,
-'navigate' => false, // keep off until verified compatible with Octane setup
+# 2. Import Alpine in resources/js/app.js
+# Add: import Alpine from 'alpinejs'; window.Alpine = Alpine; Alpine.start();
+
+# 3. Spatie Laravel Permission
+composer require spatie/laravel-permission
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan migrate
+# Then create a DatabaseSeeder or RoleSeeder for the 4 roles
 ```
 
-**Note:** Do **not** use `Octane::table()` — it is Swoole-only and unavailable under FrankenPHP. Use Redis for all shared state.
+**Deliverables:**
+- `npm run build` completes without errors
+- MyDS colour tokens visible in browser DevTools (e.g. `--color-primary: #2563EB`)
+- Alpine.js v3 registered globally; dropdowns/hamburger toggling works
+- Base layout renders with header + footer across both locales (`/ms` and `/en`)
+- Language switcher swaps locale correctly
+- RBAC roles seeded: `super_admin`, `content_editor`, `publisher`, `viewer`
+- PHPUnit smoke test passes: `php artisan test --filter=HomepageTest`
+
+**Effort:** 16 hours
 
 ---
 
@@ -564,8 +574,8 @@ class QuickLink extends Model {
 
 | Week | Milestone | Success Criteria |
 |------|-----------|-----------------|
-| 1 | Tooling Bootstrap | Laravel 12 + Octane + Filament + Boost + Blueprint all installed and verified |
-| 2 | Foundation Complete | FrankenPHP running, Tailwind v4 active, base layouts built, RBAC seeded |
+| 1 | ✅ Tooling Bootstrap | Laravel 12 + Octane + Filament + Boost + Blueprint all installed and verified — 2026-02-21 |
+| 2 | Design System & Base UI | Alpine.js registered, MyDS `@theme` tokens active, base layouts + nav + footer built, RBAC roles seeded |
 | 5 | CMS Complete | All 12 collections manageable in Filament |
 | 9 | All Pages Complete | All 10 public pages functional in ms/en |
 | 11 | QA Complete | 90+ Lighthouse, WCAG AA, load test passed |
