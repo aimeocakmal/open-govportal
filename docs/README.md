@@ -11,6 +11,10 @@ This folder contains planning and technical reference documents for OpenGovPorta
 5. `docs/caching.md` for cache strategy and invalidation patterns.
 6. `docs/design.md` for UI system and accessibility baseline.
 7. `docs/agentic-coding.md` for execution workflow and quality gates.
+8. `docs/testing.md` for testing strategy, factories, and CI/CD pipeline.
+9. `docs/api.md` for REST API endpoints, request/response format, and rate limiting.
+10. `docs/deployment.md` for Docker, Kubernetes, zero-downtime deployment, and backups.
+11. `docs/security.md` for OWASP coverage, security headers, RBAC, and PDPA compliance.
 
 ## Source Of Truth Rules
 
