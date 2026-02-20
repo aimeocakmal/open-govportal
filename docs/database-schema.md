@@ -349,7 +349,9 @@ INSERT INTO settings VALUES
     ('facebook_url', '', 'string', NOW()),
     ('twitter_url', '', 'string', NOW()),
     ('instagram_url', '', 'string', NOW()),
-    ('youtube_url', '', 'string', NOW());
+    ('youtube_url', '', 'string', NOW()),
+    ('site_default_theme', 'default', 'string', NOW());
+                                            -- valid values: keys in config/themes.php valid_themes array
 ```
 
 ### `navigation_items`

@@ -214,12 +214,17 @@ composer require filament/blueprint --dev
 > Week 2 therefore focuses only on what is genuinely outstanding.
 
 **Tasks:**
-- [ ] Install JS dependencies and add Alpine.js v3.x (`npm install && npm pkg set dependencies.alpinejs=^3.x.x`)
-- [ ] Add MyDS design tokens to `resources/css/app.css` via `@theme` (colours, fonts, spacing — from `docs/design.md`)
-- [ ] Create base Blade layouts: `resources/views/layouts/app.blade.php` and `layouts/guest.blade.php`
-- [ ] Build `<x-nav>` navigation component with mobile hamburger menu and language switcher (`ms`/`en`)
+- [ ] Install JS dependencies and add Alpine.js v3.x (`npm install && npm install alpinejs`); import and start Alpine in `resources/js/app.js`
+- [ ] Create `resources/css/themes/default.css` with all MyDS tokens under `[data-theme="default"], :root` (see `docs/design.md → Theme System`)
+- [ ] Update `resources/css/app.css`: import default theme file; declare `@theme` block referencing the same CSS variable names so Tailwind generates utility classes; add Inter font import and typography utilities
+- [ ] Create `config/themes.php` with `valid_themes => ['default']`
+- [ ] Create `ApplyTheme` middleware: reads `govportal_theme` cookie → falls back to `settings.site_default_theme` → shares `$currentTheme` view variable; register on `web` group
+- [ ] Create base Blade layouts: `resources/views/layouts/app.blade.php` (`<html data-theme="{{ $currentTheme }}">`) and `layouts/guest.blade.php`
+- [ ] Build `<x-nav>` navigation component with mobile hamburger menu (Alpine.js) and language switcher (`ms`/`en`)
 - [ ] Build `<x-footer>` component
+- [ ] Build `<x-theme-switcher>` Alpine.js component (see `docs/design.md → Theme System`); place in nav or footer
 - [ ] Install Spatie Laravel Permission; seed roles (`super_admin`, `content_editor`, `publisher`, `viewer`)
+- [ ] Seed `site_default_theme = default` in `settings` table (via `DatabaseSeeder`)
 - [ ] Write base PHPUnit feature test: homepage returns 200 for both locales; Livewire test helper configured
 
 **Deferred (moved to correct phase):**
@@ -247,14 +252,16 @@ php artisan migrate
 
 **Deliverables:**
 - `npm run build` completes without errors
-- MyDS colour tokens visible in browser DevTools (e.g. `--color-primary: #2563EB`)
-- Alpine.js v3 registered globally; dropdowns/hamburger toggling works
+- MyDS colour tokens visible in browser DevTools (`--color-primary: #2563EB` on `[data-theme="default"]`)
+- `<html data-theme="default">` rendered server-side on every public page
+- Theme switcher component visible; clicking it changes `data-theme` and writes cookie
+- Alpine.js v3 registered globally; hamburger and dropdowns toggle correctly
 - Base layout renders with header + footer across both locales (`/ms` and `/en`)
 - Language switcher swaps locale correctly
 - RBAC roles seeded: `super_admin`, `content_editor`, `publisher`, `viewer`
 - PHPUnit smoke test passes: `php artisan test --filter=HomepageTest`
 
-**Effort:** 16 hours
+**Effort:** 20 hours
 
 ---
 
@@ -413,6 +420,7 @@ Recreate homepage sections from kd-portal's `home/` components:
 - [ ] Octane tuning (workers, max_requests)
 - [ ] Route, config, view caching in production
 - [ ] Lighthouse audit → target 90+ score
+- [ ] Add dark mode theme (`resources/css/themes/dark.css`) — register in `config/themes.php`; verify WCAG AA contrast ratios for dark palette
 
 **Deliverables:**
 - Page load < 1 second

@@ -524,11 +524,153 @@ body {
 
 ---
 
+## Theme System
+
+OpenGovPortal supports multiple visual themes selectable by the end user. The default theme implements the full MyDS colour palette (blue, light mode).
+
+### Architecture
+
+Themes are implemented using CSS custom properties and the HTML `data-theme` attribute:
+
+1. `resources/css/themes/default.css` — declares the default design tokens under `[data-theme="default"], :root`
+2. Each additional theme overrides the same CSS variables under its own `[data-theme="name"]` selector
+3. `resources/css/app.css` imports all theme files; Tailwind `@theme` block generates utility classes from the same variable names
+4. `<html data-theme="{{ $currentTheme }}">` is set server-side by `ApplyTheme` middleware (reads `govportal_theme` cookie)
+5. Alpine.js `<x-theme-switcher>` component handles client-side switching (updates `data-theme` attribute + writes cookie)
+
+Tailwind utility classes (`bg-primary`, `text-primary-dark`, `border-error`, etc.) automatically reflect theme overrides because Tailwind v4 generates them as `var(--color-primary)` references.
+
+### File Structure
+
+```
+resources/css/
+  app.css                 ← @import "tailwindcss"; @import each theme file; global utilities
+  themes/
+    default.css           ← MyDS Blue, light — [data-theme="default"], :root
+    dark.css              ← Dark mode overrides — [data-theme="dark"]  (Phase 4)
+```
+
+### Default Theme (`themes/default.css`)
+
+```css
+/* resources/css/themes/default.css */
+[data-theme="default"],
+:root {
+  /* Primary */
+  --color-primary:       #2563EB;
+  --color-primary-dark:  #1D4ED8;
+  --color-primary-light: #3B82F6;
+
+  /* Secondary */
+  --color-secondary:       #64748B;
+  --color-secondary-dark:  #475569;
+  --color-secondary-light: #94A3B8;
+
+  /* Semantic */
+  --color-success:       #10B981;
+  --color-success-light: #D1FAE5;
+  --color-warning:       #F59E0B;
+  --color-warning-light: #FEF3C7;
+  --color-error:         #EF4444;
+  --color-error-light:   #FEE2E2;
+  --color-info:          #3B82F6;
+  --color-info-light:    #DBEAFE;
+
+  /* Surfaces */
+  --color-bg:      #FFFFFF;
+  --color-surface: #F1F5F9;
+  --color-border:  #CBD5E1;
+  --color-text:    #0F172A;
+  --color-muted:   #64748B;
+}
+```
+
+### Theme Persistence
+
+| Layer | Mechanism |
+|-------|-----------|
+| User preference | Cookie `govportal_theme` (1-year, path=`/`) |
+| Site default | `settings` key `site_default_theme` (editable in Filament `ManageSiteInfo`) |
+| Server-side render | `ApplyTheme` middleware reads cookie → shares `$currentTheme` view variable |
+| HTML attribute | `<html data-theme="{{ $currentTheme }}">` in base layout |
+| Client-side switch | `<x-theme-switcher>` Alpine.js component updates attribute + writes cookie |
+
+### `ApplyTheme` Middleware
+
+```php
+// app/Http/Middleware/ApplyTheme.php
+public function handle(Request $request, Closure $next): Response
+{
+    $valid  = config('themes.valid_themes', ['default']);
+    $cookie = $request->cookie('govportal_theme');
+    $default = Setting::get('site_default_theme', 'default');
+    $theme  = ($cookie && in_array($cookie, $valid)) ? $cookie : $default;
+
+    view()->share('currentTheme', $theme);
+
+    return $next($request);
+}
+```
+
+Register on the `web` middleware group in `bootstrap/app.php`.
+
+### `config/themes.php`
+
+```php
+return [
+    'valid_themes' => ['default'],  // extend as new themes are added
+];
+```
+
+### Alpine.js Theme Switcher Component
+
+```html
+{{-- resources/views/components/layout/theme-switcher.blade.php --}}
+<div x-data="{
+    theme: document.documentElement.dataset.theme || 'default',
+    set(name) {
+        this.theme = name;
+        document.documentElement.dataset.theme = name;
+        document.cookie = 'govportal_theme=' + name + ';path=/;max-age=31536000';
+    }
+}" class="flex items-center gap-2">
+    @foreach(config('themes.valid_themes') as $key)
+        <button
+            @click="set('{{ $key }}')"
+            :class="{ 'ring-2 ring-primary': theme === '{{ $key }}' }"
+            class="px-3 py-1 rounded-md text-sm font-medium border border-border hover:bg-surface transition-colors"
+        >
+            {{ ucfirst($key) }}
+        </button>
+    @endforeach
+</div>
+```
+
+### How to Add a New Theme
+
+1. Create `resources/css/themes/{name}.css` and override the relevant variables under `[data-theme="{name}"]`.
+2. Add `@import "./themes/{name}.css";` to `resources/css/app.css`.
+3. Add the theme key to `config/themes.php` `valid_themes` array.
+4. Update `ManageSiteInfo` Filament settings form to include the new option.
+
+### Available Themes
+
+| Key | Name | Status |
+|-----|------|--------|
+| `default` | MyDS Blue (Light) | Planned — Week 2 |
+| `dark` | Dark Mode | Planned — Phase 4 |
+
+---
+
 ## Implementation Checklist
 
 ### Setup
 - [ ] Import Inter font from Google Fonts
-- [ ] Configure Tailwind v4.x with MYDS colors via `@theme` in `resources/css/app.css`
+- [ ] Create `resources/css/themes/default.css` with full MyDS token set under `[data-theme="default"], :root`
+- [ ] Configure Tailwind v4.x `@theme` block in `resources/css/app.css` to reference the same CSS variable names
+- [ ] Create `config/themes.php` with `valid_themes` array
+- [ ] Create and register `ApplyTheme` middleware on `web` group
+- [ ] Apply `data-theme="{{ $currentTheme }}"` to `<html>` in base layout
 - [ ] Set up base typography styles
 - [ ] Create component library
 

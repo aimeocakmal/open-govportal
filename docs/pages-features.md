@@ -357,6 +357,26 @@ protected $rules = [
 
 ---
 
+### Theme Switcher — **Status: Planned**
+
+**Blade component:** `resources/views/components/layout/theme-switcher.blade.php`
+
+**Elements:**
+- One button per available theme (list from `config/themes.php valid_themes`)
+- Active theme highlighted with a ring indicator
+- Clicking a button: sets `data-theme` on `<html>`, writes `govportal_theme` cookie (1 year)
+- Initial state read from `data-theme` attribute (set server-side by `ApplyTheme` middleware)
+
+**Implementation:**
+- Pure Alpine.js micro-interaction — no server call needed
+- `ApplyTheme` middleware reads `govportal_theme` cookie → falls back to `settings.site_default_theme` → shares `$currentTheme` with all views
+- Base layout: `<html data-theme="{{ $currentTheme }}">`
+- Placed in nav or footer — exact placement determined during Week 2 build
+
+**Cache:** No cache invalidation needed — theme is per-user (cookie). Admin `site_default_theme` change invalidates `navigation` tag (covers layout re-render).
+
+---
+
 ### Search (`/carian`) — **Status: Planned**
 
 **Payload plugin:** `@payloadcms/plugin-search`
@@ -537,6 +557,7 @@ When a model is saved, these cache tags must be flushed:
 | `Setting` (site info) | `navigation`, `footer`, `profil-kementerian`, `static-pages` |
 | `MinisterProfile` | `profil-kementerian` |
 | `Address` | `hubungi-kami` |
+| `Setting` (`site_default_theme` key) | `navigation` |
 
 Implement invalidation via a `CacheObserver` registered on each model in `AppServiceProvider`.
 
