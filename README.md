@@ -1,403 +1,59 @@
-# OpenGovPortal
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-> Laravel recreation of the Kementerian Digital Malaysia portal (digital.gov.my)
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Laravel](https://img.shields.io/badge/Laravel-11-red.svg)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.3%2B-blue.svg)](https://php.net)
+## About Laravel
 
----
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-## Overview
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-**OpenGovPortal** is a Laravel 11 recreation of the official [Kementerian Digital Malaysia](https://www.digital.gov.my/) website, originally built by GovTech Malaysia as [kd-portal](https://github.com/govtechmy/kd-portal) (Next.js 15 + Payload CMS + MongoDB).
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-This project migrates the portal to a **Laravel 11 + Octane** stack, targeting **10,000+ concurrent users** with sub-second response times, while preserving full feature parity and MyDS design compliance.
+## Learning Laravel
 
-### Source Reference
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-| Item | Details |
-|------|---------|
-| **Original Site** | https://www.digital.gov.my/ |
-| **Original Repo** | https://github.com/govtechmy/kd-portal |
-| **Original Stack** | Next.js 15 + Payload CMS + MongoDB |
-| **Target Stack** | Laravel 11 + Octane (FrankenPHP) + PostgreSQL |
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-### Key Features
+## Laravel Sponsors
 
-- **High Performance** — Laravel Octane (FrankenPHP) for 10x speed — app booted once, kept in memory per worker
-- **Secure** — Role-based access control, audit logging
-- **Multi-language** — Bahasa Malaysia (ms-MY) + English (en-GB)
-- **Responsive** — Mobile-first, MyDS-compliant design
-- **Full CMS** — Filament admin panel replacing Payload CMS
-- **PostgreSQL** — Enterprise-grade database (replaces MongoDB)
-- **Heavy Caching** — Redis + CDN for optimal performance
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
----
+### Premium Partners
 
-## Architecture
-
-```
-┌─────────────────────────────────────────┐
-│  CDN (Cloudflare)                       │
-│  - Global edge caching                  │
-│  - DDoS protection + WAF                │
-│  - HTTP/3 at edge                       │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│  AWS ALB (Load Balancer)                │
-│  - Distributes to FrankenPHP pods       │
-│  - Health checks (/up endpoint)         │
-│  - Rate limiting via WAF rules          │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│  LARAVEL OCTANE (FrankenPHP / Caddy)    │
-│  - App booted once, kept in memory      │
-│  - No separate Nginx needed             │
-│  - HTTP/2 + HTTP/3 natively via Caddy   │
-│  - Handle 10K+ concurrent               │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│  REDIS CLUSTER                          │
-│  - Full-page cache (tagged)             │
-│  - Session storage                      │
-│  - Query cache                          │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│  POSTGRESQL                             │
-│  - Primary + Read Replicas              │
-│  - PgBouncer connection pooling         │
-└─────────────────────────────────────────┘
-```
-
----
-
-## Tech Stack
-
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **Framework** | Laravel 11 | Core application |
-| **Server** | Laravel Octane + FrankenPHP | High-concurrency; Caddy built-in (no Nginx) |
-| **Frontend** | Blade + Tailwind CSS + Livewire 3 + Alpine.js | TALL stack — server-rendered + reactive UI |
-| **Admin CMS** | Filament v3 | Admin panel replacing Payload CMS |
-| **Database** | PostgreSQL | Primary data store |
-| **Cache** | Redis | Full-page & query caching (tagged) |
-| **Auth** | Spatie Laravel Permission | RBAC (Role-Based Access Control) |
-| **CDN** | Cloudflare | Edge caching, WAF & DDoS protection |
-| **Queue** | Redis | Background job processing |
-| **Storage** | AWS S3 | Media and file storage |
-| **Email** | AWS SES | Transactional email (contact form) |
-| **Search** | Laravel Scout + PostgreSQL FTS | Full-text search |
-
----
-
-## Performance Targets
-
-| Metric | Target | Implementation |
-|--------|--------|----------------|
-| **First Contentful Paint** | < 1 second | CDN + edge caching |
-| **Time to Interactive** | < 2 seconds | Octane + Redis |
-| **Concurrent Users** | 10,000+ | FrankenPHP + horizontal scaling on Kubernetes |
-| **Database Queries** | < 10/page | Aggressive caching |
-| **Uptime** | 99.9% | Load balancer + failover |
-
----
-
-## Documentation
-
-Full technical documentation available in [`docs/`](docs/):
-
-| Document | Description |
-|----------|-------------|
-| [Documentation Guide](docs/README.md) | Doc index, source-of-truth rules, and maintenance standards |
-| [Agentic Coding Playbook](docs/agentic-coding.md) | Task execution workflow and definition of done for coding agents |
-| [Pages & Features](docs/pages-features.md) | All pages, routes, and features from kd-portal |
-| [Conversion Plan](docs/conversion-timeline.md) | 12-week Laravel migration plan |
-| [Database Schema](docs/database-schema.md) | PostgreSQL schema (mapped from Payload CMS collections) |
-| [Architecture](docs/architecture.md) | System design & infrastructure |
-| [Caching Strategy](docs/caching.md) | Multi-layer caching implementation |
-| [Design System](docs/design.md) | MyDS design tokens and component specs |
-
----
-
-## Quick Start
-
-### Prerequisites
-
-- PHP 8.3+ (or Docker with `dunglas/frankenphp:latest-php8.3`)
-- PostgreSQL 14+
-- Redis 7+
-- Composer
-- Node.js 18+
-- Docker (recommended for FrankenPHP — no PHP extension compilation needed)
-
-### Installation
-
-```bash
-# Clone repository
-git clone https://github.com/aimeocakmal/open-govportal.git
-cd open-govportal
-
-# Install dependencies
-composer install
-npm install
-
-# Environment setup
-cp .env.example .env
-php artisan key:generate
-
-# Configure database in .env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=govportal
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-
-# Configure Redis in .env
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-# Run migrations
-php artisan migrate --seed
-
-# Build assets
-npm run build
-
-# Start Octane with FrankenPHP (production mode)
-php artisan octane:frankenphp --host=0.0.0.0 --port=8000 --workers=8
-```
-
-### Development Mode
-
-```bash
-# Traditional Laravel serve (no Octane — good for basic dev)
-php artisan serve
-
-# Or with Octane + FrankenPHP (hot reload — matches production)
-php artisan octane:frankenphp --watch
-```
-
----
-
-## Role-Based Access Control
-
-### Default Roles
-
-| Role | Permissions | Description |
-|------|-------------|-------------|
-| **Super Admin** | All permissions | System administrator |
-| **Content Editor** | Create and edit content | Content creators |
-| **Publisher** | Publish approved content | Approvers |
-| **Viewer** | Read-only | Public servants |
-
-### Permission Granularity
-
-- **Modules:** Broadcasts, Achievements, Directory, Policy, Downloads, Gallery, etc.
-- **Actions:** Create, Read, Update, Delete, Publish
-- **Scope:** Own content, All content
-
----
-
-## Site Pages (from kd-portal)
-
-All pages support `/ms/` and `/en/` locale prefixes:
-
-| Route | Malay | Description |
-|-------|-------|-------------|
-| `/` | Laman Utama | Homepage with hero, quick links, broadcasts |
-| `/siaran` | Siaran | News & broadcasts listing |
-| `/pencapaian` | Pencapaian | Ministry achievements |
-| `/statistik` | Statistik | Statistics & data |
-| `/direktori` | Direktori | Staff directory |
-| `/dasar` | Dasar | Policy documents |
-| `/profil-kementerian` | Profil Kementerian | Ministry profile |
-| `/hubungi-kami` | Hubungi Kami | Contact us |
-| `/penafian` | Penafian | Disclaimer |
-| `/dasar-privasi` | Dasar Privasi | Privacy policy |
-
-## Multi-Language Support
-
-Matches kd-portal locales:
-
-- **Bahasa Malaysia** (ms-MY) — Default
-- **English** (en-GB)
-
-Switch languages via URL: `/ms/siaran` or `/en/siaran`
-
----
-
-## Caching Strategy
-
-### 3-Layer Cache Architecture
-
-```
-Layer 1: CDN (Cloudflare)
-├── Static assets (CSS, JS, images)
-├── Full HTML pages (TTL: 1-24 hours)
-└── Edge locations: 300+ cities
-
-Layer 2: Redis (Application Cache)
-├── Full-page cache (dynamic pages)
-├── Query results (database)
-├── Session data
-└── TTL: 1-60 minutes
-
-Layer 3: PostgreSQL
-├── Internal query cache
-├── Materialized views
-└── Read replicas for scaling
-```
-
----
-
-## Performance Optimization
-
-### Enable Caching
-
-```bash
-# Route cache
-php artisan route:cache
-
-# View cache
-php artisan view:cache
-
-# Config cache
-php artisan config:cache
-
-# Event cache
-php artisan event:cache
-```
-
-### Octane Configuration
-
-```php
-// config/octane.php
-return [
-    'server' => 'frankenphp',
-
-    'frankenphp' => [
-        'workers' => env('OCTANE_WORKERS', 8),        // CPU cores × 2
-        'max_requests' => env('OCTANE_MAX_REQUESTS', 500),
-    ],
-];
-```
-
-> **Note:** `Octane::table()` is Swoole-only — do not use it. All shared state goes through Redis.
-
----
-
-## Testing
-
-```bash
-# Run tests
-php artisan test
-
-# Run with coverage
-php artisan test --coverage
-
-# Feature tests
-php artisan test --filter=Feature
-
-# Unit tests
-php artisan test --filter=Unit
-```
-
----
-
-## Deployment
-
-### Production Checklist
-
-- [ ] Environment variables configured
-- [ ] Database migrated
-- [ ] Redis configured
-- [ ] SSL certificate installed
-- [ ] CDN configured
-- [ ] Monitoring enabled
-- [ ] Backups scheduled
-- [ ] Octane running as service
-
-### Docker Deployment
-
-```bash
-# Build and run with Docker
-docker-compose up -d
-
-# Scale workers
-docker-compose up -d --scale app=4
-```
-
----
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-### Development Workflow
+## Code of Conduct
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
----
+## Security Vulnerabilities
 
-## Security
-
-For security vulnerabilities, please email security@opengovportal.org instead of using the issue tracker.
-
-### Security Features
-
-- CSRF protection
-- SQL injection prevention
-- XSS filtering
-- Rate limiting
-- Audit logging
-- HTTPS enforcement
-- Secure headers
-
----
-
-## Roadmap
-
-| Phase | Timeline | Features |
-|-------|----------|----------|
-| **Phase 1** | Q1 2026 | Core CMS, RBAC, Multi-language |
-| **Phase 2** | Q2 2026 | API, Mobile app support |
-| **Phase 3** | Q3 2026 | AI features, Chatbot integration |
-| **Phase 4** | Q4 2026 | Advanced analytics, Reporting |
-
----
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
-OpenGovPortal is open-sourced software licensed under the [MIT license](LICENSE).
-
----
-
-## Support
-
-- 📧 Email: support@opengovportal.org
-- 💬 Discord: [Join our community](https://discord.gg/opengovportal)
-- 🐛 Issues: [GitHub Issues](https://github.com/aimeocakmal/open-govportal/issues)
-
----
-
-## Acknowledgments
-
-- Built with [Laravel](https://laravel.com)
-- Inspired by the need for better government digital services
-- Created for the Malaysian public sector
-
----
-
-> **OpenGovPortal:** Modern, fast, secure government portals for the people.
-
-**Made with ❤️ in Malaysia**
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

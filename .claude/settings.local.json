@@ -1,7 +1,27 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(pg_isready:*)",
+      "Bash(redis-cli ping:*)",
+      "Bash(php:*)",
+      "Bash(composer require:*)",
+      "Bash(composer config:*)",
+      "Bash(composer show:*)",
+      "Read(//Users/akmal/Documents/Work/github/govportal/**)",
+      "Bash(curl:*)",
+      "Bash(for port in 5432 5433 5434 5435 5436)",
+      "Bash(do)",
+      "Bash(echo:*)",
+      "Bash(break)",
+      "Bash(done)",
+      "Bash(lsof:*)",
+      "Bash(# Find psql via Herd/DBngin find /Applications/DBngin.app -name \"\"psql\"\")",
+      "Read(//usr/local/**)",
+      "Read(//opt/homebrew/**)",
+      "Bash(PSQL=/opt/homebrew/Cellar/libpq/16.4/bin/psql:*)",
+      "Bash($PSQL -h 127.0.0.1 -p 5432 -U postgres -c \"\\\\du\")",
+      "Bash($PSQL -h 127.0.0.1 -p 5432 -U postgres -c \"CREATE DATABASE govportal;\")"
     ]
   }
 }
