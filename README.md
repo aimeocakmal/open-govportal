@@ -105,6 +105,8 @@ Full technical documentation available in [`docs/`](docs/):
 
 | Document | Description |
 |----------|-------------|
+| [Documentation Guide](docs/README.md) | Doc index, source-of-truth rules, and maintenance standards |
+| [Agentic Coding Playbook](docs/agentic-coding.md) | Task execution workflow and definition of done for coding agents |
 | [Pages & Features](docs/pages-features.md) | All pages, routes, and features from kd-portal |
 | [Conversion Plan](docs/conversion-timeline.md) | 12-week Laravel migration plan |
 | [Database Schema](docs/database-schema.md) | PostgreSQL schema (mapped from Payload CMS collections) |
@@ -141,17 +143,17 @@ cp .env.example .env
 php artisan key:generate
 
 # Configure database in .env
-db_connection=pgsql
-db_host=127.0.0.1
-db_port=5432
-db_database=govportal
-db_username=postgres
-db_password=your_password
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=govportal
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
 
 # Configure Redis in .env
-redis_host=127.0.0.1
-redis_password=null
-redis_port=6379
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
 
 # Run migrations
 php artisan migrate --seed
@@ -182,9 +184,8 @@ php artisan octane:start --watch
 | Role | Permissions | Description |
 |------|-------------|-------------|
 | **Super Admin** | All permissions | System administrator |
-| **Department Admin** | Department content | Manage specific department |
-| **Content Editor** | Create, edit | Content creators |
-| **Content Publisher** | Publish, unpublish | Approvers |
+| **Content Editor** | Create and edit content | Content creators |
+| **Publisher** | Publish approved content | Approvers |
 | **Viewer** | Read-only | Public servants |
 
 ### Permission Granularity

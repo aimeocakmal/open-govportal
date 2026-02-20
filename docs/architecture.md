@@ -332,7 +332,7 @@ Cache::events()->listen(function ($event) {
 
 ## Next Steps
 
-1. [Installation Guide](installation.md)
+1. [Documentation Guide](README.md)
 2. [Caching Strategy](caching.md)
 3. [Database Schema](database-schema.md)
-4. [Security Configuration](security.md)
+4. [Agentic Coding Playbook](agentic-coding.md)

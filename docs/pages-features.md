@@ -6,6 +6,18 @@ Source: https://github.com/govtechmy/kd-portal
 
 ---
 
+## Implementation Status Convention
+
+Use this document as a parity inventory, not as implementation proof.
+
+- `Planned`: documented target behavior not yet built.
+- `Implemented`: behavior exists in code and has validation evidence.
+- `Deferred`: intentionally postponed and tracked in the timeline.
+
+When updating a page section, include one of these status labels explicitly.
+
+---
+
 ## URL Structure
 
 All public pages are locale-prefixed:

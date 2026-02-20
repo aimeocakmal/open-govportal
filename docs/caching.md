@@ -387,7 +387,7 @@ class WarmCache extends Command
         $this->call('route:cache');
         
         // Warm latest announcements
-        foreach (['ms', 'en', 'zh'] as $locale) {
+        foreach (['ms', 'en'] as $locale) {
             Announcement::getLatest(10, $locale);
             $this->info("Warmed announcements for {$locale}");
         }
@@ -485,6 +485,6 @@ redis-cli info memory | grep used_memory_human
 
 ## Next Steps
 
-- [Installation Guide](installation.md)
-- [Performance Optimization](performance.md)
-- [Monitoring Setup](monitoring.md)
+- [Documentation Guide](README.md)
+- [Architecture](architecture.md)
+- [Agentic Coding Playbook](agentic-coding.md)

@@ -8,6 +8,26 @@
 
 ---
 
+## Agentic Delivery Rules
+
+To execute this plan safely with coding agents, each weekly task should be split into ticket-sized slices using this template:
+
+- `Slice`: one endpoint, one model, one migration, or one UI component.
+- `Inputs`: source references from kd-portal and target files in this repo.
+- `Output`: expected code artifacts (files changed/created).
+- `Validation`: exact commands and manual checks.
+- `Done`: objective passes and related docs are updated.
+
+Recommended sequence inside each week:
+
+1. Data model and migrations
+2. Admin (Filament) resource
+3. Public route/controller/view
+4. Caching and invalidation
+5. Tests and docs update
+
+---
+
 ## Source System Analysis (kd-portal)
 
 ### Tech Stack
