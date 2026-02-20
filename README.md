@@ -1,6 +1,6 @@
-# 🏛️ OpenGovPortal
+# OpenGovPortal
 
-> High-performance, open-source government portal solution built with Laravel
+> Laravel recreation of the Kementerian Digital Malaysia portal (digital.gov.my)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Laravel](https://img.shields.io/badge/Laravel-11-red.svg)](https://laravel.com)
@@ -10,17 +10,28 @@
 
 ## Overview
 
-**OpenGovPortal** is a modern, high-performance content management system designed specifically for government agencies and public sector organizations. Built with **Laravel 11 + Octane**, it handles **10,000+ concurrent users** while maintaining sub-second response times.
+**OpenGovPortal** is a Laravel 11 recreation of the official [Kementerian Digital Malaysia](https://www.digital.gov.my/) website, originally built by GovTech Malaysia as [kd-portal](https://github.com/govtechmy/kd-portal) (Next.js 15 + Payload CMS + MongoDB).
+
+This project migrates the portal to a **Laravel 11 + Octane** stack, targeting **10,000+ concurrent users** with sub-second response times, while preserving full feature parity and MyDS design compliance.
+
+### Source Reference
+
+| Item | Details |
+|------|---------|
+| **Original Site** | https://www.digital.gov.my/ |
+| **Original Repo** | https://github.com/govtechmy/kd-portal |
+| **Original Stack** | Next.js 15 + Payload CMS + MongoDB |
+| **Target Stack** | Laravel 11 + Octane + PostgreSQL |
 
 ### Key Features
 
-- ⚡ **High Performance** — Laravel Octane (Swoole) for 10x speed
-- 🔐 **Secure** — Role-based access control, audit logging
-- 🌍 **Multi-language** — BM, English, Chinese support
-- 📱 **Responsive** — Mobile-first design
-- 🤖 **Agentic AI Ready** — Clean architecture for AI-assisted development
-- 🗄️ **PostgreSQL** — Enterprise-grade database
-- 💾 **Heavy Caching** — Redis + CDN for optimal performance
+- **High Performance** — Laravel Octane (Swoole) for 10x speed
+- **Secure** — Role-based access control, audit logging
+- **Multi-language** — Bahasa Malaysia (ms-MY) + English (en-GB)
+- **Responsive** — Mobile-first, MyDS-compliant design
+- **Full CMS** — Filament admin panel replacing Payload CMS
+- **PostgreSQL** — Enterprise-grade database (replaces MongoDB)
+- **Heavy Caching** — Redis + CDN for optimal performance
 
 ---
 
@@ -94,16 +105,12 @@ Full technical documentation available in [`docs/`](docs/):
 
 | Document | Description |
 |----------|-------------|
+| [Pages & Features](docs/pages-features.md) | All pages, routes, and features from kd-portal |
+| [Conversion Plan](docs/conversion-timeline.md) | 12-week Laravel migration plan |
+| [Database Schema](docs/database-schema.md) | PostgreSQL schema (mapped from Payload CMS collections) |
 | [Architecture](docs/architecture.md) | System design & infrastructure |
-| [Installation](docs/installation.md) | Setup guide & requirements |
 | [Caching Strategy](docs/caching.md) | Multi-layer caching implementation |
-| [Database Schema](docs/database-schema.md) | PostgreSQL schema design |
-| [RBAC](docs/rbac.md) | Role-based access control |
-| [Multi-language](docs/multi-language.md) | i18n implementation (BM/EN/CN) |
-| [Performance](docs/performance.md) | Optimization techniques |
-| [Security](docs/security.md) | Security best practices |
-| [Deployment](docs/deployment.md) | Production deployment guide |
-| [API](docs/api.md) | REST API documentation |
+| [Design System](docs/design.md) | MyDS design tokens and component specs |
 
 ---
 
@@ -182,21 +189,37 @@ php artisan octane:start --watch
 
 ### Permission Granularity
 
-- **Modules:** Announcements, Services, Downloads, Gallery, etc.
+- **Modules:** Broadcasts, Achievements, Directory, Policy, Downloads, Gallery, etc.
 - **Actions:** Create, Read, Update, Delete, Publish
-- **Scope:** Own content, Department content, All content
+- **Scope:** Own content, All content
 
 ---
 
+## Site Pages (from kd-portal)
+
+All pages support `/ms/` and `/en/` locale prefixes:
+
+| Route | Malay | Description |
+|-------|-------|-------------|
+| `/` | Laman Utama | Homepage with hero, quick links, broadcasts |
+| `/siaran` | Siaran | News & broadcasts listing |
+| `/pencapaian` | Pencapaian | Ministry achievements |
+| `/statistik` | Statistik | Statistics & data |
+| `/direktori` | Direktori | Staff directory |
+| `/dasar` | Dasar | Policy documents |
+| `/profil-kementerian` | Profil Kementerian | Ministry profile |
+| `/hubungi-kami` | Hubungi Kami | Contact us |
+| `/penafian` | Penafian | Disclaimer |
+| `/dasar-privasi` | Dasar Privasi | Privacy policy |
+
 ## Multi-Language Support
 
-Built-in support for Malaysian languages:
+Matches kd-portal locales:
 
-- 🇲🇾 **Bahasa Malaysia** (ms)
-- 🇬🇧 **English** (en)
-- 🇨🇳 **中文** (zh)
+- **Bahasa Malaysia** (ms-MY) — Default
+- **English** (en-GB)
 
-Switch languages via URL: `/ms/announcements` or `/en/announcements`
+Switch languages via URL: `/ms/siaran` or `/en/siaran`
 
 ---
 

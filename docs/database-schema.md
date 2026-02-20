@@ -1,470 +1,575 @@
-# 🗄️ Database Schema
+# Database Schema
 
 ## Overview
 
-OpenGovPortal uses **PostgreSQL** with a focus on performance, security, and scalability. The schema supports multi-tenancy (departments), multi-language content, and role-based access control.
+OpenGovPortal uses **PostgreSQL**, mapping all 12 Payload CMS collections from kd-portal (MongoDB) to relational tables. Content tables use separate `_ms` / `_en` columns for bilingual content (matching kd-portal's `ms-MY` / `en-GB` locales).
 
-## Entity Relationship Diagram
+---
+
+## Entity Relationship Overview
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│     users       │     │    roles        │     │  permissions    │
-├─────────────────┤     ├─────────────────┤     ├─────────────────┤
-│ id (PK)         │◄────┤ id (PK)         │     │ id (PK)         │
-│ name            │     │ name            │     │ name            │
-│ email           │     │ guard_name      │     │ guard_name      │
-│ password        │     └─────────────────┘     └─────────────────┘
-│ department_id   │            ▲                         ▲
-│ is_active       │            │                         │
-└─────────────────┘     ┌──────┴────────┐         ┌─────┴──────────┐
-         ▲              │  role_user    │         │ role_permission│
-         │              ├───────────────┤         ├────────────────┤
-         │              │ user_id (FK)  │         │ role_id (FK)   │
-         │              │ role_id (FK)  │         │ permission_id  │
-         │              └───────────────┘         └────────────────┘
-         │
-         │              ┌─────────────────┐
-         └─────────────►│  departments    │
-                        ├─────────────────┤
-                        │ id (PK)         │
-                        │ name            │
-                        │ code            │
-                        │ description     │
-                        │ is_active       │
-                        └─────────────────┘
-                                 │
-         ┌───────────────────────┼───────────────────────┐
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  announcements  │    │    services     │    │   downloads     │
-├─────────────────┤    ├─────────────────┤    ├─────────────────┤
-│ id (PK)         │    │ id (PK)         │    │ id (PK)         │
-│ department_id   │    │ department_id   │    │ department_id   │
-│ title           │    │ title           │    │ title           │
-│ slug            │    │ description     │    │ file_path       │
-│ content         │    │ icon            │    │ file_size       │
-│ locale          │    │ is_active       │    │ download_count  │
-│ published_at    │    └─────────────────┘    └─────────────────┘
-│ is_published    │
-└─────────────────┘
+users ─────────────────────────────────────── (CMS admin users)
+  │
+  └── (via Spatie roles/permissions)
+
+Content Tables (public-facing):
+  broadcasts          ← Payload: Broadcast
+  achievements        ← Payload: Achievement
+  celebrations        ← Payload: Celebration
+  staff_directories   ← Payload: Directory
+  policies            ← Payload: Policy
+  files               ← Payload: File
+  hero_banners        ← Payload: HeroBanner
+  quick_links         ← Payload: QuickLink
+  media               ← Payload: Media
+  feedbacks           ← Payload: Feedback
+  search_overrides    ← Payload: Search-Overrides
+
+Site Configuration Tables:
+  settings            ← Payload Global: SiteInfo
+  navigation_items    ← Payload Global: Header
+  footer_settings     ← Payload Global: Footer
+  homepage_settings   ← Payload Global: Homepage
+  minister_profiles   ← Payload Global: MinisterProfile
+  addresses           ← Payload Global: Addresses
+  feedback_settings   ← Payload Global: FeedbackSettings
 ```
 
-## Core Tables
+---
 
-### 1. Users & Authentication
+## Content Tables
+
+### 1. `broadcasts`
+
+Replaces Payload `Broadcast` collection. News, press releases, announcements.
 
 ```sql
--- Users table
+CREATE TABLE broadcasts (
+    id              BIGSERIAL PRIMARY KEY,
+    title_ms        VARCHAR(500) NOT NULL,
+    title_en        VARCHAR(500),
+    slug            VARCHAR(600) NOT NULL UNIQUE,
+    content_ms      TEXT,
+    content_en      TEXT,
+    excerpt_ms      VARCHAR(1000),
+    excerpt_en      VARCHAR(1000),
+    featured_image  VARCHAR(2048),          -- S3 key or URL
+    type            VARCHAR(50) DEFAULT 'announcement',
+                                            -- announcement | press_release | news
+    status          VARCHAR(20) DEFAULT 'draft',
+                                            -- draft | published
+    published_at    TIMESTAMPTZ,
+    created_by      BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_broadcasts_status_published ON broadcasts(status, published_at DESC);
+CREATE INDEX idx_broadcasts_slug ON broadcasts(slug);
+CREATE INDEX idx_broadcasts_search ON broadcasts USING GIN(
+    to_tsvector('simple', COALESCE(title_ms,'') || ' ' || COALESCE(title_en,''))
+);
+```
+
+### 2. `achievements`
+
+Replaces Payload `Achievement` collection. Ministry milestones and accomplishments.
+
+```sql
+CREATE TABLE achievements (
+    id              BIGSERIAL PRIMARY KEY,
+    title_ms        VARCHAR(500) NOT NULL,
+    title_en        VARCHAR(500),
+    slug            VARCHAR(600) NOT NULL UNIQUE,
+    description_ms  TEXT,
+    description_en  TEXT,
+    date            DATE NOT NULL,
+    icon            VARCHAR(2048),          -- S3 key
+    is_featured     BOOLEAN DEFAULT FALSE,
+    status          VARCHAR(20) DEFAULT 'draft',
+    published_at    TIMESTAMPTZ,
+    created_by      BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_achievements_date ON achievements(date DESC);
+CREATE INDEX idx_achievements_status ON achievements(status, is_featured);
+```
+
+Note: kd-portal homepage fetches last 7 achievements sorted by date, excluding items marked `not_achievement`.
+
+### 3. `celebrations`
+
+Replaces Payload `Celebration` collection. Special events and celebrations.
+
+```sql
+CREATE TABLE celebrations (
+    id              BIGSERIAL PRIMARY KEY,
+    title_ms        VARCHAR(500) NOT NULL,
+    title_en        VARCHAR(500),
+    slug            VARCHAR(600) UNIQUE,
+    description_ms  TEXT,
+    description_en  TEXT,
+    event_date      DATE,
+    image           VARCHAR(2048),          -- S3 key
+    status          VARCHAR(20) DEFAULT 'draft',
+    published_at    TIMESTAMPTZ,
+    created_by      BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 4. `staff_directories`
+
+Replaces Payload `Directory` collection. Ministry staff listings.
+
+```sql
+CREATE TABLE staff_directories (
+    id              BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL,
+    position_ms     VARCHAR(500),
+    position_en     VARCHAR(500),
+    department_ms   VARCHAR(255),
+    department_en   VARCHAR(255),
+    division_ms     VARCHAR(255),
+    division_en     VARCHAR(255),
+    email           VARCHAR(255),
+    phone           VARCHAR(50),
+    fax             VARCHAR(50),
+    photo           VARCHAR(2048),          -- S3 key
+    sort_order      INTEGER DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_staff_name ON staff_directories(name);
+CREATE INDEX idx_staff_department ON staff_directories(department_ms, department_en);
+CREATE INDEX idx_staff_search ON staff_directories USING GIN(
+    to_tsvector('simple', COALESCE(name,'') || ' ' || COALESCE(position_ms,'') || ' ' || COALESCE(department_ms,''))
+);
+```
+
+### 5. `policies`
+
+Replaces Payload `Policy` collection. Policy documents available for download.
+
+```sql
+CREATE TABLE policies (
+    id              BIGSERIAL PRIMARY KEY,
+    title_ms        VARCHAR(500) NOT NULL,
+    title_en        VARCHAR(500),
+    slug            VARCHAR(600) NOT NULL UNIQUE,
+    description_ms  TEXT,
+    description_en  TEXT,
+    category        VARCHAR(100),
+    file_url        VARCHAR(2048),          -- S3 key (PDF)
+    file_size       BIGINT,                 -- bytes
+    download_count  INTEGER DEFAULT 0,
+    status          VARCHAR(20) DEFAULT 'draft',
+    published_at    TIMESTAMPTZ,
+    created_by      BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_policies_category ON policies(category);
+CREATE INDEX idx_policies_status ON policies(status, published_at DESC);
+CREATE INDEX idx_policies_search ON policies USING GIN(
+    to_tsvector('simple', COALESCE(title_ms,'') || ' ' || COALESCE(title_en,''))
+);
+```
+
+### 6. `files`
+
+Replaces Payload `File` collection. General downloadable files.
+
+```sql
+CREATE TABLE files (
+    id              BIGSERIAL PRIMARY KEY,
+    title_ms        VARCHAR(500),
+    title_en        VARCHAR(500),
+    description_ms  TEXT,
+    description_en  TEXT,
+    filename        VARCHAR(500) NOT NULL,
+    file_url        VARCHAR(2048) NOT NULL,  -- S3 key
+    mime_type       VARCHAR(100),
+    file_size       BIGINT,
+    category        VARCHAR(100),
+    download_count  INTEGER DEFAULT 0,
+    is_public       BOOLEAN DEFAULT TRUE,
+    created_by      BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 7. `hero_banners`
+
+Replaces Payload `HeroBanner` collection. Homepage carousel slides.
+
+```sql
+CREATE TABLE hero_banners (
+    id              BIGSERIAL PRIMARY KEY,
+    title_ms        VARCHAR(500),
+    title_en        VARCHAR(500),
+    subtitle_ms     TEXT,
+    subtitle_en     TEXT,
+    image           VARCHAR(2048) NOT NULL,  -- S3 key
+    image_alt_ms    VARCHAR(500),
+    image_alt_en    VARCHAR(500),
+    cta_label_ms    VARCHAR(200),
+    cta_label_en    VARCHAR(200),
+    cta_url         VARCHAR(2048),
+    sort_order      INTEGER DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_hero_active_order ON hero_banners(is_active, sort_order);
+```
+
+### 8. `quick_links`
+
+Replaces Payload `QuickLink` collection. Homepage quick navigation links.
+
+```sql
+CREATE TABLE quick_links (
+    id              BIGSERIAL PRIMARY KEY,
+    label_ms        VARCHAR(200) NOT NULL,
+    label_en        VARCHAR(200),
+    url             VARCHAR(2048) NOT NULL,
+    icon            VARCHAR(100),            -- icon name or S3 key
+    sort_order      INTEGER DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 9. `media`
+
+Replaces Payload `Media` collection. General media asset library.
+
+```sql
+CREATE TABLE media (
+    id              BIGSERIAL PRIMARY KEY,
+    filename        VARCHAR(500) NOT NULL,
+    original_name   VARCHAR(500),
+    file_url        VARCHAR(2048) NOT NULL,  -- S3 key
+    mime_type       VARCHAR(100),
+    file_size       BIGINT,
+    width           INTEGER,
+    height          INTEGER,
+    alt_ms          VARCHAR(500),
+    alt_en          VARCHAR(500),
+    caption_ms      TEXT,
+    caption_en      TEXT,
+    uploaded_by     BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 10. `feedbacks`
+
+Replaces Payload `Feedback` collection. User-submitted feedback.
+
+```sql
+CREATE TABLE feedbacks (
+    id              BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(255),
+    email           VARCHAR(255),
+    subject         VARCHAR(500),
+    message         TEXT NOT NULL,
+    page_url        VARCHAR(2048),           -- Which page was feedback from
+    rating          SMALLINT,               -- Optional star rating 1-5
+    status          VARCHAR(20) DEFAULT 'new',
+                                            -- new | read | replied | archived
+    reply           TEXT,
+    replied_at      TIMESTAMPTZ,
+    replied_by      BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    ip_address      INET,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_feedback_status ON feedbacks(status, created_at DESC);
+```
+
+### 11. `search_overrides`
+
+Replaces Payload `Search-Overrides` collection. Custom search result boosting.
+
+```sql
+CREATE TABLE search_overrides (
+    id              BIGSERIAL PRIMARY KEY,
+    query           VARCHAR(500) NOT NULL,   -- Search keyword to match
+    title_ms        VARCHAR(500),
+    title_en        VARCHAR(500),
+    url             VARCHAR(2048),
+    description_ms  TEXT,
+    description_en  TEXT,
+    priority        INTEGER DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+---
+
+## Site Configuration Tables
+
+These replace Payload CMS Globals (singleton site-wide configuration).
+
+### `settings`
+
+Replaces Payload Global: `SiteInfo`
+
+```sql
+CREATE TABLE settings (
+    key             VARCHAR(255) PRIMARY KEY,
+    value           TEXT,
+    type            VARCHAR(50) DEFAULT 'string',  -- string | json | boolean
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Default values:
+INSERT INTO settings VALUES
+    ('site_name_ms', 'Kementerian Digital Malaysia', 'string', NOW()),
+    ('site_name_en', 'Ministry of Digital Malaysia', 'string', NOW()),
+    ('site_description_ms', '...', 'string', NOW()),
+    ('site_description_en', '...', 'string', NOW()),
+    ('google_analytics_id', '', 'string', NOW()),
+    ('facebook_url', '', 'string', NOW()),
+    ('twitter_url', '', 'string', NOW()),
+    ('instagram_url', '', 'string', NOW()),
+    ('youtube_url', '', 'string', NOW());
+```
+
+### `navigation_items`
+
+Replaces Payload Global: `Header`
+
+```sql
+CREATE TABLE navigation_items (
+    id              BIGSERIAL PRIMARY KEY,
+    label_ms        VARCHAR(200) NOT NULL,
+    label_en        VARCHAR(200),
+    url             VARCHAR(2048),
+    parent_id       BIGINT REFERENCES navigation_items(id) ON DELETE CASCADE,
+    sort_order      INTEGER DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    opens_new_tab   BOOLEAN DEFAULT FALSE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### `footer_settings`
+
+Replaces Payload Global: `Footer`
+
+```sql
+CREATE TABLE footer_settings (
+    id              BIGSERIAL PRIMARY KEY,
+    section         VARCHAR(100) NOT NULL,   -- links | social | legal
+    label_ms        VARCHAR(200),
+    label_en        VARCHAR(200),
+    url             VARCHAR(2048),
+    sort_order      INTEGER DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### `minister_profiles`
+
+Replaces Payload Global: `MinisterProfile`
+
+```sql
+CREATE TABLE minister_profiles (
+    id              BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL,
+    title_ms        VARCHAR(500),
+    title_en        VARCHAR(500),
+    bio_ms          TEXT,
+    bio_en          TEXT,
+    photo           VARCHAR(2048),           -- S3 key
+    is_current      BOOLEAN DEFAULT TRUE,
+    appointed_at    DATE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### `addresses`
+
+Replaces Payload Global: `Addresses`
+
+```sql
+CREATE TABLE addresses (
+    id              BIGSERIAL PRIMARY KEY,
+    label_ms        VARCHAR(200),
+    label_en        VARCHAR(200),
+    address_ms      TEXT,
+    address_en      TEXT,
+    phone           VARCHAR(50),
+    fax             VARCHAR(50),
+    email           VARCHAR(255),
+    google_maps_url VARCHAR(2048),
+    sort_order      INTEGER DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### `feedback_settings`
+
+Replaces Payload Global: `FeedbackSettings`
+
+```sql
+CREATE TABLE feedback_settings (
+    key             VARCHAR(255) PRIMARY KEY,
+    value           TEXT,
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Default:
+INSERT INTO feedback_settings VALUES
+    ('is_enabled', 'true', NOW()),
+    ('recipient_email', '', NOW()),
+    ('success_message_ms', 'Terima kasih atas maklum balas anda.', NOW()),
+    ('success_message_en', 'Thank you for your feedback.', NOW());
+```
+
+---
+
+## Auth & RBAC Tables
+
+### `users`
+
+CMS admin users (Filament). Not for public authentication.
+
+```sql
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    email_verified_at TIMESTAMP NULL,
-    password VARCHAR(255) NOT NULL,
-    department_id BIGINT REFERENCES departments(id),
-    phone VARCHAR(20),
-    avatar VARCHAR(255),
-    is_active BOOLEAN DEFAULT true,
-    last_login_at TIMESTAMP NULL,
-    remember_token VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Password reset tokens
-CREATE TABLE password_reset_tokens (
-    email VARCHAR(255) PRIMARY KEY,
-    token VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Sessions (for security)
-CREATE TABLE sessions (
-    id VARCHAR(128) PRIMARY KEY,
-    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    payload TEXT NOT NULL,
-    last_activity INT NOT NULL
+    id              BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL,
+    email           VARCHAR(255) NOT NULL UNIQUE,
+    password        VARCHAR(255) NOT NULL,
+    is_active       BOOLEAN DEFAULT TRUE,
+    last_login_at   TIMESTAMPTZ,
+    remember_token  VARCHAR(100),
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 ```
 
-### 2. Departments (Multi-tenancy)
+### Spatie Permission Tables
+
+Standard Spatie Laravel Permission tables (generated by package migration):
+
+```
+model_has_roles        — assigns roles to users
+model_has_permissions  — assigns permissions directly to users
+role_has_permissions   — assigns permissions to roles
+roles                  — named roles (super_admin, content_editor, publisher)
+permissions            — named permissions (view broadcasts, create broadcasts, etc.)
+```
+
+**Default Roles (seeded):**
+
+| Role | Description |
+|------|-------------|
+| `super_admin` | Full system access |
+| `content_editor` | Create and edit content; cannot publish |
+| `publisher` | Approve and publish content |
+| `viewer` | Read-only CMS access |
+
+**Default Permissions (seeded):**
+
+Each content type gets: `view_*`, `create_*`, `edit_*`, `delete_*`, `publish_*`
+
+Content types: `broadcasts`, `achievements`, `celebrations`, `staff_directories`, `policies`, `files`, `hero_banners`, `quick_links`, `media`, `feedbacks`
+
+---
+
+## Search Index (Laravel Scout)
+
+PostgreSQL full-text search using `pg_search` / custom Scout driver:
 
 ```sql
-CREATE TABLE departments (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    code VARCHAR(50) UNIQUE NOT NULL,
-    description TEXT,
-    logo VARCHAR(255),
-    email VARCHAR(255),
-    phone VARCHAR(20),
-    address TEXT,
-    website VARCHAR(255),
-    sort_order INT DEFAULT 0,
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE searchable_content (
+    id              BIGSERIAL PRIMARY KEY,
+    searchable_type VARCHAR(100) NOT NULL,   -- App\Models\Broadcast, etc.
+    searchable_id   BIGINT NOT NULL,
+    title_ms        TEXT,
+    title_en        TEXT,
+    content_ms      TEXT,
+    content_en      TEXT,
+    url_ms          VARCHAR(2048),
+    url_en          VARCHAR(2048),
+    priority        INTEGER DEFAULT 0,       -- from Search-Overrides
+    tsvector_ms     TSVECTOR GENERATED ALWAYS AS (
+                        to_tsvector('simple', COALESCE(title_ms,'') || ' ' || COALESCE(content_ms,''))
+                    ) STORED,
+    tsvector_en     TSVECTOR GENERATED ALWAYS AS (
+                        to_tsvector('english', COALESCE(title_en,'') || ' ' || COALESCE(content_en,''))
+                    ) STORED,
+    updated_at      TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (searchable_type, searchable_id)
 );
 
--- Create indexes
-CREATE INDEX idx_departments_code ON departments(code);
-CREATE INDEX idx_departments_active ON departments(is_active);
+CREATE INDEX idx_search_ms ON searchable_content USING GIN(tsvector_ms);
+CREATE INDEX idx_search_en ON searchable_content USING GIN(tsvector_en);
 ```
 
-### 3. Content Tables
+Search priority (matching kd-portal Payload search plugin config):
+- Achievements: priority 10
+- Broadcasts: priority 20
+- Staff Directories: priority 30
+- Policies: priority 40
 
-#### Announcements
+---
 
-```sql
-CREATE TABLE announcements (
-    id BIGSERIAL PRIMARY KEY,
-    department_id BIGINT REFERENCES departments(id) ON DELETE CASCADE,
-    author_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
-    
-    -- Content
-    title VARCHAR(500) NOT NULL,
-    slug VARCHAR(500) UNIQUE NOT NULL,
-    excerpt TEXT,
-    content TEXT NOT NULL,
-    locale VARCHAR(5) DEFAULT 'ms',
-    
-    -- Media
-    featured_image VARCHAR(255),
-    attachments JSONB DEFAULT '[]',
-    
-    -- Publication
-    is_published BOOLEAN DEFAULT false,
-    is_featured BOOLEAN DEFAULT false,
-    published_at TIMESTAMP NULL,
-    expired_at TIMESTAMP NULL,
-    
-    -- Stats
-    view_count INT DEFAULT 0,
-    
-    -- Timestamps
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL
-);
+## Migration Order
 
--- Indexes for performance
-CREATE INDEX idx_announcements_dept ON announcements(department_id);
-CREATE INDEX idx_announcements_locale ON announcements(locale);
-CREATE INDEX idx_announcements_published ON announcements(is_published, published_at);
-CREATE INDEX idx_announcements_slug ON announcements(slug);
-CREATE INDEX idx_announcements_search ON announcements USING gin(to_tsvector('simple', title || ' ' || COALESCE(content, '')));
-```
+Run migrations in this order to respect foreign key constraints:
 
-#### Services
+1. `users`
+2. `roles`, `permissions` (Spatie)
+3. `media`
+4. `hero_banners`
+5. `quick_links`
+6. `broadcasts`
+7. `achievements`
+8. `celebrations`
+9. `staff_directories`
+10. `policies`
+11. `files`
+12. `feedbacks`
+13. `search_overrides`
+14. `searchable_content`
+15. `settings`
+16. `navigation_items`
+17. `footer_settings`
+18. `minister_profiles`
+19. `addresses`
+20. `feedback_settings`
 
-```sql
-CREATE TABLE services (
-    id BIGSERIAL PRIMARY KEY,
-    department_id BIGINT REFERENCES departments(id) ON DELETE CASCADE,
-    
-    -- Content
-    title VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) UNIQUE NOT NULL,
-    description TEXT,
-    requirements TEXT,
-    procedures TEXT,
-    fees TEXT,
-    timeline TEXT,
-    locale VARCHAR(5) DEFAULT 'ms',
-    
-    -- Media
-    icon VARCHAR(100),
-    image VARCHAR(255),
-    documents JSONB DEFAULT '[]',
-    
-    -- Settings
-    is_online BOOLEAN DEFAULT false,
-    form_url VARCHAR(500),
-    contact_email VARCHAR(255),
-    contact_phone VARCHAR(20),
-    
-    -- Status
-    is_active BOOLEAN DEFAULT true,
-    sort_order INT DEFAULT 0,
-    
-    -- Stats
-    view_count INT DEFAULT 0,
-    
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+---
 
-CREATE INDEX idx_services_dept ON services(department_id);
-CREATE INDEX idx_services_active ON services(is_active);
-```
+## Key Design Decisions
 
-#### Downloads
-
-```sql
-CREATE TABLE downloads (
-    id BIGSERIAL PRIMARY KEY,
-    department_id BIGINT REFERENCES departments(id) ON DELETE CASCADE,
-    
-    -- File info
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    file_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(500) NOT NULL,
-    file_size BIGINT NOT NULL,
-    mime_type VARCHAR(100),
-    
-    -- Category
-    category VARCHAR(100),
-    locale VARCHAR(5) DEFAULT 'ms',
-    
-    -- Stats
-    download_count INT DEFAULT 0,
-    
-    -- Status
-    is_active BOOLEAN DEFAULT true,
-    
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_downloads_dept ON downloads(department_id);
-CREATE INDEX idx_downloads_category ON downloads(category);
-```
-
-### 4. RBAC Tables (Spatie Permission)
-
-```sql
--- Roles
-CREATE TABLE roles (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    guard_name VARCHAR(255) NOT NULL DEFAULT 'web',
-    department_id BIGINT REFERENCES departments(id) ON DELETE CASCADE,
-    description TEXT,
-    is_system BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (name, guard_name, department_id)
-);
-
--- Permissions
-CREATE TABLE permissions (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    guard_name VARCHAR(255) NOT NULL DEFAULT 'web',
-    module VARCHAR(100),
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (name, guard_name)
-);
-
--- Role-User pivot
-CREATE TABLE role_user (
-    role_id BIGINT REFERENCES roles(id) ON DELETE CASCADE,
-    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-    PRIMARY KEY (role_id, user_id)
-);
-
--- Permission-Role pivot
-CREATE TABLE permission_role (
-    permission_id BIGINT REFERENCES permissions(id) ON DELETE CASCADE,
-    role_id BIGINT REFERENCES roles(id) ON DELETE CASCADE,
-    PRIMARY KEY (permission_id, role_id)
-);
-
--- Indexes
-CREATE INDEX idx_roles_dept ON roles(department_id);
-CREATE INDEX idx_permissions_module ON permissions(module);
-```
-
-### 5. Audit & Activity Logs
-
-```sql
--- Activity logs
-CREATE TABLE activity_logs (
-    id BIGSERIAL PRIMARY KEY,
-    log_name VARCHAR(100) DEFAULT 'default',
-    description TEXT NOT NULL,
-    subject_type VARCHAR(255),
-    subject_id BIGINT,
-    causer_type VARCHAR(255),
-    causer_id BIGINT,
-    properties JSONB DEFAULT '{}',
-    event VARCHAR(50),
-    batch_uuid UUID,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_activity_logs_subject ON activity_logs(subject_type, subject_id);
-CREATE INDEX idx_activity_logs_causer ON activity_logs(causer_type, causer_id);
-CREATE INDEX idx_activity_logs_name ON activity_logs(log_name);
-CREATE INDEX idx_activity_logs_created ON activity_logs(created_at);
-
--- Failed login attempts
-CREATE TABLE login_attempts (
-    id BIGSERIAL PRIMARY KEY,
-    email VARCHAR(255),
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    was_successful BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_login_attempts_ip ON login_attempts(ip_address);
-CREATE INDEX idx_login_attempts_email ON login_attempts(email);
-CREATE INDEX idx_login_attempts_time ON login_attempts(created_at);
-```
-
-## Materialized Views (For Performance)
-
-### Department Stats
-
-```sql
-CREATE MATERIALIZED VIEW mv_department_stats AS
-SELECT 
-    d.id as department_id,
-    d.name as department_name,
-    d.code as department_code,
-    COUNT(DISTINCT a.id) as announcement_count,
-    COUNT(DISTINCT s.id) as service_count,
-    COUNT(DISTINCT dl.id) as download_count,
-    COUNT(DISTINCT u.id) as user_count
-FROM departments d
-LEFT JOIN announcements a ON a.department_id = d.id AND a.is_published = true
-LEFT JOIN services s ON s.department_id = d.id AND s.is_active = true
-LEFT JOIN downloads dl ON dl.department_id = d.id AND dl.is_active = true
-LEFT JOIN users u ON u.department_id = d.id AND u.is_active = true
-GROUP BY d.id, d.name, d.code;
-
-CREATE UNIQUE INDEX idx_mv_dept_stats_id ON mv_department_stats(department_id);
-
--- Refresh every hour
-REFRESH MATERIALIZED VIEW CONCURRENTLY mv_department_stats;
-```
-
-### Popular Content
-
-```sql
-CREATE MATERIALIZED VIEW mv_popular_content AS
-SELECT 
-    'announcement' as content_type,
-    a.id as content_id,
-    a.title,
-    a.department_id,
-    d.name as department_name,
-    a.view_count,
-    a.published_at
-FROM announcements a
-JOIN departments d ON d.id = a.department_id
-WHERE a.is_published = true
-    AND a.published_at >= NOW() - INTERVAL '30 days'
-
-UNION ALL
-
-SELECT 
-    'service' as content_type,
-    s.id as content_id,
-    s.title,
-    s.department_id,
-    d.name as department_name,
-    s.view_count,
-    s.created_at as published_at
-FROM services s
-JOIN departments d ON d.id = s.department_id
-WHERE s.is_active = true
-
-ORDER BY view_count DESC;
-
-CREATE INDEX idx_mv_popular_dept ON mv_popular_content(department_id);
-```
-
-## Seeding Data
-
-### Default Departments
-
-```sql
-INSERT INTO departments (name, code, description, is_active, sort_order) VALUES
-('Jabatan Perdana Menteri', 'JPM', 'Prime Minister Department', true, 1),
-('Kementerian Kewangan', 'MOF', 'Ministry of Finance', true, 2),
-('Kementerian Pendidikan', 'MOE', 'Ministry of Education', true, 3),
-('Kementerian Kesihatan', 'MOH', 'Ministry of Health', true, 4),
-('Kementerian Dalam Negeri', 'MOHA', 'Ministry of Home Affairs', true, 5);
-```
-
-### Default Roles
-
-```sql
--- System roles (global)
-INSERT INTO roles (name, guard_name, description, is_system) VALUES
-('Super Admin', 'web', 'Full system access', true),
-('System Admin', 'web', 'System administration', true);
-
--- Department roles (per department)
--- Note: These would be created programmatically for each department
--- department_id, name, description
-```
-
-### Default Permissions
-
-```sql
-INSERT INTO permissions (name, guard_name, module, description) VALUES
--- Announcements
-('announcements.view', 'web', 'announcements', 'View announcements'),
-('announcements.create', 'web', 'announcements', 'Create announcements'),
-('announcements.edit', 'web', 'announcements', 'Edit announcements'),
-('announcements.delete', 'web', 'announcements', 'Delete announcements'),
-('announcements.publish', 'web', 'announcements', 'Publish announcements'),
-
--- Services
-('services.view', 'web', 'services', 'View services'),
-('services.create', 'web', 'services', 'Create services'),
-('services.edit', 'web', 'services', 'Edit services'),
-('services.delete', 'web', 'services', 'Delete services'),
-
--- Downloads
-('downloads.view', 'web', 'downloads', 'View downloads'),
-('downloads.create', 'web', 'downloads', 'Create downloads'),
-('downloads.edit', 'web', 'downloads', 'Edit downloads'),
-('downloads.delete', 'web', 'downloads', 'Delete downloads'),
-
--- Users
-('users.view', 'web', 'users', 'View users'),
-('users.create', 'web', 'users', 'Create users'),
-('users.edit', 'web', 'users', 'Edit users'),
-('users.delete', 'web', 'users', 'Delete users'),
-
--- Departments
-('departments.view', 'web', 'departments', 'View departments'),
-('departments.manage', 'web', 'departments', 'Manage departments');
-```
-
-## Migration Files Structure
-
-```
-database/
-├── migrations/
-│   ├── 0001_01_01_000000_create_users_table.php
-│   ├── 0001_01_01_000001_create_cache_table.php
-│   ├── 0001_01_01_000002_create_jobs_table.php
-│   ├── 2024_01_01_000001_create_departments_table.php
-│   ├── 2024_01_01_000002_create_announcements_table.php
-│   ├── 2024_01_01_000003_create_services_table.php
-│   ├── 2024_01_01_000004_create_downloads_table.php
-│   ├── 2024_01_01_000005_create_activity_logs_table.php
-│   └── 2024_01_01_000006_create_login_attempts_table.php
-└── seeders/
-    ├── DatabaseSeeder.php
-    ├── DepartmentSeeder.php
-    ├── RolePermissionSeeder.php
-    └── UserSeeder.php
-```
-
-## Next Steps
-
-- [Installation Guide](installation.md)
-- [Caching Strategy](caching.md)
-- [Security Configuration](security.md)
+| Decision | Rationale |
+|----------|-----------|
+| Separate `_ms`/`_en` columns (not a translations table) | Simpler queries; matches kd-portal's two-locale design (ms-MY, en-GB only) |
+| S3 URLs stored as strings | Matches kd-portal's S3 storage setup; avoids premature abstraction |
+| No department/tenant partitioning | kd-portal is a single-ministry site; no multi-tenancy needed |
+| PostgreSQL FTS instead of Elasticsearch | Sufficient for the site's scale; avoids extra infrastructure |
+| `settings` key-value table | Flexible for infrequent global config changes |
