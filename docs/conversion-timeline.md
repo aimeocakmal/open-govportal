@@ -202,7 +202,7 @@ composer require filament/blueprint --dev
 
 **Effort:** 16 hours
 
-#### Week 2: Design System & Base UI
+#### Week 2: Design System & Base UI ✅ COMPLETED 2026-02-21
 
 > **Note:** Several Week 2 tasks were completed as part of Week 1 or are already present in Laravel 12 defaults:
 > - Tailwind CSS v4.x — already installed (`@tailwindcss/vite ^4.0.0` in `package.json`)
@@ -214,18 +214,24 @@ composer require filament/blueprint --dev
 > Week 2 therefore focuses only on what is genuinely outstanding.
 
 **Tasks:**
-- [ ] Install JS dependencies and add Alpine.js v3.x (`npm install && npm install alpinejs`); import and start Alpine in `resources/js/app.js`
-- [ ] Create `resources/css/themes/default.css` with all MyDS tokens under `[data-theme="default"], :root` (see `docs/design.md → Theme System`)
-- [ ] Update `resources/css/app.css`: import default theme file; declare `@theme` block referencing the same CSS variable names so Tailwind generates utility classes; add Inter font import and typography utilities
-- [ ] Create `config/themes.php` with `valid_themes => ['default']`
-- [ ] Create `ApplyTheme` middleware: reads `govportal_theme` cookie → falls back to `settings.site_default_theme` → shares `$currentTheme` view variable; register on `web` group
-- [ ] Create base Blade layouts: `resources/views/layouts/app.blade.php` (`<html data-theme="{{ $currentTheme }}">`) and `layouts/guest.blade.php`
-- [ ] Build `<x-nav>` navigation component with mobile hamburger menu (Alpine.js) and language switcher (`ms`/`en`)
-- [ ] Build `<x-footer>` component
-- [ ] Build `<x-theme-switcher>` Alpine.js component (see `docs/design.md → Theme System`); place in nav or footer
-- [ ] Install Spatie Laravel Permission; seed roles (`super_admin`, `content_editor`, `publisher`, `viewer`)
-- [ ] Seed `site_default_theme = default` in `settings` table (via `DatabaseSeeder`)
-- [ ] Write base PHPUnit feature test: homepage returns 200 for both locales; Livewire test helper configured
+- [x] Install JS dependencies and add Alpine.js v3.x (`npm install && npm install alpinejs`); import and start Alpine in `resources/js/app.js`
+- [x] Create `resources/css/themes/default.css` with all MyDS tokens under `[data-theme="default"], :root` (see `docs/design.md → Theme System`)
+- [x] Update `resources/css/app.css`: import default theme file; declare `@theme inline` block so Tailwind generates utility classes from CSS variables; Inter font import moved to top
+- [x] Create `config/themes.php` with `valid_themes => ['default' => 'Default']` and `fallback` key
+- [x] Create `ApplyTheme` middleware: reads `govportal_theme` cookie → falls back to `settings.site_default_theme` → shares `$currentTheme` view variable; registered on `web` group in `bootstrap/app.php`
+- [x] Create `SetLocale` middleware: reads `{locale}` route param, validates, calls `App::setLocale()`; aliased as `setlocale` in `bootstrap/app.php`
+- [x] Create `app/Models/Setting.php` with `get()` / `set()` helpers; create `settings` migration
+- [x] Create base Blade components: `resources/views/components/layouts/app.blade.php` (`<html data-theme="{{ $currentTheme }}">`) and `layouts/guest.blade.php`
+- [x] Build `<x-layout.nav>` navigation component with mobile hamburger menu (Alpine.js) and language switcher (`ms`/`en`)
+- [x] Build `<x-layout.footer>` component
+- [x] Build `<x-layout.theme-switcher>` Alpine.js component; placed in nav (desktop + mobile)
+- [x] Install Spatie Laravel Permission (v7.2.0); add `HasRoles` to `User` model; create `RoleSeeder`
+- [x] Create `SettingsSeeder`; seed `site_default_theme = default` and site info defaults
+- [x] Update `DatabaseSeeder` to call `RoleSeeder` and `SettingsSeeder`
+- [x] Create `lang/ms/common.php` and `lang/en/common.php` with nav, footer, action labels
+- [x] Create `HomeController`, locale-prefixed routes in `web.php`, placeholder home view
+- [x] Share `$navItems` and `$footerData` via `AppServiceProvider::boot()` (hardcoded; swapped to DB in Week 4)
+- [x] Write `tests/Feature/HomepageTest.php` — 5 assertions pass
 
 **Deferred (moved to correct phase):**
 - AWS S3 disk → Week 4 (needed when `File`/`Media` models are built)
@@ -583,7 +589,7 @@ class QuickLink extends Model {
 | Week | Milestone | Success Criteria |
 |------|-----------|-----------------|
 | 1 | ✅ Tooling Bootstrap | Laravel 12 + Octane + Filament + Boost + Blueprint all installed and verified — 2026-02-21 |
-| 2 | Design System & Base UI | Alpine.js registered, MyDS `@theme` tokens active, base layouts + nav + footer built, RBAC roles seeded |
+| 2 | ✅ Design System & Base UI | Alpine.js + MyDS tokens + theme system + nav/footer + RBAC roles + 5 passing tests — 2026-02-21 |
 | 5 | CMS Complete | All 12 collections manageable in Filament |
 | 9 | All Pages Complete | All 10 public pages functional in ms/en |
 | 11 | QA Complete | 90+ Lighthouse, WCAG AA, load test passed |

@@ -21,7 +21,16 @@
       "Read(//opt/homebrew/**)",
       "Bash(PSQL=/opt/homebrew/Cellar/libpq/16.4/bin/psql:*)",
       "Bash($PSQL -h 127.0.0.1 -p 5432 -U postgres -c \"\\\\du\")",
-      "Bash($PSQL -h 127.0.0.1 -p 5432 -U postgres -c \"CREATE DATABASE govportal;\")"
+      "Bash($PSQL -h 127.0.0.1 -p 5432 -U postgres -c \"CREATE DATABASE govportal;\")",
+      "Bash(npm install:*)",
+      "Bash(export:*)",
+      "Bash(. \"$NVM_DIR/nvm.sh\")",
+      "Bash(nvm use:*)",
+      "Bash(node --version:*)",
+      "Bash(npm run build:*)",
+      "Bash(~/.nvm/nvm.sh use:*)",
+      "Bash(source:*)",
+      "Bash(npm --version:*)"
     ]
   }
 }

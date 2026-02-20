@@ -1,0 +1,53 @@
+/* MyDS Blue — Default Theme
+ * All design tokens for the Malaysian Government Design System (MyDS).
+ * Values are applied under [data-theme="default"] and :root so utilities
+ * work regardless of whether the data-theme attribute is present.
+ */
+
+[data-theme="default"],
+:root {
+    /* Primary */
+    --color-primary: #2563EB;
+    --color-primary-dark: #1D4ED8;
+    --color-primary-light: #3B82F6;
+
+    /* Secondary */
+    --color-secondary: #64748B;
+    --color-secondary-dark: #475569;
+    --color-secondary-light: #94A3B8;
+
+    /* Semantic — Success */
+    --color-success: #10B981;
+    --color-success-light: #D1FAE5;
+
+    /* Semantic — Warning */
+    --color-warning: #F59E0B;
+    --color-warning-light: #FEF3C7;
+
+    /* Semantic — Error */
+    --color-error: #EF4444;
+    --color-error-light: #FEE2E2;
+
+    /* Semantic — Info */
+    --color-info: #3B82F6;
+    --color-info-light: #DBEAFE;
+
+    /* Neutral (Grayscale) */
+    --color-black: #0F172A;
+    --color-gray-800: #1E293B;
+    --color-gray-700: #334155;
+    --color-gray-600: #475569;
+    --color-gray-500: #64748B;
+    --color-gray-400: #94A3B8;
+    --color-gray-300: #CBD5E1;
+    --color-gray-200: #E2E8F0;
+    --color-gray-100: #F1F5F9;
+    --color-white: #FFFFFF;
+
+    /* Surfaces */
+    --color-bg: #FFFFFF;
+    --color-surface: #F1F5F9;
+    --color-border: #CBD5E1;
+    --color-text: #0F172A;
+    --color-muted: #64748B;
+}
