@@ -24,7 +24,7 @@ These decisions are final. Do not reopen them without a documented reason.
 
 | Topic | Decision | Rationale |
 |-------|----------|-----------|
-| **Frontend approach** | **Full TALL stack** (Tailwind + Alpine.js + Laravel + **Livewire**) | Filament v3 already bundles Livewire 3; server-side components are simpler and more maintainable than Alpine+fetch |
+| **Frontend approach** | **Full TALL stack** (Tailwind + Alpine.js + Laravel + **Livewire**) | Filament 5.x already bundles Livewire 4; server-side components are simpler and more maintainable than Alpine+fetch |
 | Direktori live search | **Livewire component `DirectoriSearch`** | Real-time server-side filtering; clean validation; no manual fetch() calls |
 | Contact form | **Livewire component `ContactForm`** | Native `$errors`, `wire:model`, `wire:submit`; no manual JS form handling |
 | Site search | **Livewire component `SearchResults`** | Server-side FTS query; debounced `wire:model.live` |

@@ -3,7 +3,7 @@
 ## Executive Summary
 
 **Source:** https://github.com/govtechmy/kd-portal (Next.js 15 + Payload CMS + MongoDB)
-**Target:** OpenGovPortal (Laravel 11 + Octane + PostgreSQL)
+**Target:** OpenGovPortal (Laravel 12 + Octane + PostgreSQL)
 **Goal:** Full recreation of https://www.digital.gov.my/ using the Laravel stack
 
 ---
@@ -124,7 +124,7 @@ The Payload search plugin indexes these collections with priorities:
 | Aspect | kd-portal (Source) | OpenGovPortal (Target) |
 |--------|--------------------|------------------------|
 | **Rendering** | SSR/SSG (Next.js) | SSR with Redis page caching |
-| **CMS** | Payload CMS (headless) | Filament v3 admin panel |
+| **CMS** | Payload CMS (headless) | Filament v5 admin panel |
 | **Database** | MongoDB | PostgreSQL |
 | **Storage** | AWS S3 | AWS S3 (via Laravel Filesystem) |
 | **Search** | Payload Search Plugin | Laravel Scout + PostgreSQL FTS |
@@ -154,7 +154,7 @@ The original portal uses **MyDS (Malaysian Government Design System)**. Key desi
 #### Week 1: Project Setup & Design System
 
 **Tasks:**
-- [ ] Initialize Laravel 11 project
+- [ ] Initialize Laravel 12 project
 - [ ] Install and configure Laravel Octane with FrankenPHP (`composer require laravel/octane dunglas/frankenphp-caddy`)
 - [ ] Set up PostgreSQL database + Redis
 - [ ] Configure Laravel multi-language (`ms`, `en`) with locale URL prefix
@@ -174,9 +174,9 @@ The original portal uses **MyDS (Malaysian Government Design System)**. Key desi
 #### Week 2: Core Infrastructure
 
 **Tasks:**
-- [ ] Install Filament v3 admin panel (Livewire 3 comes bundled — no separate install needed)
+- [ ] Install Filament 5.x admin panel (Livewire 4 comes bundled — no separate install needed)
 - [ ] Configure FrankenPHP: set `'server' => 'frankenphp'` in `config/octane.php`; build Docker image from `dunglas/frankenphp:latest-php8.3`
-- [ ] Verify Livewire 3 + Octane compatibility configuration (`config/octane.php`, `config/livewire.php`)
+- [ ] Verify Livewire 4 + Octane compatibility configuration (`config/octane.php`, `config/livewire.php`)
 - [ ] Install and configure Spatie Laravel Permission (RBAC)
 - [ ] Configure AWS S3 for media storage (matching kd-portal's S3 setup)
 - [ ] Set up full-page caching middleware (Redis, skip for Livewire-embedded pages)
@@ -573,4 +573,4 @@ class QuickLink extends Model {
 
 ---
 
-*This plan converts https://github.com/govtechmy/kd-portal from Next.js 15 + Payload CMS + MongoDB to Laravel 11 + Octane + Filament + PostgreSQL, achieving full feature parity with https://www.digital.gov.my/*
+*This plan converts https://github.com/govtechmy/kd-portal from Next.js 15 + Payload CMS + MongoDB to Laravel 12 + Octane + Filament + PostgreSQL, achieving full feature parity with https://www.digital.gov.my/*

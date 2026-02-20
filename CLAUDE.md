@@ -6,7 +6,7 @@ This file is loaded automatically by Claude Code. Read it before doing any work 
 
 ## What This Project Is
 
-A Laravel 11 recreation of https://www.digital.gov.my/ — the official website of Kementerian Digital Malaysia.
+A Laravel 12 recreation of https://www.digital.gov.my/ — the official website of Kementerian Digital Malaysia.
 
 The source to replicate is https://github.com/govtechmy/kd-portal (Next.js 15 + Payload CMS + MongoDB).
 
@@ -31,12 +31,12 @@ This project uses the full **TALL stack**: Tailwind CSS, Alpine.js, Laravel, Liv
 
 | Layer | Technology | Notes |
 |-------|-----------|-------|
-| Framework | Laravel 11 | |
+| Framework | Laravel 12 | |
 | Performance | Laravel Octane + **FrankenPHP** | Not Swoole — see architecture.md for rationale |
-| Admin CMS | Filament v3 | Filament already bundles Livewire 3 |
-| Styling | Tailwind CSS | MyDS design tokens |
-| Reactivity | Livewire 3 | Server-side components for all interactive pages |
-| Micro-interactions | Alpine.js | UI-only: carousel, mobile menu, dropdowns, modals |
+| Admin CMS | Filament v5.x | Filament already bundles Livewire 4 |
+| Styling | Tailwind CSS v4.x | MyDS design tokens; CSS-first config via `@theme` |
+| Reactivity | Livewire 4 | Server-side components for all interactive pages |
+| Micro-interactions | Alpine.js v3.x | UI-only: carousel, mobile menu, dropdowns, modals |
 | Templates | Blade | All views; Livewire components extend Blade |
 | Database | PostgreSQL | |
 | Cache | Redis (tagged cache) | |
@@ -46,6 +46,7 @@ This project uses the full **TALL stack**: Tailwind CSS, Alpine.js, Laravel, Liv
 | Search | PostgreSQL FTS via `searchable_content` table | |
 | Charts | Chart.js | Not Recharts, not ApexCharts |
 | Carousel | Alpine.js + Embla.js (vanilla) | Alpine only for UI, no server state |
+| Agentic tooling | Laravel Boost v2.x | AI coding agent integration for agentic workflows |
 
 ### Octane server: FrankenPHP
 

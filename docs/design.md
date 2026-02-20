@@ -81,39 +81,37 @@ Familiar look and feel, increasing citizens' trust in the government's digital p
 
 ### Tailwind Config
 
-```javascript
-// tailwind.config.js
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          DEFAULT: '#2563EB',
-          dark: '#1D4ED8',
-          light: '#3B82F6',
-        },
-        secondary: {
-          DEFAULT: '#64748B',
-          dark: '#475569',
-          light: '#94A3B8',
-        },
-        success: {
-          DEFAULT: '#10B981',
-          light: '#D1FAE5',
-        },
-        warning: {
-          DEFAULT: '#F59E0B',
-          light: '#FEF3C7',
-        },
-        error: {
-          DEFAULT: '#EF4444',
-          light: '#FEE2E2',
-        },
-      },
-    },
-  },
+Tailwind CSS v4.x uses **CSS-first configuration** — no `tailwind.config.js`. All theme tokens are declared in your CSS file using the `@theme` directive.
+
+```css
+/* resources/css/app.css */
+@import "tailwindcss";
+
+@theme {
+  /* MyDS colour palette */
+  --color-primary: #2563EB;
+  --color-primary-dark: #1D4ED8;
+  --color-primary-light: #3B82F6;
+
+  --color-secondary: #64748B;
+  --color-secondary-dark: #475569;
+  --color-secondary-light: #94A3B8;
+
+  --color-success: #10B981;
+  --color-success-light: #D1FAE5;
+
+  --color-warning: #F59E0B;
+  --color-warning-light: #FEF3C7;
+
+  --color-error: #EF4444;
+  --color-error-light: #FEE2E2;
+
+  --color-info: #3B82F6;
+  --color-info-light: #DBEAFE;
 }
 ```
+
+Utility classes are generated automatically from `@theme` tokens (e.g. `bg-primary`, `text-primary-dark`, `border-error`).
 
 ---
 
@@ -530,7 +528,7 @@ body {
 
 ### Setup
 - [ ] Import Inter font from Google Fonts
-- [ ] Configure Tailwind with MYDS colors
+- [ ] Configure Tailwind v4.x with MYDS colors via `@theme` in `resources/css/app.css`
 - [ ] Set up base typography styles
 - [ ] Create component library
 
