@@ -47,22 +47,22 @@ User Request
 # Rule 1: Admin panel - No cache
 /admin/*
   Cache Level: Bypass
-  
+
 # Rule 2: Static assets - Long cache
 /*.css, /*.js, /*.png, /*.jpg, /*.woff2
   Cache Level: Cache Everything
   Edge Cache TTL: 1 month
   Browser Cache TTL: 1 month
-  
-# Rule 3: Public pages - Short cache
-/announcements/*, /services/*, /departments/*
+
+# Rule 3: Public pages - Short cache (locale-prefixed routes)
+/ms/*, /en/*
   Cache Level: Cache Everything
   Edge Cache TTL: 1 hour
   Browser Cache TTL: 1 hour
   Bypass Cache on Cookie: gov_session
-  
-# Rule 4: API - Short cache
-/api/v1/*
+
+# Rule 4: API search endpoint - Short cache
+/api/direktori*
   Cache Level: Cache Everything
   Edge Cache TTL: 5 minutes
 ```
@@ -80,7 +80,7 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache" 
 curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache" \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
-  --data '{"files":["https://govportal.gov.my/announcements/latest"]}'
+  --data '{"files":["https://digital.gov.my/ms/siaran","https://digital.gov.my/en/siaran"]}'
 ```
 
 ## Layer 2: Redis (Application Cache)
@@ -88,25 +88,25 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache" 
 ### Cache Structure
 
 ```php
-// Full-page cache (HTML)
+// Full-page cache (HTML) — key includes locale segment from URL
 Cache::store('redis')->put(
-    'page:/announcements:ms',
+    'page:/ms/siaran',
     '<html>...</html>',
     now()->addHour()
 );
 
-// Query result cache
+// Query result cache — broadcasts listing
 Cache::store('redis')->put(
-    'query:announcements:latest:10:ms',
-    $announcements,
+    'query:broadcasts:latest:6:ms',
+    $broadcasts,
     now()->addMinutes(10)
 );
 
 // Fragment cache (partial view)
 Cache::store('redis')->put(
-    'fragment:header:ms',
-    $headerHtml,
-    now()->addHours(2)
+    'fragment:navigation:ms',
+    $navHtml,
+    now()->addHours(24)
 );
 ```
 
@@ -171,20 +171,29 @@ class CacheResponse
 ```php
 // routes/web.php
 
-// Public pages - cached for 1 hour
-Route::middleware('cache.response:3600')->group(function () {
+// Public locale-prefixed pages — cached for 1 hour
+Route::prefix('{locale}')->middleware(['set.locale', 'cache.response:3600'])->group(function () {
     Route::get('/', [HomeController::class, 'index']);
-    Route::get('/announcements', [AnnouncementController::class, 'index']);
-    Route::get('/announcements/{slug}', [AnnouncementController::class, 'show']);
-    Route::get('/services', [ServiceController::class, 'index']);
-    Route::get('/departments', [DepartmentController::class, 'index']);
+    Route::get('/siaran', [BroadcastController::class, 'index']);
+    Route::get('/siaran/{slug}', [BroadcastController::class, 'show']);
+    Route::get('/pencapaian', [AchievementController::class, 'index']);
+    Route::get('/direktori', [DirectoriController::class, 'index']);
+    Route::get('/dasar', [DasarController::class, 'index']);
+    Route::get('/statistik', [StatistikController::class, 'index']);
+    Route::get('/profil-kementerian', [ProfilKementerianController::class, 'index']);
+    Route::get('/penafian', [StaticPageController::class, 'penafian']);
+    Route::get('/dasar-privasi', [StaticPageController::class, 'dasarPrivasi']);
 });
 
-// Admin panel - no cache
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard']);
-    // ...
+// Contact form POST — never cached
+Route::prefix('{locale}')->middleware('set.locale')->group(function () {
+    Route::get('/hubungi-kami', [HubungiKamiController::class, 'index']);
+    Route::post('/hubungi-kami', [HubungiKamiController::class, 'submit']);
+    Route::get('/dasar/{id}/muat-turun', [DasarController::class, 'download']);
 });
+
+// Admin panel — Filament handles its own auth; no caching
+// Filament routes are registered automatically under /admin
 ```
 
 ### Query Cache
@@ -197,33 +206,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class Announcement extends Model
+class Broadcast extends Model
 {
-    public static function getLatest($limit = 10, $locale = 'ms')
+    // Scoped query result cache — used by HomeController and BroadcastController
+    public static function getLatest(int $limit = 6): Collection
     {
-        $cacheKey = "query:announcements:latest:{$limit}:{$locale}";
-        
-        return Cache::remember($cacheKey, 600, function () use ($limit, $locale) {
-            return self::where('locale', $locale)
-                ->where('published', true)
-                ->where('published_at', '<=', now())
+        $locale = app()->getLocale(); // 'ms' or 'en'
+        $cacheKey = "query:broadcasts:latest:{$limit}:{$locale}";
+
+        return Cache::remember($cacheKey, 600, function () use ($limit) {
+            return self::published()
                 ->orderBy('published_at', 'desc')
                 ->limit($limit)
                 ->get();
         });
     }
-    
-    public static function getByDepartment($departmentId, $locale = 'ms')
+
+    // Local scope used by getLatest()
+    public function scopePublished(Builder $query): Builder
     {
-        $cacheKey = "query:announcements:dept:{$departmentId}:{$locale}";
-        
-        return Cache::remember($cacheKey, 600, function () use ($departmentId, $locale) {
-            return self::where('department_id', $departmentId)
-                ->where('locale', $locale)
-                ->where('published', true)
-                ->orderBy('published_at', 'desc')
-                ->paginate(20);
-        });
+        return $query->where('status', 'published')
+                     ->where('published_at', '<=', now());
     }
 }
 ```
@@ -233,18 +236,20 @@ class Announcement extends Model
 ```php
 use Illuminate\Support\Facades\Cache;
 
-// Store with tags
-Cache::tags(['announcements', 'department:5'])->put(
-    'announcement:123:ms',
-    $announcement,
+// Store with tags (use exact tag names from docs/pages-features.md)
+Cache::tags(['broadcasts', 'homepage'])->put(
+    'broadcast:my-slug:ms',
+    $broadcast,
     3600
 );
 
-// Invalidate all announcements
-Cache::tags(['announcements'])->flush();
+// Invalidate all broadcast-related caches (listing + homepage section)
+Cache::tags(['broadcasts'])->flush();
 
-// Invalidate specific department
-Cache::tags(['department:5'])->flush();
+// Invalidate homepage only (e.g., after QuickLink change)
+Cache::tags(['homepage'])->flush();
+
+// Full tag-to-model mapping: see docs/pages-features.md → "Cache Tag → Route / Model Mapping"
 ```
 
 ### Octane In-Memory Cache
@@ -282,23 +287,31 @@ ALTER SYSTEM SET shared_buffers = '4GB';
 ALTER SYSTEM SET effective_cache_size = '12GB';
 ALTER SYSTEM SET work_mem = '256MB';
 
--- Create materialized view for heavy queries
-CREATE MATERIALIZED VIEW mv_department_stats AS
-SELECT 
-    d.id,
-    d.name,
-    COUNT(a.id) as announcement_count,
-    COUNT(s.id) as service_count
-FROM departments d
-LEFT JOIN announcements a ON a.department_id = d.id
-LEFT JOIN services s ON s.department_id = d.id
-GROUP BY d.id, d.name;
+-- Materialized view for statistics page (refreshed hourly via scheduler)
+-- Counts published content per type for the Statistik page
+CREATE MATERIALIZED VIEW mv_content_stats AS
+SELECT
+    'broadcasts'        AS content_type,
+    COUNT(*)            AS total,
+    COUNT(*) FILTER (WHERE published_at >= NOW() - INTERVAL '30 days') AS last_30_days
+FROM broadcasts WHERE status = 'published'
+UNION ALL
+SELECT
+    'achievements'      AS content_type,
+    COUNT(*)            AS total,
+    COUNT(*) FILTER (WHERE date >= NOW() - INTERVAL '30 days') AS last_30_days
+FROM achievements WHERE status = 'published'
+UNION ALL
+SELECT
+    'policies'          AS content_type,
+    COUNT(*)            AS total,
+    COUNT(*) FILTER (WHERE published_at >= NOW() - INTERVAL '30 days') AS last_30_days
+FROM policies WHERE status = 'published';
 
--- Create index on materialized view
-CREATE INDEX idx_mv_dept_stats_id ON mv_department_stats(id);
+CREATE UNIQUE INDEX idx_mv_content_stats_type ON mv_content_stats(content_type);
 
--- Refresh materialized view (run periodically)
-REFRESH MATERIALIZED VIEW CONCURRENTLY mv_department_stats;
+-- Refresh hourly (add to Laravel scheduler)
+REFRESH MATERIALIZED VIEW CONCURRENTLY mv_content_stats;
 ```
 
 ### Query Result Cache
@@ -327,25 +340,25 @@ Cache::put('key', $value, 3600); // 1 hour
 ### 2. Event-Based
 
 ```php
-// app/Observers/AnnouncementObserver.php
-class AnnouncementObserver
+// app/Observers/BroadcastObserver.php
+// Registered in AppServiceProvider: Broadcast::observe(BroadcastObserver::class)
+class BroadcastObserver
 {
-    public function saved(Announcement $announcement)
+    public function saved(Broadcast $broadcast): void
     {
-        // Clear related caches
-        Cache::tags(['announcements'])->flush();
-        Cache::tags(["department:{$announcement->department_id}"])->flush();
-        
-        // Clear CDN cache
-        Cloudflare::purgeUrls([
-            url("/announcements/{$announcement->slug}"),
-            url('/announcements'),
-        ]);
+        // Flush Redis tags (see full mapping in docs/pages-features.md)
+        Cache::tags(['broadcasts', 'homepage'])->flush();
+
+        // Flush specific detail page cache if slug changed
+        if ($broadcast->wasChanged('slug') && $broadcast->getOriginal('slug')) {
+            Cache::tags(["broadcast:{$broadcast->getOriginal('slug')}"])->flush();
+        }
+        Cache::tags(["broadcast:{$broadcast->slug}"])->flush();
     }
-    
-    public function deleted(Announcement $announcement)
+
+    public function deleted(Broadcast $broadcast): void
     {
-        $this->saved($announcement);
+        Cache::tags(['broadcasts', 'homepage', "broadcast:{$broadcast->slug}"])->flush();
     }
 }
 ```
@@ -379,25 +392,30 @@ class WarmCache extends Command
     protected $signature = 'cache:warm';
     protected $description = 'Warm up the cache with frequently accessed data';
     
-    public function handle()
+    public function handle(): void
     {
         $this->info('Warming cache...');
-        
-        // Warm homepage
-        $this->call('route:cache');
-        
-        // Warm latest announcements
+
         foreach (['ms', 'en'] as $locale) {
-            Announcement::getLatest(10, $locale);
-            $this->info("Warmed announcements for {$locale}");
+            app()->setLocale($locale);
+
+            // Warm homepage data
+            Broadcast::getLatest(6);
+            Achievement::getLatest(7);
+            $this->info("Warmed homepage data for {$locale}");
+
+            // Warm broadcasts listing
+            Broadcast::published()->orderBy('published_at', 'desc')->paginate(15);
+            $this->info("Warmed siaran listing for {$locale}");
+
+            // Warm achievements listing
+            Achievement::published()->orderBy('date', 'desc')->get();
+            $this->info("Warmed pencapaian listing for {$locale}");
         }
-        
-        // Warm services
-        Service::getFeatured();
-        
-        // Warm departments
-        Department::getActive();
-        
+
+        // Warm navigation (locale-independent structure)
+        NavigationItem::whereNull('parent_id')->with('children')->ordered()->get();
+
         $this->info('Cache warming complete!');
     }
 }

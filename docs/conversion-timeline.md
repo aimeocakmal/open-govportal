@@ -155,7 +155,7 @@ The original portal uses **MyDS (Malaysian Government Design System)**. Key desi
 
 **Tasks:**
 - [ ] Initialize Laravel 11 project
-- [ ] Install and configure Laravel Octane (Swoole)
+- [ ] Install and configure Laravel Octane with FrankenPHP (`composer require laravel/octane dunglas/frankenphp-caddy`)
 - [ ] Set up PostgreSQL database + Redis
 - [ ] Configure Laravel multi-language (`ms`, `en`) with locale URL prefix
 - [ ] Set up Tailwind CSS with MyDS design tokens (colors, fonts, spacing)
@@ -164,7 +164,7 @@ The original portal uses **MyDS (Malaysian Government Design System)**. Key desi
 - [ ] Build footer component
 
 **Deliverables:**
-- Running Laravel skeleton with Octane
+- Running Laravel skeleton with Octane + FrankenPHP (`php artisan octane:frankenphp --port=8000`)
 - MyDS Tailwind config
 - Base layout with header + footer
 - Language switcher working
@@ -174,12 +174,14 @@ The original portal uses **MyDS (Malaysian Government Design System)**. Key desi
 #### Week 2: Core Infrastructure
 
 **Tasks:**
-- [ ] Install Filament v3 admin panel
+- [ ] Install Filament v3 admin panel (Livewire 3 comes bundled — no separate install needed)
+- [ ] Configure FrankenPHP: set `'server' => 'frankenphp'` in `config/octane.php`; build Docker image from `dunglas/frankenphp:latest-php8.3`
+- [ ] Verify Livewire 3 + Octane compatibility configuration (`config/octane.php`, `config/livewire.php`)
 - [ ] Install and configure Spatie Laravel Permission (RBAC)
 - [ ] Configure AWS S3 for media storage (matching kd-portal's S3 setup)
-- [ ] Set up full-page caching middleware (Redis)
+- [ ] Set up full-page caching middleware (Redis, skip for Livewire-embedded pages)
 - [ ] Configure CI/CD pipeline (GitHub Actions)
-- [ ] Write base tests
+- [ ] Write base tests (include Livewire test helpers via `use Livewire\Volt\Volt` or `Livewire::test()`)
 - [ ] Set up Laravel Scout for search
 
 **Deliverables:**
@@ -187,8 +189,28 @@ The original portal uses **MyDS (Malaysian Government Design System)**. Key desi
 - RBAC roles and permissions seeded
 - S3 media storage working
 - Caching middleware active
+- FrankenPHP starts without error: `php artisan octane:frankenphp --port=8000 --workers=8`
+- Livewire works correctly under Octane FrankenPHP (verified with `php artisan octane:frankenphp --watch`)
 
 **Effort:** 40 hours
+
+**FrankenPHP + Livewire config notes:**
+```php
+// config/octane.php — use FrankenPHP, not Swoole
+return [
+    'server' => 'frankenphp',
+    'frankenphp' => [
+        'workers' => env('OCTANE_WORKERS', 8),
+        'max_requests' => env('OCTANE_MAX_REQUESTS', 500),
+    ],
+];
+
+// config/livewire.php — ensure these are set for Octane
+'inject_assets' => true,
+'navigate' => false, // keep off until verified compatible with Octane setup
+```
+
+**Note:** Do **not** use `Octane::table()` — it is Swoole-only and unavailable under FrankenPHP. Use Redis for all shared state.
 
 ---
 
@@ -282,16 +304,17 @@ Recreate homepage sections from kd-portal's `home/` components:
 #### Week 7: Siaran & Pencapaian Pages
 
 **Tasks:**
-- [ ] `/siaran` — Broadcasts listing (with pagination, filter by type)
-- [ ] `/siaran/{slug}` — Broadcast detail page
-- [ ] `/pencapaian` — Achievements listing (with year filter)
-- [ ] `/pencapaian/{slug}` — Achievement detail
-- [ ] Breadcrumb navigation
-- [ ] Related content links
-- [ ] SEO meta tags per page
+- [ ] `/siaran` — `SiaranList` Livewire component (type filter + pagination)
+- [ ] `/siaran/{slug}` — Broadcast detail page (pure Blade, no Livewire)
+- [ ] `/pencapaian` — `PencapaianList` Livewire component (year filter)
+- [ ] `/pencapaian/{slug}` — Achievement detail (pure Blade)
+- [ ] Breadcrumb navigation component
+- [ ] Related content section (pure Blade, server-side query)
+- [ ] SEO meta tags per page (`<x-seo>` Blade component)
 
 **Deliverables:**
 - Siaran and Pencapaian pages in ms/en
+- Livewire filter + pagination working under Octane
 - Detail pages with full content
 
 **Effort:** 40 hours
@@ -299,16 +322,15 @@ Recreate homepage sections from kd-portal's `home/` components:
 #### Week 8: Direktori & Statistik Pages
 
 **Tasks:**
-- [ ] `/direktori` — Staff directory with search by name/department
-- [ ] Directory card components with contact info
-- [ ] `/statistik` — Statistics page with charts
-- [ ] Integrate Chart.js (or ApexCharts) for data visualisations (replaces Recharts)
-- [ ] Statistics data management in Filament
-- [ ] Responsive table/grid layout
+- [ ] `/direktori` — `DirectoriSearch` Livewire component (name + department filter, `wire:model.live.debounce.400ms`)
+- [ ] Staff card Blade component with photo, name, position, email, phone
+- [ ] `/statistik` — Statistics page with Chart.js (pure Blade + Alpine.js `x-init`)
+- [ ] Statistics data management in Filament (JSON field or dedicated settings)
+- [ ] Responsive grid layout for staff cards
 
 **Deliverables:**
-- Direktori page with live search
-- Statistik page with charts
+- Direktori page with live Livewire search (tested under Octane)
+- Statistik page with Chart.js rendering
 
 **Effort:** 40 hours
 
@@ -317,11 +339,11 @@ Recreate homepage sections from kd-portal's `home/` components:
 **Tasks:**
 - [ ] `/dasar` — Policy documents listing + download links
 - [ ] `/profil-kementerian` — Ministry profile with minister info (MinisterProfile global)
-- [ ] `/hubungi-kami` — Contact page with form + addresses (Addresses global)
-- [ ] Contact form submission → Feedback collection + email notification (AWS SES)
+- [ ] `/hubungi-kami` — `ContactForm` Livewire component + addresses section (pure Blade)
+- [ ] Contact form submission via Livewire → Feedback collection + dispatch `SendFeedbackEmail` job (AWS SES)
 - [ ] `/penafian` — Disclaimer (static Blade view)
 - [ ] `/dasar-privasi` — Privacy policy (static Blade view)
-- [ ] Global site search at `/carian` using Laravel Scout
+- [ ] Global site search at `/carian` — `SearchResults` Livewire component with `wire:model.live.debounce.500ms`
 - [ ] XML Sitemap generation
 - [ ] 404 and error pages
 
@@ -508,7 +530,7 @@ class QuickLink extends Model {
 
 | Week | Milestone | Success Criteria |
 |------|-----------|-----------------|
-| 2 | Foundation Complete | Laravel + Octane running, Filament accessible |
+| 2 | Foundation Complete | Laravel + Octane (FrankenPHP) running, Filament accessible |
 | 5 | CMS Complete | All 12 collections manageable in Filament |
 | 9 | All Pages Complete | All 10 public pages functional in ms/en |
 | 11 | QA Complete | 90+ Lighthouse, WCAG AA, load test passed |

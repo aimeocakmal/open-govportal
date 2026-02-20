@@ -21,11 +21,11 @@ This project migrates the portal to a **Laravel 11 + Octane** stack, targeting *
 | **Original Site** | https://www.digital.gov.my/ |
 | **Original Repo** | https://github.com/govtechmy/kd-portal |
 | **Original Stack** | Next.js 15 + Payload CMS + MongoDB |
-| **Target Stack** | Laravel 11 + Octane + PostgreSQL |
+| **Target Stack** | Laravel 11 + Octane (FrankenPHP) + PostgreSQL |
 
 ### Key Features
 
-- **High Performance** — Laravel Octane (Swoole) for 10x speed
+- **High Performance** — Laravel Octane (FrankenPHP) for 10x speed — app booted once, kept in memory per worker
 - **Secure** — Role-based access control, audit logging
 - **Multi-language** — Bahasa Malaysia (ms-MY) + English (en-GB)
 - **Responsive** — Mobile-first, MyDS-compliant design
@@ -39,26 +39,30 @@ This project migrates the portal to a **Laravel 11 + Octane** stack, targeting *
 
 ```
 ┌─────────────────────────────────────────┐
-│  CDN (Cloudflare/AWS CloudFront)        │
+│  CDN (Cloudflare)                       │
 │  - Global edge caching                  │
-│  - DDoS protection                      │
+│  - DDoS protection + WAF                │
+│  - HTTP/3 at edge                       │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│  LOAD BALANCER (Nginx/ALB)              │
-│  - SSL termination                      │
-│  - Rate limiting                        │
+│  AWS ALB (Load Balancer)                │
+│  - Distributes to FrankenPHP pods       │
+│  - Health checks (/up endpoint)         │
+│  - Rate limiting via WAF rules          │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│  LARAVEL OCTANE (Swoole)                │
-│  - Application in memory                │
+│  LARAVEL OCTANE (FrankenPHP / Caddy)    │
+│  - App booted once, kept in memory      │
+│  - No separate Nginx needed             │
+│  - HTTP/2 + HTTP/3 natively via Caddy   │
 │  - Handle 10K+ concurrent               │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
 │  REDIS CLUSTER                          │
-│  - Full-page cache                      │
+│  - Full-page cache (tagged)             │
 │  - Session storage                      │
 │  - Query cache                          │
 └──────────────┬──────────────────────────┘
@@ -66,7 +70,7 @@ This project migrates the portal to a **Laravel 11 + Octane** stack, targeting *
 ┌──────────────▼──────────────────────────┐
 │  POSTGRESQL                             │
 │  - Primary + Read Replicas              │
-│  - Connection pooling                   │
+│  - PgBouncer connection pooling         │
 └─────────────────────────────────────────┘
 ```
 
@@ -77,13 +81,17 @@ This project migrates the portal to a **Laravel 11 + Octane** stack, targeting *
 | Component | Technology | Purpose |
 |-----------|------------|---------|
 | **Framework** | Laravel 11 | Core application |
-| **Performance** | Laravel Octane (Swoole) | High-concurrency handling |
-| **Frontend** | Blade + Tailwind CSS | Lightweight, fast rendering |
+| **Server** | Laravel Octane + FrankenPHP | High-concurrency; Caddy built-in (no Nginx) |
+| **Frontend** | Blade + Tailwind CSS + Livewire 3 + Alpine.js | TALL stack — server-rendered + reactive UI |
+| **Admin CMS** | Filament v3 | Admin panel replacing Payload CMS |
 | **Database** | PostgreSQL | Primary data store |
-| **Cache** | Redis | Full-page & query caching |
+| **Cache** | Redis | Full-page & query caching (tagged) |
 | **Auth** | Spatie Laravel Permission | RBAC (Role-Based Access Control) |
-| **CDN** | Cloudflare | Edge caching & security |
+| **CDN** | Cloudflare | Edge caching, WAF & DDoS protection |
 | **Queue** | Redis | Background job processing |
+| **Storage** | AWS S3 | Media and file storage |
+| **Email** | AWS SES | Transactional email (contact form) |
+| **Search** | Laravel Scout + PostgreSQL FTS | Full-text search |
 
 ---
 
@@ -93,7 +101,7 @@ This project migrates the portal to a **Laravel 11 + Octane** stack, targeting *
 |--------|--------|----------------|
 | **First Contentful Paint** | < 1 second | CDN + edge caching |
 | **Time to Interactive** | < 2 seconds | Octane + Redis |
-| **Concurrent Users** | 10,000+ | Swoole + horizontal scaling |
+| **Concurrent Users** | 10,000+ | FrankenPHP + horizontal scaling on Kubernetes |
 | **Database Queries** | < 10/page | Aggressive caching |
 | **Uptime** | 99.9% | Load balancer + failover |
 
@@ -120,12 +128,12 @@ Full technical documentation available in [`docs/`](docs/):
 
 ### Prerequisites
 
-- PHP 8.3+
+- PHP 8.3+ (or Docker with `dunglas/frankenphp:latest-php8.3`)
 - PostgreSQL 14+
 - Redis 7+
 - Composer
 - Node.js 18+
-- Swoole PHP extension (for Octane)
+- Docker (recommended for FrankenPHP — no PHP extension compilation needed)
 
 ### Installation
 
@@ -161,18 +169,18 @@ php artisan migrate --seed
 # Build assets
 npm run build
 
-# Start Octane (production mode)
-php artisan octane:start --server=swoole --host=0.0.0.0 --port=8000
+# Start Octane with FrankenPHP (production mode)
+php artisan octane:frankenphp --host=0.0.0.0 --port=8000 --workers=8
 ```
 
 ### Development Mode
 
 ```bash
-# Traditional Laravel serve (no Octane)
+# Traditional Laravel serve (no Octane — good for basic dev)
 php artisan serve
 
-# Or with Octane (hot reload)
-php artisan octane:start --watch
+# Or with Octane + FrankenPHP (hot reload — matches production)
+php artisan octane:frankenphp --watch
 ```
 
 ---
@@ -268,13 +276,19 @@ php artisan event:cache
 
 ### Octane Configuration
 
-```ini
-# config/octane.php
-'server' => 'swoole',
-'workers' => 8,
-'max_requests' => 1000,
-'task_workers' => 4,
+```php
+// config/octane.php
+return [
+    'server' => 'frankenphp',
+
+    'frankenphp' => [
+        'workers' => env('OCTANE_WORKERS', 8),        // CPU cores × 2
+        'max_requests' => env('OCTANE_MAX_REQUESTS', 500),
+    ],
+];
 ```
+
+> **Note:** `Octane::table()` is Swoole-only — do not use it. All shared state goes through Redis.
 
 ---
 

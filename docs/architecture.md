@@ -14,34 +14,38 @@ OpenGovPortal is designed as a high-performance, scalable government portal capa
                         │ HTTPS
 ┌───────────────────────▼─────────────────────────────────────────┐
 │                        CDN LAYER                                │
-│  Cloudflare / AWS CloudFront                                    │
+│  Cloudflare                                                     │
 │  - Static asset caching (CSS, JS, images)                      │
 │  - Full-page HTML caching                                      │
-│  - DDoS protection                                             │
-│  - SSL termination                                             │
-│  - WAF (Web Application Firewall)                              │
+│  - DDoS protection + WAF                                       │
+│  - SSL/TLS termination                                         │
+│  - HTTP/3 at edge                                              │
 └───────────────────────┬─────────────────────────────────────────┘
                         │
 ┌───────────────────────▼─────────────────────────────────────────┐
-│                     LOAD BALANCER                               │
-│  Nginx / AWS ALB / HAProxy                                      │
-│  - Request distribution                                         │
-│  - Health checks                                                │
-│  - Rate limiting (100 req/min per IP)                          │
-│  - SSL passthrough                                              │
+│                AWS ALB (Load Balancer)                          │
+│  - Request distribution across FrankenPHP pods                 │
+│  - Health checks (/up endpoint)                                │
+│  - Rate limiting (100 req/min per IP, via ALB rules)           │
+│  - SSL passthrough to FrankenPHP                               │
 └───────────────────────┬─────────────────────────────────────────┘
                         │
 ┌───────────────────────▼─────────────────────────────────────────┐
-│                   APPLICATION SERVERS                           │
-│  Laravel Octane (Swoole) - Multiple Instances                   │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐              │
-│  │  Worker 1   │ │  Worker 2   │ │  Worker N   │              │
-│  │  (Swoole)   │ │  (Swoole)   │ │  (Swoole)   │              │
-│  └─────────────┘ └─────────────┘ └─────────────┘              │
+│              APPLICATION SERVERS (FrankenPHP)                   │
+│  Laravel Octane + FrankenPHP — Multiple Kubernetes Pods        │
 │                                                                 │
-│  - Application booted once, kept in memory                     │
-│  - Handle 10,000+ concurrent connections                       │
-│  - Shared nothing architecture                                 │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌───────────────┐  │
+│  │   Pod 1         │  │   Pod 2         │  │   Pod N       │  │
+│  │  FrankenPHP     │  │  FrankenPHP     │  │  FrankenPHP   │  │
+│  │  (Caddy built-in│  │  (Caddy built-in│  │  ...          │  │
+│  │  + PHP workers) │  │  + PHP workers) │  │               │  │
+│  └─────────────────┘  └─────────────────┘  └───────────────┘  │
+│                                                                 │
+│  - Caddy web server built-in (no separate Nginx needed)        │
+│  - Application booted once, kept in memory per worker          │
+│  - HTTP/2 + HTTP/3 natively via Caddy                         │
+│  - Automatic TLS (Caddy handles certs, CDN handles edge)       │
+│  - Better Livewire worker isolation vs Swoole                  │
 └───────────────────────┬─────────────────────────────────────────┘
                         │
 ┌───────────────────────▼─────────────────────────────────────────┐
@@ -111,60 +115,111 @@ Page Rules:
   - Polish: Lossless
 ```
 
-### 2. Load Balancer (Nginx)
+### 2. Load Balancer (AWS ALB)
 
-**Configuration:**
-```nginx
-upstream octane_backend {
-    least_conn;
-    server 10.0.1.10:8000 weight=5;
-    server 10.0.1.11:8000 weight=5;
-    server 10.0.1.12:8000 weight=5;
-    keepalive 32;
-}
+FrankenPHP includes Caddy as the built-in web server, so a separate Nginx reverse proxy is **not needed**. AWS ALB distributes traffic directly to FrankenPHP pods.
 
-server {
-    listen 443 ssl http2;
-    server_name govportal.gov.my;
-    
-    # Rate limiting
-    limit_req_zone $binary_remote_addr zone=api:10m rate=100r/m;
-    limit_req zone=api burst=20 nodelay;
-    
-    # Proxy to Octane
-    location / {
-        proxy_pass http://octane_backend;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
+**ALB target group health check:**
+```
+Protocol: HTTP
+Path: /up
+Port: 8000
+Healthy threshold: 2
+Unhealthy threshold: 3
+Interval: 30s
 ```
 
-### 3. Laravel Octane (Swoole)
+**Rate limiting:** Applied at the Cloudflare WAF level (100 req/min per IP for public routes, 5/hour for contact form submissions).
 
-**Why Octane:**
-- Traditional PHP: Boot Laravel on every request (~50-100ms)
-- Octane: Boot once, keep in memory (~1-2ms per request)
-- **Performance gain: 10-20x faster**
+### 3. Laravel Octane + FrankenPHP
 
-**Worker Configuration:**
+**Why FrankenPHP over Swoole for this project:**
+
+| Factor | Decision |
+|--------|---------|
+| Nginx not needed | FrankenPHP/Caddy is the web server — one fewer service in Kubernetes |
+| Livewire isolation | Better worker process isolation vs Swoole shared memory |
+| Docker/K8s fit | Official `dunglas/frankenphp` image; no custom PHP extension compilation |
+| `Octane::table()` | Not used — Redis handles all shared state; Swoole-only feature not needed |
+| Laravel direction | Default server in Laravel 12; actively maintained by Laravel team |
+
+**Why Octane at all:**
+- Traditional PHP-FPM: Boot Laravel on every request (~50-100ms overhead)
+- FrankenPHP worker mode: Boot once, keep in memory (~1-2ms overhead)
+- **Performance gain: 10-20x faster than PHP-FPM**
+
+**Octane configuration:**
 ```php
 // config/octane.php
 return [
-    'server' => 'swoole',
-    
-    'swoole' => [
-        'workers' => 8,              // CPU cores * 2
-        'task_workers' => 4,         // Background jobs
-        'max_requests' => 1000,      // Restart worker after N requests
-        'max_execution_time' => 30,  // Request timeout
+    'server' => 'frankenphp',
+
+    'frankenphp' => [
+        'workers' => env('OCTANE_WORKERS', 8),  // CPU cores * 2
+        'max_requests' => env('OCTANE_MAX_REQUESTS', 500),
     ],
-    
-    'cache' => [
-        'rows' => 1000,              // In-memory table rows
-    ],
+];
+```
+
+**Dockerfile (FrankenPHP):**
+```dockerfile
+FROM dunglas/frankenphp:latest-php8.3
+
+# Install PHP extensions
+RUN install-php-extensions \
+    pdo_pgsql \
+    redis \
+    pcntl \
+    zip \
+    gd
+
+# Copy application
+COPY . /app
+WORKDIR /app
+
+RUN composer install --no-dev --optimize-autoloader
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
+
+EXPOSE 8000
+CMD ["php", "artisan", "octane:frankenphp", "--port=8000", "--workers=8"]
+```
+
+**Kubernetes pod spec:**
+```yaml
+# .kube/deployment.yaml (excerpt)
+containers:
+  - name: govportal
+    image: your-registry/govportal:latest
+    ports:
+      - containerPort: 8000
+    env:
+      - name: OCTANE_WORKERS
+        value: "8"
+      - name: OCTANE_MAX_REQUESTS
+        value: "500"
+    livenessProbe:
+      httpGet:
+        path: /up
+        port: 8000
+      initialDelaySeconds: 10
+      periodSeconds: 30
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
+      limits:
+        cpu: "2000m"
+        memory: "2Gi"
+```
+
+**Important FrankenPHP + Livewire config:**
+```php
+// config/livewire.php
+return [
+    'inject_assets' => true,
+    'navigate' => false,  // Keep off — verify Octane compatibility before enabling
 ];
 ```
 
@@ -173,12 +228,12 @@ return [
 **Structure:**
 ```
 Redis DB 0: Full-Page Cache
-  key: "page:/announcements:ms"
+  key: "page:/ms/siaran"
   value: <html>...</html>
   ttl: 3600
 
 Redis DB 1: Query Cache
-  key: "query:announcements:latest:10:ms"
+  key: "query:broadcasts:latest:6:ms"
   value: [ {...}, {...} ]
   ttl: 600
 
