@@ -205,6 +205,7 @@ One class per interactive component. Naming: `PascalCase`, file: `app/Livewire/{
 | `DirectoriSearch` | `app/Livewire/DirectoriSearch.php` | `resources/views/livewire/direktori-search.blade.php` |
 | `ContactForm` | `app/Livewire/ContactForm.php` | `resources/views/livewire/contact-form.blade.php` |
 | `SearchResults` | `app/Livewire/SearchResults.php` | `resources/views/livewire/search-results.blade.php` |
+| `AiChat` | `app/Livewire/AiChat.php` | `resources/views/livewire/ai-chat.blade.php` |
 
 **Rules for Livewire components:**
 - Always declare `public` properties for `wire:model` bindings
@@ -272,7 +273,34 @@ resources/views/
     dasar-privasi.blade.php
   carian/
     index.blade.php             ← embeds <livewire:search-results />
+  livewire/
+    ...
+    ai-chat.blade.php           ← floating chat widget (included in layouts/app.blade.php)
 ```
+
+### AI Classes (`app/Livewire/`, `app/Services/`, `app/Jobs/`, `app/Filament/Actions/Ai/`, `app/Observers/`)
+
+Consistent naming is required. Do not invent alternatives.
+
+| Class | File | Purpose |
+|-------|------|---------|
+| `AiChat` | `app/Livewire/AiChat.php` | Public chatbot Livewire component |
+| `AiService` | `app/Services/AiService.php` | Single entry point for all Prism PHP calls (Claude + OpenAI) |
+| `RagService` | `app/Services/RagService.php` | RAG pipeline: embed query → pgvector search → context assembly |
+| `EmbeddingObserver` | `app/Observers/EmbeddingObserver.php` | Fires on model `saved`/`deleted`; dispatches `GenerateEmbeddingJob` |
+| `GenerateEmbeddingJob` | `app/Jobs/GenerateEmbeddingJob.php` | Queued; chunks + embeds content; upserts `content_embeddings` |
+| `AiGrammarAction` | `app/Filament/Actions/Ai/AiGrammarAction.php` | Filament action: grammar check |
+| `AiTranslateAction` | `app/Filament/Actions/Ai/AiTranslateAction.php` | Filament action: translate BM ↔ EN |
+| `AiExpandAction` | `app/Filament/Actions/Ai/AiExpandAction.php` | Filament action: expand text |
+| `AiSummariseAction` | `app/Filament/Actions/Ai/AiSummariseAction.php` | Filament action: summarise |
+| `AiTldrAction` | `app/Filament/Actions/Ai/AiTldrAction.php` | Filament action: generate TLDR into excerpt field |
+| `AiGenerateAction` | `app/Filament/Actions/Ai/AiGenerateAction.php` | Filament action: generate from prompt or image |
+
+**AI naming rules:**
+- All Prism PHP / Claude / OpenAI calls go through `AiService` — never call Prism directly from controllers or Livewire components.
+- All pgvector search calls go through `RagService`.
+- `EmbeddingObserver` must be registered in `AppServiceProvider::boot()` for every embeddable model.
+- Filament AI actions live exclusively in `app/Filament/Actions/Ai/` — do not put them in Resources directly.
 
 ### Language Files (`lang/`)
 
@@ -449,6 +477,56 @@ php artisan test --filter=ContactFormTest
 # Test Livewire validation inline feedback:
 php artisan test --filter=ContactFormValidationTest
 # Expect: submitting empty form shows validation errors without page reload
+```
+
+### AI Chatbot (AiChat Livewire)
+
+```bash
+# Ensure ANTHROPIC_API_KEY and OPENAI_API_KEY are set in .env
+
+# Run embedding pipeline tests
+php artisan test --filter=GenerateEmbeddingJobTest
+# Expect: content_embeddings rows created for test model
+
+# Run chatbot component tests
+php artisan test --filter=AiChatTest
+# Expect: message submitted → response returned (mocked Prism)
+
+# Verify rate limiting
+for i in {1..12}; do curl -s -o /dev/null -w "%{http_code}\n" -X POST http://govportal.test/livewire/update; done
+# Expect: first 10 succeed, 11th and 12th return 429
+
+# Manual: visit /ms — floating chat button visible bottom-right; send a question about the ministry
+# Expect: response references actual content from the database
+```
+
+### Admin AI Editor (Filament Actions)
+
+```bash
+# Run Filament AI action tests
+php artisan test --filter=AiGrammarActionTest
+php artisan test --filter=AiTranslateActionTest
+# Expect: all pass (mock Prism responses)
+
+# Manual: log in to /admin as super_admin → edit a Broadcast → click "Semak Tatabahasa BM"
+# Expect: corrected text replaces field content without page reload
+```
+
+### RAG / pgvector
+
+```bash
+# Check pgvector extension is installed
+php artisan tinker --execute="DB::statement('SELECT extname FROM pg_extension WHERE extname = \'vector\'')"
+# Expect: result set with 'vector' row
+
+# Verify content_embeddings populated after seeding
+php artisan db:seed --class=BroadcastSeeder
+php artisan tinker --execute="App\Models\ContentEmbedding::count()"
+# Expect: integer > 0
+
+# Run similarity search smoke test
+php artisan test --filter=RagServiceTest
+# Expect: top-5 chunks returned for a test query
 ```
 
 ---

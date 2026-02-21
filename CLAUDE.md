@@ -10,7 +10,7 @@ A Laravel 12 recreation of https://www.digital.gov.my/ — the official website 
 
 The source to replicate is https://github.com/govtechmy/kd-portal (Next.js 15 + Payload CMS + MongoDB).
 
-**Scope constraint:** Build only what exists in kd-portal. Do not add features that are not present in the source site.
+**Scope constraint:** Build only what exists in kd-portal, **plus the approved AI extension** (public AI chatbot + admin AI content editor). All other features require explicit approval before adding.
 
 ---
 
@@ -47,6 +47,9 @@ This project uses the full **TALL stack**: Tailwind CSS, Alpine.js, Laravel, Liv
 | Charts | Chart.js | Not Recharts, not ApexCharts |
 | Carousel | Alpine.js + Embla.js (vanilla) | Alpine only for UI, no server state |
 | Agentic tooling | Laravel Boost v2.x | AI coding agent integration for agentic workflows |
+| AI framework | Prism PHP (`echolabsdev/prism`) | Unified interface for all AI provider calls (LLM + embeddings) |
+| AI provider | **Admin-configurable** via `ManageAiSettings` | Anthropic, OpenAI, Google Gemini, Groq, Mistral, Ollama, or any OpenAI-compatible endpoint (Qwen, Moonshot, DeepSeek, …) |
+| Vector storage | pgvector (PostgreSQL extension) | `content_embeddings` table; no separate vector DB; dimension configured via `PGVECTOR_DIMENSION` |
 
 ### Octane server: FrankenPHP
 
@@ -134,12 +137,16 @@ Use only the tag names defined in [docs/pages-features.md](docs/pages-features.m
 | Carousel | Alpine.js + Embla.js (vanilla) — no server state needed |
 | Static pages (Penafian, Dasar Privasi) | Content from `settings` table via Filament |
 | i18n | Native `lang/ms/` + `lang/en/` PHP arrays |
+| Public AI chatbot | Livewire component `AiChat`; RAG via pgvector + admin-configured LLM; rate limit configurable via settings |
+| Admin AI editor | Filament custom actions on RichEditor fields; any admin-configured LLM provider |
+| AI provider selection | `ManageAiSettings` Filament page; LLM + embedding provider/model/key configurable without code changes |
+| RAG pipeline | Model saved → `EmbeddingObserver` → `GenerateEmbeddingJob` (queued) → admin-configured embedding provider → pgvector |
 
 ---
 
 ## What Not To Do
 
-- Do not add features not present in kd-portal
+- Do not add features not present in kd-portal (exception: approved AI features — see Resolved Decisions)
 - Do not use Inertia.js, React, or Vue
 - Do not use Alpine.js for anything that involves server state — use Livewire instead
 - Do not use `fetch()` / `axios` directly in Alpine.js for data fetching — use Livewire wire calls

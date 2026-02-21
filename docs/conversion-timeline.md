@@ -476,6 +476,127 @@ Recreate homepage sections from kd-portal's `home/` components:
 
 ---
 
+### Phase 6: AI Features (Weeks 13–16)
+
+> **Approved extension beyond kd-portal parity.** See [docs/ai.md](ai.md) and [docs/architecture.md → AI Services Layer](architecture.md) for full specification.
+
+#### Week 13: RAG Foundation
+
+Set up the embedding pipeline so all content is vector-indexed before building the chatbot.
+
+**Tasks:**
+- [ ] Install `pgvector` PostgreSQL extension; enable in migration
+- [ ] Create `content_embeddings` migration + `ContentEmbedding` model (morphic, chunk_index, locale, embedding `vector(1536)`, metadata JSON)
+- [ ] Install Prism PHP (`echolabsdev/prism`); configure Anthropic + OpenAI providers in `config/prism.php`
+- [ ] Create `AiService` (`app/Services/AiService.php`) — single entry point for all Claude + OpenAI calls
+- [ ] Create `RagService` (`app/Services/RagService.php`) — embed query → pgvector similarity search → context assembly
+- [ ] Create `EmbeddingObserver` (`app/Observers/EmbeddingObserver.php`) — fires `GenerateEmbeddingJob` on model `saved`/`deleted`
+- [ ] Create `GenerateEmbeddingJob` (`app/Jobs/GenerateEmbeddingJob.php`) — queued; chunks content, calls OpenAI `text-embedding-3-small`, upserts `content_embeddings`
+- [ ] Register `EmbeddingObserver` on all embeddable models in `AppServiceProvider`: `Broadcast`, `Achievement`, `Policy`, `StaffDirectory`
+- [ ] Add `AI_CHATBOT_ENABLED`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` to `.env.example`
+- [ ] Write `GenerateEmbeddingJobTest` + `RagServiceTest`
+
+**Installation Commands:**
+
+```bash
+# pgvector extension (run in PostgreSQL)
+psql -U postgres -d govportal -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+# Prism PHP
+composer require echolabsdev/prism
+
+# Queue worker (for embedding jobs)
+php artisan queue:work --queue=embeddings
+```
+
+**Deliverables:**
+- `content_embeddings` table with pgvector column
+- `php artisan db:seed --class=BroadcastSeeder` → rows appear in `content_embeddings`
+- `RagServiceTest` passes (top-5 chunks returned for a test query)
+- `GenerateEmbeddingJobTest` passes
+
+**Effort:** 32 hours
+
+---
+
+#### Week 14: Public AI Chatbot
+
+Build the `AiChat` Livewire component and integrate it into the public layout.
+
+**Tasks:**
+- [ ] Create `AiChat` Livewire component (`app/Livewire/AiChat.php` + `resources/views/livewire/ai-chat.blade.php`)
+  - Properties: `$messages = []` (session conversation history), `$input = ''`, `$isThinking = false`
+  - Method `send()`: validates input, embeds query via `RagService`, builds prompt, calls Claude via `AiService`, appends response to `$messages`
+  - Rate limiting: 10 messages/hour per IP via `RateLimiter::attempt('ai-chat:' . $ip, 10, ...)`
+  - Session-only history: store in PHP session, not DB; never log PII
+- [ ] Create privacy disclaimer modal (Alpine.js) — shown on first open; acceptance stored in session
+- [ ] Add `<livewire:ai-chat />` to `resources/views/components/layouts/app.blade.php`
+- [ ] Style floating chat button + chat window with Tailwind (MyDS tokens)
+- [ ] Bilingual support: system prompt adapts to `app()->getLocale()`
+- [ ] Add `lang/ms/ai.php` + `lang/en/ai.php` for all AI-related UI strings
+- [ ] Write `AiChatTest` (mock `AiService` + `RagService`)
+- [ ] Add rate limit test: 11th message in same hour returns error response
+
+**Deliverables:**
+- Chat widget visible on `/ms` and `/en` pages
+- Sends question → receives contextually accurate response (sourced from DB content)
+- Rate limiting enforced (10/hour/IP)
+- Privacy disclaimer shown on first open
+- `AiChatTest` passes (all happy paths + rate limit)
+
+**Effort:** 32 hours
+
+---
+
+#### Week 15: Admin AI Content Editor
+
+Inject AI actions into existing Filament content resources.
+
+**Tasks:**
+- [ ] Create base Filament action classes in `app/Filament/Actions/Ai/`:
+  - `AiGrammarAction` — grammar check BM or EN
+  - `AiTranslateAction` — BM ↔ EN translation (from/to locale as constructor params)
+  - `AiExpandAction` — expand selected text
+  - `AiSummariseAction` — summarise field content
+  - `AiTldrAction` — generate 2-3 sentence TLDR → fills `excerpt_{locale}` field
+  - `AiGenerateAction` — generate from text prompt (modal)
+  - `AiGenerateFromImageAction` — generate from image URL + prompt (modal)
+- [ ] Inject relevant actions into these Filament resources: `BroadcastResource`, `AchievementResource`, `PolicyResource`
+- [ ] Add `lang/ms/ai_admin.php` + `lang/en/ai_admin.php` for action labels and confirmations
+- [ ] Write tests for each action class: `AiGrammarActionTest`, `AiTranslateActionTest`, etc. (mock `AiService`)
+- [ ] Manual QA: each action button opens modal or replaces content inline
+
+**Deliverables:**
+- AI action buttons visible on `content_ms` / `content_en` fields in Broadcast, Achievement, Policy editors
+- Each action calls Claude and returns a result within 10 seconds
+- All action tests pass (mocked)
+
+**Effort:** 32 hours
+
+---
+
+#### Week 16: AI QA, Performance & Monitoring
+
+**Tasks:**
+- [ ] Load test embedding job queue (target: 100 concurrent saves without job queue overflow)
+- [ ] Benchmark chatbot response time (target: first token < 2 seconds, full response < 10 seconds)
+- [ ] Add `ai_usage_logs` table (optional, anonymised): `operation`, `locale`, `duration_ms`, `tokens_used`, `created_at` — no user PII
+- [ ] Monitor pgvector index size; add `ivfflat` index on `content_embeddings.embedding` if > 10,000 rows
+- [ ] Verify PDPA compliance: no PII in embeddings (audit sample of 20 rows), no user data persisted in chat logs
+- [ ] Update Cloudflare WAF rules to allow AI chat Livewire requests (bypass full-page cache)
+- [ ] Add `AI_CHATBOT_ENABLED` feature flag check in `AiChat` component — disabled → hide widget gracefully
+- [ ] Documentation: update `docs/ai.md` with final architecture, API key rotation guide, cost estimation
+
+**Deliverables:**
+- AI chatbot handles 50 concurrent users without degrading page performance
+- pgvector index optimised
+- PDPA audit passed
+- `docs/ai.md` finalised
+
+**Effort:** 32 hours
+
+---
+
 ## Resource Requirements
 
 ### Team Composition

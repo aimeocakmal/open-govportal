@@ -35,6 +35,11 @@ These decisions are final. Do not reopen them without a documented reason.
 | Alpine.js scope | **Micro-interactions only**: mobile menu toggle, dropdown open/close, modal show/hide, carousel init | Alpine must NOT make server requests or manage application data |
 | Static pages (Penafian, Dasar Privasi) | **`settings` table via Filament** (not hardcoded Blade) | Allows non-dev edits; consistent with other CMS content |
 | i18n storage | **`lang/ms/` and `lang/en/` PHP arrays** | Native Laravel; no extra package; aligns with `App::setLocale()` |
+| Public AI chatbot | **Livewire component `AiChat`** — RAG via pgvector + admin-configured LLM; rate-limited (configurable) | Server-side streaming; no client-side fetch; session-only history; hidden if not configured |
+| Admin AI editor | **Filament custom actions** on RichEditor — grammar check, translate BM/EN, expand, summarise, TLDR, generate | Synchronous LLM calls (any configured provider); hidden if `ai_admin_editor_enabled = false` |
+| AI provider config | **`ManageAiSettings`** Filament settings page — LLM provider, model, API key, base URL; embedding provider, model, key; feature flags | Provider-agnostic: Anthropic, OpenAI, Google, Groq, Mistral, Ollama, OpenAI-compatible (Qwen, Moonshot, etc.) |
+| RAG embedding pipeline | **Observer → queued Job**: `EmbeddingObserver` dispatches `GenerateEmbeddingJob` on model save | Async; admin-configured embedding provider via Prism PHP; dimension must match pgvector column |
+| Vector storage | **pgvector** in existing PostgreSQL cluster — `content_embeddings` table | No separate vector DB; cosine similarity search; re-index required if embedding dimension changes |
 
 ---
 
@@ -401,6 +406,41 @@ protected $rules = [
 
 ---
 
+### AI Chatbot — **Status: Planned** (Phase 6)
+
+**Livewire component:** `App\Livewire\AiChat`
+**View:** `resources/views/livewire/ai-chat.blade.php`
+
+Floating chat widget rendered on all public pages via the base layout (`<livewire:ai-chat />`). Answers questions using RAG retrieval from embedded content.
+
+**User-facing behaviour:**
+- Floating "Chat with us" button (bottom-right) — Alpine.js toggle for open/close
+- Chat window shows conversation history (session-only — not persisted)
+- User message submitted via Livewire `wire:submit`
+- Response streams from the **admin-configured LLM provider** via Prism PHP (Livewire streaming)
+- Bilingual: responds in the same locale as the current page (`app()->getLocale()`)
+
+**RAG pipeline (per message):**
+1. Embed user message via admin-configured embedding provider (via `AiService::embed()`)
+2. pgvector similarity search on `content_embeddings` — top 5 chunks, filtered by locale
+3. Build system prompt: "You are the AI assistant for Kementerian Digital Malaysia. Answer using only the provided context."
+4. Call admin-configured LLM via `AiService::chat()` (Prism PHP) + conversation history (last 10 turns)
+5. Return response; append to session history
+
+**Rate limiting:** 10 messages/hour per IP via Redis rate limiter (Laravel `RateLimiter` facade).
+
+**Privacy disclaimer:** First-time chatbot open shows a modal: "Your messages may be processed by an AI provider. Do not share personal information." Acceptance stored in session.
+
+**Cache:** No cache — responses are dynamic per user query.
+
+**Blade layout placement:**
+```blade
+{{-- resources/views/components/layouts/app.blade.php --}}
+<livewire:ai-chat />  {{-- renders floating chat widget on all public pages --}}
+```
+
+---
+
 ## Admin Panel (Filament) — **Status: Planned**
 
 Replaces Payload CMS admin at `/admin`.
@@ -433,6 +473,43 @@ Replaces Payload CMS admin at `/admin`.
 | `ManageMinisterProfile` | MinisterProfile | Planned |
 | `ManageAddresses` | Addresses | Planned |
 | `ManageFeedbackSettings` | FeedbackSettings | Planned |
+| `ManageAiSettings` | AI configuration (Phase 6) | Planned |
+
+### Admin AI Content Editor — **Status: Planned** (Phase 6)
+
+AI-assisted editing is integrated as **Filament custom actions** on RichEditor and Textarea fields in all content resources. No new Filament resource is created — actions are injected into existing form schemas.
+
+**Resources that receive AI actions:** `BroadcastResource`, `AchievementResource`, `PolicyResource`, `HeroBannerResource` (any resource with `title_{locale}` or `content_{locale}` fields).
+
+**Available AI actions (per RichEditor field):**
+
+| Action label | Operation | Input | Output |
+|-------------|-----------|-------|--------|
+| **Semak Tatabahasa BM** | Grammar check (Bahasa Malaysia) | Field content | Corrected text with change summary |
+| **Grammar Check (EN)** | Grammar check (English) | Field content | Corrected text with change summary |
+| **Terjemah → EN** | Translate BM → EN | `content_ms` field | Fills `content_en` field |
+| **Terjemah → BM** | Translate EN → BM | `content_en` field | Fills `content_ms` field |
+| **Kembangkan** | Expand / elaborate | Selected text | Longer, more detailed version |
+| **Ringkaskan** | Summarise | Field content | Condensed version |
+| **Jana TLDR** | Auto TLDR | `content_{locale}` field | 2-3 sentence summary → fills `excerpt_{locale}` |
+| **Jana daripada Prompt** | Generate from text prompt | Modal: text prompt + locale | Draft content inserted into field |
+| **Jana daripada Imej** | Generate from image | Modal: image URL/upload + prompt | Caption or content based on image |
+
+**Implementation pattern:**
+```php
+// Inside BroadcastResource::form()
+Forms\Components\RichEditor::make('content_ms')
+    ->hintAction(
+        AiGrammarAction::make('grammar_ms')->locale('ms')
+    )
+    ->hintAction(
+        AiTranslateAction::make('translate_to_en')->from('ms')->to('en')
+    )
+    // ...
+```
+
+**Service class:** `App\Services\AiService` — single entry point for all Prism PHP / Claude calls.
+**Action classes:** `app/Filament/Actions/Ai/` — one class per operation, injected as Filament actions.
 
 ---
 
@@ -449,6 +526,7 @@ Server-side reactive components. Use for anything that involves data from the da
 | `DirectoriSearch` | `livewire/direktori-search.blade.php` | `/direktori` |
 | `ContactForm` | `livewire/contact-form.blade.php` | `/hubungi-kami` |
 | `SearchResults` | `livewire/search-results.blade.php` | `/carian` |
+| `AiChat` | `livewire/ai-chat.blade.php` | All public pages (floating widget) |
 
 ### Alpine.js (micro-interactions only — no server calls)
 
@@ -558,8 +636,11 @@ When a model is saved, these cache tags must be flushed:
 | `MinisterProfile` | `profil-kementerian` |
 | `Address` | `hubungi-kami` |
 | `Setting` (`site_default_theme` key) | `navigation` |
+| Any embeddable model saved | No page cache tag — triggers `GenerateEmbeddingJob` instead (pgvector update) |
 
 Implement invalidation via a `CacheObserver` registered on each model in `AppServiceProvider`.
+
+**Note on AI chatbot:** The `AiChat` Livewire component bypasses all Redis page caching — responses are always dynamically generated per user query.
 
 ---
 

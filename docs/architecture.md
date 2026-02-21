@@ -385,9 +385,149 @@ Cache::events()->listen(function ($event) {
 
 *Can scale down for lower traffic or use smaller instances for development.*
 
+## AI Services Layer
+
+### Overview
+
+The AI features run as an additional service layer on top of the existing architecture. No separate AI infrastructure is required — all AI work happens within the Laravel application process via Prism PHP, with vector storage in the existing PostgreSQL cluster.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        AI SERVICES LAYER                        │
+│                   (all providers configurable                   │
+│                    via ManageAiSettings in /admin)              │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │               LLM PROVIDER (admin-configurable)          │  │
+│  │  Anthropic │ OpenAI │ Google Gemini │ Groq │ Mistral     │  │
+│  │  xAI │ Ollama (local) │ OpenAI-compatible endpoint       │  │
+│  │  (Qwen/DashScope, Moonshot, DeepSeek, Together AI, ...)  │  │
+│  │                                                          │  │
+│  │  - Chatbot responses      - Grammar check BM/EN          │  │
+│  │  - Translate BM ↔ EN     - Expand / Summarise            │  │
+│  │  - TLDR generation        - Generate from prompt/image   │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────┐  ┌─────────────────────────┐   │
+│  │ EMBEDDING PROVIDER        │  │ pgvector (PostgreSQL)    │   │
+│  │ (admin-configurable)      │  │ content_embeddings table │   │
+│  │ OpenAI │ Google │ Cohere  │  │ - morphic (type + id)    │   │
+│  │ VoyageAI │ Ollama (local) │  │ - chunk_index, locale    │   │
+│  │                           │  │ - embedding vector(n)    │   │
+│  │ Dimension varies by model │  │ - metadata JSON          │   │
+│  └───────────────────────────┘  └─────────────────────────┘   │
+│                                                                 │
+│  Prism PHP (echolabsdev/prism) — unified interface;            │
+│  AiService resolves active provider from settings table        │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### RAG Pipeline (Retrieval-Augmented Generation)
+
+Content is embedded on every save and queried at chat time:
+
+```
+WRITE PATH (content save):
+  Model saved → EmbeddingObserver → dispatch GenerateEmbeddingJob
+  → GenerateEmbeddingJob (queued, async):
+      1. Chunk content into ~500-token segments (ms + en separately)
+      2. Call OpenAI text-embedding-3-small via Prism PHP
+      3. Upsert into content_embeddings (embeddable_type, embeddable_id, chunk_index, locale)
+      4. Log embedding stats for monitoring
+
+READ PATH (chatbot query):
+  User message → AiChat Livewire component:
+      1. Embed user query via OpenAI (same model for consistent vector space)
+      2. pgvector similarity search: top-5 chunks by cosine distance, filtered by locale
+      3. Build context prompt: system prompt + retrieved chunks + conversation history
+      4. Call Claude claude-sonnet-4-6 via Prism PHP (streaming)
+      5. Return response; append to session-only conversation history
+```
+
+### Models That Generate Embeddings
+
+| Model | Fields embedded | Priority |
+|-------|----------------|---------|
+| `Broadcast` | `title_{locale}`, `content_{locale}`, `excerpt_{locale}` | High |
+| `Achievement` | `title_{locale}`, `description_{locale}` | High |
+| `Policy` | `title_{locale}`, `description_{locale}` | Medium |
+| `StaffDirectory` | `name`, `position_{locale}`, `department_{locale}` | Low |
+| Settings (`homepage_*`, `disclaimer_*`, `privacy_policy_*`) | value | Medium |
+
+### Admin AI Editor (Filament)
+
+AI actions are implemented as **Filament custom actions** on RichEditor fields. They call Claude synchronously (no job queue) since admin users expect immediate feedback.
+
+```
+Admin opens content editor in Filament
+→ Clicks AI action button on RichEditor field
+→ Filament Action calls AiService::handle($operation, $text, $locale)
+→ Prism PHP calls Claude claude-sonnet-4-6
+→ Returns result; Filament replaces/appends field content
+```
+
+**Available operations:**
+
+| Action | Trigger | Input | Output |
+|--------|---------|-------|--------|
+| Grammar Check (BM) | Button | Selected text | Corrected text + explanation |
+| Grammar Check (EN) | Button | Selected text | Corrected text + explanation |
+| Translate BM → EN | Button | Full field content | English translation |
+| Translate EN → BM | Button | Full field content | Bahasa Malaysia translation |
+| Expand | Button | Selected text | Longer, more detailed version |
+| Summarise | Button | Full field content | Condensed version |
+| Auto TLDR | Button | Full field content | 2-3 sentence summary (saved to `excerpt_{locale}`) |
+| Generate from Prompt | Modal | Text prompt | Draft content |
+| Generate from Image | Modal | Image URL + prompt | Description or content based on image |
+
+### Rate Limiting
+
+| Feature | Limit | Scope |
+|---------|-------|-------|
+| Public chatbot | 10 messages/hour | Per IP (Redis rate limiter) |
+| Admin AI editor | No limit | Authenticated users only |
+| Embedding job | Throttled via queue | 5 concurrent workers max |
+
+### Privacy & PDPA Compliance
+
+- No PII (names, emails, ICs) is stored in `content_embeddings`
+- Conversation history stored in PHP session only — not persisted to database
+- Chat logs (if any) anonymised — no user identification
+- User messages sent to Anthropic API per their privacy policy; inform users via chatbot disclaimer
+
+### Environment Variables (Fallback Defaults)
+
+All values below are **fallback defaults** only — they are overridden by the admin-configured settings stored in the `settings` table via `ManageAiSettings`. Use `.env` for local development; use the admin panel in production.
+
+```env
+# LLM provider fallback
+AI_LLM_PROVIDER=anthropic         # anthropic | openai | google | groq | mistral | xai | ollama | openai-compatible
+AI_LLM_MODEL=claude-sonnet-4-6
+AI_LLM_API_KEY=sk-ant-...
+AI_LLM_BASE_URL=                   # only for openai-compatible (e.g., Qwen, Moonshot)
+
+# Embedding provider fallback
+AI_EMBEDDING_PROVIDER=openai
+AI_EMBEDDING_MODEL=text-embedding-3-small
+AI_EMBEDDING_API_KEY=sk-...
+AI_EMBEDDING_DIMENSION=1536        # must match pgvector column; changing requires reindex
+
+# pgvector
+PGVECTOR_ENABLED=true
+PGVECTOR_DIMENSION=1536            # set before running migrations; changing requires column rebuild
+
+# Feature flags (also configurable in ManageAiSettings)
+AI_CHATBOT_ENABLED=false
+AI_ADMIN_EDITOR_ENABLED=false
+AI_CHATBOT_RATE_LIMIT=10
+```
+
+---
+
 ## Next Steps
 
 1. [Documentation Guide](README.md)
 2. [Caching Strategy](caching.md)
 3. [Database Schema](database-schema.md)
 4. [Agentic Coding Playbook](agentic-coding.md)
+5. [AI Features](ai.md)

@@ -15,6 +15,7 @@ This folder contains planning and technical reference documents for OpenGovPorta
 9. `docs/api.md` for REST API endpoints, request/response format, and rate limiting.
 10. `docs/deployment.md` for Docker, Kubernetes, zero-downtime deployment, and backups.
 11. `docs/security.md` for OWASP coverage, security headers, RBAC, and PDPA compliance.
+12. `docs/ai.md` for AI chatbot architecture, RAG pipeline, embedding strategy, and admin AI editor.
 
 ## Project Phases
 
@@ -25,6 +26,7 @@ This folder contains planning and technical reference documents for OpenGovPorta
 | **3: Public Pages** | 6–9 | All 10 public pages, Livewire components, bilingual routes, SEO |
 | **4: Performance & Quality** | 10–11 | Redis caching, WCAG AA, PHPUnit coverage, security audit, load testing |
 | **5: Migration & Launch** | 12 | Content migration from MongoDB, DNS cutover, production deploy, monitoring |
+| **6: AI Features** | 13–16 | RAG pipeline (pgvector embeddings), public AI chatbot (`AiChat` Livewire), admin AI content editor (Filament) |
 
 See [conversion-timeline.md](conversion-timeline.md) for detailed tasks, installation commands, and acceptance criteria per phase.
 

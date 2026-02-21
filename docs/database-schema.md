@@ -350,9 +350,62 @@ INSERT INTO settings VALUES
     ('twitter_url', '', 'string', NOW()),
     ('instagram_url', '', 'string', NOW()),
     ('youtube_url', '', 'string', NOW()),
-    ('site_default_theme', 'default', 'string', NOW());
+    ('site_default_theme', 'default', 'string', NOW()),
                                             -- valid values: keys in config/themes.php valid_themes array
+
+    -- AI configuration (Phase 6) — managed via ManageAiSettings Filament page
+    ('ai_llm_provider',          'anthropic',                 'string',    NOW()),
+    ('ai_llm_model',             'claude-sonnet-4-6',         'string',    NOW()),
+    ('ai_llm_api_key',           '',                          'encrypted', NOW()),
+    ('ai_llm_base_url',          '',                          'string',    NOW()),
+    -- ai_llm_base_url only needed for openai-compatible providers (Qwen, Moonshot, DeepSeek, etc.)
+
+    ('ai_embedding_provider',    'openai',                    'string',    NOW()),
+    ('ai_embedding_model',       'text-embedding-3-small',    'string',    NOW()),
+    ('ai_embedding_api_key',     '',                          'encrypted', NOW()),
+    ('ai_embedding_dimension',   '1536',                      'integer',   NOW()),
+    -- ai_embedding_dimension must match content_embeddings.embedding column dimension
+    -- changing requires full re-index: php artisan govportal:reindex-embeddings
+
+    ('ai_chatbot_enabled',       'false',                     'boolean',   NOW()),
+    ('ai_admin_editor_enabled',  'false',                     'boolean',   NOW()),
+    ('ai_chatbot_rate_limit',    '10',                        'integer',   NOW());
+    -- ai_chatbot_rate_limit: messages per hour per IP address
 ```
+
+> **Encrypted settings:** Keys with `type = 'encrypted'` are stored via `Crypt::encrypt()` and read via `Crypt::decrypt()` in `AiService`. The `Setting::get()` helper handles encryption/decryption transparently when `type = 'encrypted'`.
+
+### `content_embeddings` (Phase 6 — AI)
+
+Stores vector embeddings for all embeddable content models. Used by the RAG pipeline.
+
+```sql
+CREATE TABLE content_embeddings (
+    id              BIGSERIAL PRIMARY KEY,
+    embeddable_type VARCHAR(255) NOT NULL,   -- e.g., 'App\Models\Broadcast'
+    embeddable_id   BIGINT NOT NULL,
+    chunk_index     SMALLINT NOT NULL DEFAULT 0,
+    locale          VARCHAR(5) NOT NULL,     -- 'ms' or 'en'
+    content         TEXT NOT NULL,           -- raw chunk text (debugging / re-index)
+    embedding       vector(1536) NOT NULL,   -- dimension set by PGVECTOR_DIMENSION env var
+    metadata        JSONB,                   -- {title, slug, url, type, provider, model, dimension}
+    created_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    UNIQUE (embeddable_type, embeddable_id, chunk_index, locale)
+);
+
+CREATE INDEX idx_ce_morphic ON content_embeddings (embeddable_type, embeddable_id);
+
+-- Add after > 10,000 rows for performance:
+-- CREATE INDEX idx_ce_vector ON content_embeddings
+--     USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+```
+
+**Notes:**
+- `embedding vector(1536)` — dimension is fixed at table creation by `PGVECTOR_DIMENSION` env var (default `1536`)
+- To use a different embedding model with different dimensions, set `PGVECTOR_DIMENSION` before migrations and re-run `php artisan govportal:reindex-embeddings`
+- `metadata.provider` and `metadata.model` record which provider/model generated this embedding (for audit and re-index detection)
 
 ### `navigation_items`
 
