@@ -30,7 +30,17 @@
       "Bash(npm run build:*)",
       "Bash(~/.nvm/nvm.sh use:*)",
       "Bash(source:*)",
-      "Bash(npm --version:*)"
+      "Bash(npm --version:*)",
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__database-schema",
+      "mcp__laravel-boost__search-docs",
+      "mcp__laravel-boost__list-artisan-commands",
+      "mcp__laravel-boost__database-query",
+      "Bash(vendor/bin/pint:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(grep:*)"
     ]
   }
 }
