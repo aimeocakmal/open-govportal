@@ -273,44 +273,65 @@ php artisan migrate
 
 ### Phase 2: Content Models & CMS (Weeks 3–5)
 
-> **AI-agentic rule for Phase 2:** All model + Filament resource work starts with **Filament Blueprint**. Define the model in `draft.yaml`, run `php artisan blueprint:build`, verify the generated migration against `docs/database-schema.md`, then apply the Post-Generation Checklist. See [docs/agentic-coding.md → Filament Blueprint](agentic-coding.md) for the full protocol. Do **not** write migration/model/resource boilerplate by hand.
+> **AI-agentic rule for Phase 2:** Filament Blueprint is a **planning tool only** — `php artisan blueprint:build` does not exist. Use `php artisan make:model -mfs` to scaffold model + migration + factory + seeder, then `php artisan make:filament-resource` for the admin resource. Verify migration against `docs/database-schema.md`, then apply the Post-Generation Checklist. See `memory/filament-v5.md` for Filament v5 property types and resource structure.
 
-#### Week 3: Core Content Models
+#### Week 3: Core Content Models ✅ COMPLETED 2026-02-21
 
-Map all Payload CMS collections to Laravel models + Filament resources using Blueprint:
+Map all Payload CMS collections to Laravel models + Filament resources:
 
 **Tasks:**
-- [ ] Add `Broadcast`, `Achievement`, `Celebration`, `HeroBanner`, `QuickLink`, `Policy` to `draft.yaml` and run `php artisan blueprint:build`
-- [ ] Verify each generated migration matches `docs/database-schema.md` exactly; add GIN indexes for FTS
-- [ ] Apply Post-Generation Checklist for all 6 models (bilingual form tabs, published() scope, role gates, seeders)
+- [x] Create `Broadcast`, `Achievement`, `Celebration`, `HeroBanner`, `QuickLink`, `Policy` via `make:model -mfs` + `make:filament-resource`
+- [x] Verify each migration matches `docs/database-schema.md` exactly; add GIN indexes for FTS (wrapped in `DB::getDriverName() === 'pgsql'` check for SQLite test compatibility)
+- [x] Apply Post-Generation Checklist for all 6 models (bilingual form tabs, `published()`/`active()` scopes, factories with states, bilingual seeders)
+- [x] Update `RoleSeeder` with all 6 roles and 55 content permissions
+- [x] Write PHPUnit feature tests for all 6 models (46 tests, 68 assertions)
+- [x] Run Pint formatter
 
-**Each model follows the Blueprint-first workflow:**
-1. Add model definition to `draft.yaml` matching `docs/database-schema.md` column-for-column
-2. `php artisan blueprint:build` → verify migration → apply Post-Generation Checklist
+**Each model follows this workflow:**
+1. `php artisan make:model -mfs` → write migration matching `docs/database-schema.md` column-for-column
+2. `php artisan make:filament-resource` → customise form schema (bilingual tabs) and table
 3. Bilingual fields: `title_ms`/`title_en`, `content_ms`/`content_en` (or `description_ms`/`description_en`)
-4. Draft/published status with `published_at` scheduling; `published()` local scope
+4. Draft/published status with `published_at` scheduling; `scopePublished()` or `scopeActive()` local scope
 5. Featured image stored as S3 key string (via admin-configured `media_disk`)
 
+**Lessons learned:**
+- Filament v5 `$navigationGroup` must use type `\UnitEnum|string|null` (not `?string`)
+- PostgreSQL-specific raw SQL (GIN indexes, `to_tsvector`, `DESC` indexes) must be guarded by `if (DB::getDriverName() === 'pgsql')` since PHPUnit uses SQLite `:memory:`
+- Filament v5 forms use `Filament\Schemas\Schema` (not `Filament\Forms\Form`), `->components()`, `->recordActions()`, `->toolbarActions()`
+
 **Deliverables:**
-- 6 Filament resources working
-- All migrations run
+- 6 Filament resources working (Content group: Broadcast, Achievement, Celebration, Policy; Homepage group: HeroBanner, QuickLink)
+- All 6 migrations run on PostgreSQL
+- 53 total tests passing (80 assertions)
 
 **Effort:** 40 hours
 
 #### Week 4: Directory, Files & Site Config
 
-**Tasks:**
-- [ ] Add `StaffDirectory`, `File`, `Media`, `Feedback`, `SearchOverride` to `draft.yaml`; run `php artisan blueprint:build`; apply Post-Generation Checklist for each
-- [ ] Filament settings pages (replacing Payload CMS Globals):
-  - [ ] `ManageSiteInfo` — site name (ms/en), description, logo (S3 upload), dark-mode logo (S3), favicon (S3), social media URLs, GA tracking ID, default theme
-  - [ ] `ManageEmailSettings` — mail driver (ses/smtp/mailgun/log), SMTP host/port/credentials (encrypted), from address/name (ms/en); `SettingObserver` applies `Config::set('mail.*')` at runtime without Octane restart
-  - [ ] `ManageFooter` — footer link sections (label ms/en + URL) and social media links
-  - [ ] `ManageHomepage` — homepage layout flags and section ordering
-  - [ ] `ManageMinisterProfile` — current minister photo (S3), name, bilingual title and bio, appointment date
-  - [ ] `ManageAddresses` — office addresses with phone/fax/email/Google Maps URL
-  - [ ] `ManageFeedbackSettings` — enable/disable widget, recipient email, success messages (ms/en)
-  - [ ] `ManageMediaSettings` — storage driver selector (local/s3/r2/gcs/azure) with conditional credential fields per provider; `SettingObserver` rebuilds active disk config at runtime; requires cloud Flysystem packages below
-- [ ] Rich text editor integration (Filament RichEditor or Tiptap)
+**Tasks — Content Models (5 remaining):**
+- [ ] `StaffDirectory` — model, migration (`staff_directories` table with GIN FTS index), factory, seeder, Filament resource with bilingual position/department fields
+- [ ] `PolicyFile` — model (mapped from Payload `File`), migration (`files` table), factory, seeder, Filament resource; note: use `protected $table = 'files'` per CLAUDE.md naming (`File → PolicyFile`)
+- [ ] `Media` — model, migration (`media` table), factory, seeder, Filament resource with file upload
+- [ ] `Feedback` — model, migration (`feedbacks` table), factory, seeder, Filament resource (read-only admin view); note: `ip_address` column uses `INET` on PostgreSQL — use `$table->string('ip_address', 45)` for cross-DB compatibility
+- [ ] `SearchOverride` — model, migration (`search_overrides` table), factory, seeder, Filament resource
+
+**Tasks — Site Config Tables (4 new migrations):**
+- [ ] `footer_settings` migration + `ManageFooter` Filament settings page
+- [ ] `minister_profiles` migration + `ManageMinisterProfile` Filament settings page
+- [ ] `addresses` migration + `ManageAddresses` Filament settings page
+- [ ] `feedback_settings` migration + `ManageFeedbackSettings` Filament settings page
+
+**Tasks — Settings Pages (using existing `settings` table):**
+- [ ] `ManageSiteInfo` — site name (ms/en), description, logo (S3 upload), dark-mode logo (S3), favicon (S3), social media URLs, GA tracking ID, default theme
+- [ ] `ManageEmailSettings` — mail driver (ses/smtp/mailgun/log), SMTP host/port/credentials (encrypted), from address/name (ms/en); `SettingObserver` applies `Config::set('mail.*')` at runtime without Octane restart
+- [ ] `ManageMediaSettings` — storage driver selector (local/s3/r2/gcs/azure) with conditional credential fields per provider; `SettingObserver` rebuilds active disk config at runtime
+
+**Deferred to Week 6:**
+- `ManageHomepage` — no schema defined in `database-schema.md`; defer until Homepage page is built (Week 6) when actual layout flags are determined. Will use `settings` table keys (e.g. `homepage_show_carousel`, `homepage_section_order`).
+
+**Notes:**
+- Rich text editor: Filament v5 already includes `RichEditor` — no additional integration needed (already used in `BroadcastForm` for `content_ms`/`content_en`)
+- Cloud Flysystem packages: install only when `ManageMediaSettings` is tested with a live provider
 
 **Installation Commands (cloud storage — install only drivers you need):**
 
@@ -326,29 +347,36 @@ composer require league/flysystem-azure-blob-storage "^3.0"
 ```
 
 **Deliverables:**
-- All Payload collections mapped to Filament
-- Site configuration editable from admin
-- Media library working
+- All 11 Payload collections mapped to Filament resources (6 from Week 3 + 5 new)
+- 4 site config tables migrated + settings pages working
+- 3 settings pages (SiteInfo, Email, Media) reading/writing `settings` table
 
 **Effort:** 40 hours
 
 #### Week 5: Admin Polish
 
-**Tasks:**
-- [ ] Content versioning / revision history
-- [ ] Draft/publish workflow with scheduled publishing
-- [ ] Search indexing via Laravel Scout (PostgreSQL FTS)
-- [ ] Bulk actions in Filament
-- [ ] Image optimization on upload
-- [ ] Content preview from admin
-- [ ] Role-based access within Filament resources
-- [ ] `UserResource` enhancements: `department` field for `department_admin` scoping, last-login display column, deactivate/reactivate user action, admin password reset action, bulk role assignment
-- [ ] `RoleResource`: CRUD for Spatie Permission roles + checkbox-based permission assignment per role; update `RoleSeeder` to seed all 6 roles (`super_admin`, `department_admin`, `content_editor`, `content_author`, `publisher`, `viewer`) with default permissions per content type plus `manage_users`, `manage_roles`, `manage_settings`
+Split into must-have (5a) and nice-to-have (5b) to avoid overloading.
+
+**Week 5a — Must-Have:**
+- [ ] `UserResource` enhancements: `department` field for `department_admin` scoping, `last_login_at` display column, deactivate/reactivate user action, admin password reset action, bulk role assignment
+- [ ] `RoleResource`: CRUD for Spatie Permission roles + checkbox-based permission assignment per role (note: `RoleSeeder` already seeds all 6 roles + 55 permissions from Week 3)
+- [ ] Role-based access within Filament resources — Filament policies for all content resources, scoped by Spatie permissions
+- [ ] Draft/publish workflow: publish action button on list/edit pages, scheduled publishing via `published_at` (scheduler checks for publishable records)
+- [ ] Bulk actions in Filament: publish, unpublish, change status (extends existing `DeleteBulkAction`)
+- [ ] `StaticPage` + `PageCategory` models, migrations, Filament resources (from `database-schema.md`)
+- [ ] `ManageHomepage` settings page — homepage layout flags using `settings` table keys (deferred from Week 4; built now that Homepage data needs are clearer)
+
+**Week 5b — Nice-to-Have (can overlap with Week 6):**
+- [ ] Search indexing via PostgreSQL FTS — `searchable_content` migration + custom Scout driver; note: uses `TSVECTOR GENERATED ALWAYS AS (...)` which is PostgreSQL-only, tests need special handling
+- [ ] Image optimization on upload — WebP conversion, resize on S3 upload
+- [ ] Content preview from admin — generate preview URL showing draft content
+- [ ] Content versioning / revision history — **no schema defined in `database-schema.md`**; evaluate `spatie/laravel-activitylog` or add a `content_revisions` table before implementing
 
 **Deliverables:**
-- Full CMS parity with Payload
-- Search indexing working
-- Workflow: Draft → Review → Publish
+- Full CMS parity with Payload (all 12 collections + all globals)
+- Draft → Publish workflow with permissions enforcement
+- User + role management in Filament
+- Search indexing working (5b)
 
 **Effort:** 40 hours
 
@@ -729,6 +757,7 @@ class QuickLink extends Model {
 |------|-----------|-----------------|
 | 1 | ✅ Tooling Bootstrap | Laravel 12 + Octane + Filament + Boost + Blueprint all installed and verified — 2026-02-21 |
 | 2 | ✅ Design System & Base UI | Alpine.js + MyDS tokens + theme system + nav/footer + RBAC roles + 5 passing tests — 2026-02-21 |
+| 3 | ✅ Core Content Models | 6 models + Filament resources + 6 roles + 55 permissions + 53 tests passing — 2026-02-21 |
 | 5 | CMS Complete | All 12 collections manageable in Filament |
 | 9 | All Pages Complete | All 10 public pages functional in ms/en |
 | 11 | QA Complete | 90+ Lighthouse, WCAG AA, load test passed |

@@ -534,14 +534,14 @@ Replaces Payload CMS admin at `/admin`.
 
 | Resource | Model | Payload Collection / Source | Status |
 |----------|-------|-----------------------------|--------|
-| `BroadcastResource` | `Broadcast` | Broadcast | Planned |
-| `AchievementResource` | `Achievement` | Achievement | Planned |
-| `CelebrationResource` | `Celebration` | Celebration | Planned |
+| `BroadcastResource` | `Broadcast` | Broadcast | **Implemented** — Week 3; tests: `BroadcastTest` (8 tests) |
+| `AchievementResource` | `Achievement` | Achievement | **Implemented** — Week 3; tests: `AchievementTest` (8 tests) |
+| `CelebrationResource` | `Celebration` | Celebration | **Implemented** — Week 3; tests: `CelebrationTest` (7 tests) |
 | `StaffDirectoryResource` | `StaffDirectory` | Directory | Planned |
-| `PolicyResource` | `Policy` | Policy | Planned |
-| `FileResource` | `File` | File | Planned |
-| `HeroBannerResource` | `HeroBanner` | HeroBanner | Planned |
-| `QuickLinkResource` | `QuickLink` | QuickLink | Planned |
+| `PolicyResource` | `Policy` | Policy | **Implemented** — Week 3; tests: `PolicyTest` (9 tests) |
+| `PolicyFileResource` | `PolicyFile` | File | Planned |
+| `HeroBannerResource` | `HeroBanner` | HeroBanner | **Implemented** — Week 3; tests: `HeroBannerTest` (7 tests) |
+| `QuickLinkResource` | `QuickLink` | QuickLink | **Implemented** — Week 3; tests: `QuickLinkTest` (7 tests) |
 | `MediaResource` | `Media` | Media | Planned |
 | `FeedbackResource` | `Feedback` | Feedback (read-only) | Planned |
 | `SearchOverrideResource` | `SearchOverride` | Search-Overrides | Planned |
