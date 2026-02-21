@@ -147,6 +147,7 @@ Use only the tag names defined in [docs/pages-features.md](docs/pages-features.m
 | RAG pipeline | Model saved → `EmbeddingObserver` → `GenerateEmbeddingJob` (queued) → admin-configured embedding provider → pgvector |
 | Site settings management | `ManageSiteInfo` (branding, logo, favicon, social), `ManageEmailSettings` (SMTP/mail driver), `ManageMediaSettings` (storage driver + cloud credentials), `ManageAiSettings` (AI provider + system prompt) — all in `settings` table; encrypted for passwords and API keys |
 | User & role management | `UserResource` (create/edit/deactivate users, assign roles, `department` field for scoping) + `RoleResource` (Spatie Permission CRUD); **6 roles**: `super_admin`, `department_admin`, `content_editor`, `content_author`, `publisher`, `viewer` |
+| Model + resource scaffolding | **Filament Blueprint first** — define model in `draft.yaml`, run `php artisan blueprint:build`, verify migration against `docs/database-schema.md`, apply Post-Generation Checklist; never hand-write resource boilerplate |
 
 ---
 
@@ -160,6 +161,7 @@ Use only the tag names defined in [docs/pages-features.md](docs/pages-features.m
 - Do not reference docs that don't exist in this repo
 - Do not mark a task done without running the validation commands
 - Do not combine multiple models or routes in a single task — work in atomic slices
+- Do not write Filament resource boilerplate (migrations, models, resource pages) manually from scratch — define in `draft.yaml` and run `php artisan blueprint:build` first, then customise
 
 ---
 

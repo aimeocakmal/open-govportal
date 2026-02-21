@@ -273,23 +273,23 @@ php artisan migrate
 
 ### Phase 2: Content Models & CMS (Weeks 3–5)
 
+> **AI-agentic rule for Phase 2:** All model + Filament resource work starts with **Filament Blueprint**. Define the model in `draft.yaml`, run `php artisan blueprint:build`, verify the generated migration against `docs/database-schema.md`, then apply the Post-Generation Checklist. See [docs/agentic-coding.md → Filament Blueprint](agentic-coding.md) for the full protocol. Do **not** write migration/model/resource boilerplate by hand.
+
 #### Week 3: Core Content Models
 
-Map all Payload CMS collections to Laravel models + Filament resources:
+Map all Payload CMS collections to Laravel models + Filament resources using Blueprint:
 
 **Tasks:**
-- [ ] `Broadcast` model + migration + Filament resource (replaces Payload `Broadcast`)
-- [ ] `Achievement` model + migration + Filament resource
-- [ ] `Celebration` model + migration + Filament resource
-- [ ] `HeroBanner` model + migration + Filament resource
-- [ ] `QuickLink` model + migration + Filament resource
-- [ ] `Policy` model + migration + Filament resource
+- [ ] Add `Broadcast`, `Achievement`, `Celebration`, `HeroBanner`, `QuickLink`, `Policy` to `draft.yaml` and run `php artisan blueprint:build`
+- [ ] Verify each generated migration matches `docs/database-schema.md` exactly; add GIN indexes for FTS
+- [ ] Apply Post-Generation Checklist for all 6 models (bilingual form tabs, published() scope, role gates, seeders)
 
-**Each model needs:**
-- Multilingual fields (title_ms, title_en, content_ms, content_en)
-- Draft/published status
-- Published-at scheduling
-- Featured image via S3
+**Each model follows the Blueprint-first workflow:**
+1. Add model definition to `draft.yaml` matching `docs/database-schema.md` column-for-column
+2. `php artisan blueprint:build` → verify migration → apply Post-Generation Checklist
+3. Bilingual fields: `title_ms`/`title_en`, `content_ms`/`content_en` (or `description_ms`/`description_en`)
+4. Draft/published status with `published_at` scheduling; `published()` local scope
+5. Featured image stored as S3 key string (via admin-configured `media_disk`)
 
 **Deliverables:**
 - 6 Filament resources working
@@ -300,11 +300,7 @@ Map all Payload CMS collections to Laravel models + Filament resources:
 #### Week 4: Directory, Files & Site Config
 
 **Tasks:**
-- [ ] `StaffDirectory` model + migration + Filament resource
-- [ ] `File` model + migration + Filament resource (downloadable files)
-- [ ] `Media` model + migration + Filament resource
-- [ ] `Feedback` model + migration + Filament resource
-- [ ] `SearchOverride` model + Filament resource
+- [ ] Add `StaffDirectory`, `File`, `Media`, `Feedback`, `SearchOverride` to `draft.yaml`; run `php artisan blueprint:build`; apply Post-Generation Checklist for each
 - [ ] Filament settings pages (replacing Payload CMS Globals):
   - [ ] `ManageSiteInfo` — site name (ms/en), description, logo (S3 upload), dark-mode logo (S3), favicon (S3), social media URLs, GA tracking ID, default theme
   - [ ] `ManageEmailSettings` — mail driver (ses/smtp/mailgun/log), SMTP host/port/credentials (encrypted), from address/name (ms/en); `SettingObserver` applies `Config::set('mail.*')` at runtime without Octane restart

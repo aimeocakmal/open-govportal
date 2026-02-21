@@ -57,12 +57,13 @@ Inputs:
   - docs/database-schema.md → "broadcasts" table definition
   - docs/pages-features.md → Section "2. Siaran" for field requirements
   - docs/conversion-timeline.md → Week 3 task list
+  - draft.yaml → Broadcast model definition (write this first, before blueprint:build)
 
-Outputs:
-  - Migration creates table matching schema in database-schema.md exactly
-  - Model has $fillable, $casts, and a published() local scope
+Outputs (Blueprint generates, agent customises):
+  - Migration creates table matching schema in database-schema.md exactly (verify + add GIN indexes)
+  - Model has $fillable, $casts, and a published() local scope (add scope post-generation)
   - Filament resource has list (title_ms, type, status, published_at),
-    form (all fillable fields), and filters (status, type)
+    form (all fillable fields with bilingual tabs), and filters (status, type)
   - Seeder inserts 3 rows: 1 draft, 2 published (ms + en fields populated)
 
 Acceptance:
@@ -74,6 +75,13 @@ Acceptance:
   [ ] Both ms and en fields present in DB row
 
 Validation:
+  # 1. Write Broadcast model in draft.yaml then generate
+  php artisan blueprint:build
+  # Expect: migration, model, factory, seeder, resource files created
+
+  # 2. Verify migration matches docs/database-schema.md → broadcasts section exactly
+  # 3. Apply Post-Generation Checklist (GIN indexes, published() scope, bilingual form)
+
   php artisan migrate
   php artisan db:seed --class=BroadcastSeeder
   php artisan test --filter=BroadcastResourceTest
@@ -83,6 +91,89 @@ Risks:
   - None for a new table — no data to lose. Migration has a down() that drops the table.
   - Filament guard: ensure BroadcastResource uses 'web' guard, not 'api'.
 ```
+
+---
+
+## Filament Blueprint — AI-Agentic Scaffolding Rule
+
+Development in this project is **AI-agentic**. All new model + Filament resource work **must start with Filament Blueprint** (`php artisan blueprint:build`) before any code is written manually. Blueprint generates consistent, production-quality scaffolding from a concise YAML definition, eliminating boilerplate and reducing naming drift between agents.
+
+### What Blueprint Generates (per model)
+
+| Artifact | Path |
+|----------|------|
+| Migration | `database/migrations/{timestamp}_create_{table}_table.php` |
+| Eloquent Model | `app/Models/{Model}.php` (with `$fillable`, `$casts`, factory, relationships) |
+| Factory | `database/factories/{Model}Factory.php` |
+| Seeder scaffold | `database/seeders/{Model}Seeder.php` |
+| Filament Resource | `app/Filament/Resources/{Model}Resource.php` |
+| Resource Pages | `app/Filament/Resources/{Model}Resource/Pages/{List,Create,Edit}{Model}.php` |
+
+### When to Use Blueprint vs Manual
+
+| Task | Approach |
+|------|----------|
+| New model + migration + Filament resource | **Blueprint first** → then customise |
+| New Livewire component | `php artisan make:livewire {Name}` (Blueprint cannot generate these) |
+| Filament Settings Page / Global | `php artisan make:filament-page {Name}` (not model-backed) |
+| Public controller | `php artisan make:controller {Name}Controller` |
+| Public Blade views | Manual — no generator needed |
+| Adding a column to existing table | `php artisan make:migration add_{col}_to_{table}_table` |
+
+> **Discover Blueprint commands:** `php artisan list | grep blueprint` or use the Boost `list-artisan-commands` MCP tool.
+
+### Blueprint Draft Format
+
+Add model definitions to `draft.yaml` in the project root. Match field names and types exactly to `docs/database-schema.md`.
+
+```yaml
+models:
+  Broadcast:
+    title_ms: string:500
+    title_en: string:500 nullable
+    slug: string:600 unique
+    content_ms: longtext nullable
+    content_en: longtext nullable
+    excerpt_ms: string:1000 nullable
+    excerpt_en: string:1000 nullable
+    featured_image: string:2048 nullable
+    type: string:50 default:'announcement'
+    status: string:20 default:'draft'
+    published_at: timestamp nullable
+    created_by: id foreign:users nullable
+    softdeletes: ~
+    relationships:
+      belongsTo: User
+
+  Achievement:
+    title_ms: string:500
+    title_en: string:500 nullable
+    slug: string:600 unique
+    description_ms: longtext nullable
+    description_en: longtext nullable
+    date: date
+    icon: string:2048 nullable
+    is_featured: boolean default:false
+    status: string:20 default:'draft'
+    published_at: timestamp nullable
+    created_by: id foreign:users nullable
+    relationships:
+      belongsTo: User
+```
+
+Run: `php artisan blueprint:build`
+
+### Post-Generation Checklist (required after every Blueprint run)
+
+Blueprint generates a **starting point**, not finished code. Apply all of the following before considering the artifact done:
+
+- [ ] **Migration:** Verify all column types and sizes match `docs/database-schema.md` exactly. Add GIN indexes for FTS and any composite indexes that Blueprint did not generate.
+- [ ] **Model:** Add `published()` local scope; verify `$fillable` includes all bilingual `_ms`/`_en` columns; add `$casts` for `published_at` (datetime), JSON fields, booleans.
+- [ ] **Factory:** Add realistic `fake()` values for all fields; populate both `_ms` and `_en` variants with appropriate locale-aware text.
+- [ ] **Seeder:** Replace the scaffold stub with real rows: minimum 3 (1 draft, 2 published, both locales populated).
+- [ ] **Filament Resource:** Add bilingual form tabs or sections (one tab per locale); add status/type filter to table; add translated column headers; wire role-based `canCreate/Edit/Delete` gates.
+- [ ] **Observer registration:** Register `CacheObserver` (and `EmbeddingObserver` for Broadcast, Achievement, Policy, StaffDirectory) in `AppServiceProvider::boot()`.
+- [ ] **Tests:** Write `{Model}ResourceTest` at minimum — list loads 200, create saves to DB, published() scope returns only published rows.
 
 ---
 
@@ -96,10 +187,12 @@ Risks:
 
 2. **Plan**
    - Break work into the smallest testable unit: one model, one migration, one route, or one view.
-   - Sequence: migrations → models → Filament resource → controller → views → cache → tests → docs.
+   - Sequence: draft.yaml → blueprint:build → verify → customise → controller → views → cache → tests → docs.
    - Never skip steps. Never combine unrelated models in one task.
 
 3. **Implement**
+   - **For new models + Filament resources:** Write the model definition in `draft.yaml`, run `php artisan blueprint:build`, verify the generated migration against `docs/database-schema.md`, then apply the Post-Generation Checklist. Never write resource boilerplate by hand.
+   - **For Livewire components, controllers, Blade views:** Use `php artisan make:livewire` / `make:controller` — Blueprint does not generate these.
    - Follow naming conventions in this document exactly.
    - Make only the changes required by the acceptance criteria.
    - Do not refactor surrounding code unless it directly blocks the task.
@@ -356,6 +449,9 @@ Do not mark acceptance criteria as passing without running the commands. Do not 
 **Unresolved OR:**
 If the docs say "X or Y," stop. Look in `docs/pages-features.md → Resolved Implementation Decisions`. If it is listed there, use that decision. If it is not listed, surface the ambiguity before coding.
 
+**Skipping Blueprint for new model + resource work:**
+Do not write a migration, model, or Filament resource manually from scratch when Blueprint can generate it. Run `php artisan blueprint:build` first, then customise. Manually written boilerplate diverges from project conventions (column ordering, resource page naming, factory structure) and makes agent-to-agent handoffs inconsistent. The only valid reason to skip Blueprint is if the scaffold type is unsupported (Livewire, Filament Settings Pages, plain controllers, Blade views).
+
 **Premature abstraction:**
 Do not create a base controller, a trait, or a service class "for reuse" unless two or more concrete implementations already exist. Start simple.
 
@@ -397,11 +493,28 @@ php artisan tinker --execute="App\Models\Broadcast::count()"
 ### Filament Resource
 
 ```bash
+# Step 1: Build from Blueprint definition (draft.yaml with model defined)
+php artisan blueprint:build
+# Expect: migration, model, factory, seeder, and Resource/Pages files created
+
+# Step 2: Apply Post-Generation Checklist customisations, then migrate
+php artisan migrate
+php artisan migrate:status
+# Expect: new table shows "Ran"
+
+# Step 3: Seed sample data
+php artisan db:seed --class={Model}Seeder
+# Expect: 3 rows inserted (1 draft, 2 published; both _ms and _en fields populated)
+
+# Step 4: Verify Filament resource
 php artisan filament:check-translations
 # Optional; skip if not configured
 
+php artisan test --filter={Model}ResourceTest
+# Expect: all assertions pass
+
 # Manual: visit /admin/{resource-slug} as super_admin user
-# Expect: list page loads, create form opens, record saves
+# Expect: list page loads, create form opens, record saves, published() scope filters correctly
 ```
 
 ### Public Route + Controller
