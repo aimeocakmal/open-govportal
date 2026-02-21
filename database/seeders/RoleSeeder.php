@@ -25,6 +25,7 @@ class RoleSeeder extends Seeder
             'quick_links',
             'media',
             'feedbacks',
+            'search_overrides',
         ];
 
         // Create content permissions

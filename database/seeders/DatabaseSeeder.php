@@ -17,6 +17,15 @@ class DatabaseSeeder extends Seeder
             HeroBannerSeeder::class,
             QuickLinkSeeder::class,
             PolicySeeder::class,
+            StaffDirectorySeeder::class,
+            PolicyFileSeeder::class,
+            MediaSeeder::class,
+            FeedbackSeeder::class,
+            SearchOverrideSeeder::class,
+            FooterSettingSeeder::class,
+            MinisterProfileSeeder::class,
+            AddressSeeder::class,
+            FeedbackSettingSeeder::class,
         ]);
     }
 }
