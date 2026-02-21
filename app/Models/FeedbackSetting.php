@@ -15,7 +15,7 @@ class FeedbackSetting extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['key', 'value'];
+    protected $fillable = ['key', 'value', 'updated_at'];
 
     public static function get(string $key, mixed $default = null): mixed
     {
@@ -26,7 +26,7 @@ class FeedbackSetting extends Model
 
     public static function set(string $key, mixed $value): void
     {
-        static::updateOrCreate(['key' => $key], ['value' => $value]);
+        static::updateOrCreate(['key' => $key], ['value' => $value, 'updated_at' => now()]);
         Cache::forget("feedback_setting.{$key}");
     }
 }

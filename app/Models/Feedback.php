@@ -48,6 +48,6 @@ class Feedback extends Model
 
     public function scopeUnread(Builder $query): Builder
     {
-        return $query->whereIn('status', ['new']);
+        return $query->where('status', 'new');
     }
 }

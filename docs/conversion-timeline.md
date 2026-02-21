@@ -306,25 +306,31 @@ Map all Payload CMS collections to Laravel models + Filament resources:
 
 **Effort:** 40 hours
 
-#### Week 4: Directory, Files & Site Config
+#### Week 4: Directory, Files & Site Config ✅ COMPLETED 2026-02-21
 
 **Tasks — Content Models (5 remaining):**
-- [ ] `StaffDirectory` — model, migration (`staff_directories` table with GIN FTS index), factory, seeder, Filament resource with bilingual position/department fields
-- [ ] `PolicyFile` — model (mapped from Payload `File`), migration (`files` table), factory, seeder, Filament resource; note: use `protected $table = 'files'` per CLAUDE.md naming (`File → PolicyFile`)
-- [ ] `Media` — model, migration (`media` table), factory, seeder, Filament resource with file upload
-- [ ] `Feedback` — model, migration (`feedbacks` table), factory, seeder, Filament resource (read-only admin view); note: `ip_address` column uses `INET` on PostgreSQL — use `$table->string('ip_address', 45)` for cross-DB compatibility
-- [ ] `SearchOverride` — model, migration (`search_overrides` table), factory, seeder, Filament resource
+- [x] `StaffDirectory` — model, migration (`staff_directories` table with GIN FTS index), factory, seeder, Filament resource with bilingual position/department fields
+- [x] `PolicyFile` — model (mapped from Payload `File`), migration (`files` table), factory, seeder, Filament resource; note: use `protected $table = 'files'` per CLAUDE.md naming (`File → PolicyFile`)
+- [x] `Media` — model, migration (`media` table), factory, seeder, Filament resource with file upload
+- [x] `Feedback` — model, migration (`feedbacks` table), factory, seeder, Filament resource (read-only admin view); `ip_address` as `string(45)` for cross-DB compatibility
+- [x] `SearchOverride` — model, migration (`search_overrides` table), factory, seeder, Filament resource
 
 **Tasks — Site Config Tables (4 new migrations):**
-- [ ] `footer_settings` migration + `ManageFooter` Filament settings page
-- [ ] `minister_profiles` migration + `ManageMinisterProfile` Filament settings page
-- [ ] `addresses` migration + `ManageAddresses` Filament settings page
-- [ ] `feedback_settings` migration + `ManageFeedbackSettings` Filament settings page
+- [x] `footer_settings` migration + `ManageFooter` Filament settings page (Repeater-based)
+- [x] `minister_profiles` migration + `ManageMinisterProfile` Filament settings page (single record)
+- [x] `addresses` migration + `ManageAddresses` Filament settings page (Repeater-based)
+- [x] `feedback_settings` migration + `ManageFeedbackSettings` Filament settings page (KV model)
 
 **Tasks — Settings Pages (using existing `settings` table):**
-- [ ] `ManageSiteInfo` — site name (ms/en), description, logo (S3 upload), dark-mode logo (S3), favicon (S3), social media URLs, GA tracking ID, default theme
-- [ ] `ManageEmailSettings` — mail driver (ses/smtp/mailgun/log), SMTP host/port/credentials (encrypted), from address/name (ms/en); `SettingObserver` applies `Config::set('mail.*')` at runtime without Octane restart
-- [ ] `ManageMediaSettings` — storage driver selector (local/s3/r2/gcs/azure) with conditional credential fields per provider; `SettingObserver` rebuilds active disk config at runtime
+- [x] `ManageSiteInfo` — site name (ms/en), description, logo, dark-mode logo, favicon, social media URLs, GA tracking ID, default theme (15 settings keys)
+- [x] `ManageEmailSettings` — mail driver (ses/smtp/mailgun/log), SMTP host/port/credentials (encrypted via `Crypt::encrypt()`), from address/name (ms/en); conditional SMTP section visibility
+- [x] `ManageMediaSettings` — storage driver selector (local/s3/r2/gcs/azure) with conditional credential fields per provider; 6 encrypted keys for cloud credentials
+
+**Tasks — Review Fixes:**
+- [x] Added `department`, `avatar`, `is_active`, `last_login_at` columns to `users` table (was missing per schema doc)
+- [x] Fixed `settings.updated_at` from `TIMESTAMP` to `TIMESTAMPTZ` per schema doc
+- [x] Fixed `Feedback::scopeUnread()` to use `where()` instead of `whereIn()` with single value
+- [x] Fixed `FeedbackSetting::set()` to explicitly update `updated_at` column
 
 **Deferred to Week 6:**
 - `ManageHomepage` — no schema defined in `database-schema.md`; defer until Homepage page is built (Week 6) when actual layout flags are determined. Will use `settings` table keys (e.g. `homepage_show_carousel`, `homepage_section_order`).
@@ -332,6 +338,8 @@ Map all Payload CMS collections to Laravel models + Filament resources:
 **Notes:**
 - Rich text editor: Filament v5 already includes `RichEditor` — no additional integration needed (already used in `BroadcastForm` for `content_ms`/`content_en`)
 - Cloud Flysystem packages: install only when `ManageMediaSettings` is tested with a live provider
+- All 7 settings pages follow the Filament v5 custom page pattern: `$data` array, `Form::make()` with `livewireSubmitHandler('save')`, `Action::make('save')->submit('save')` in footer
+- Encrypted settings (passwords, API keys, cloud credentials) use `Crypt::encrypt()`/`Crypt::decrypt()` with `DecryptException` fallback
 
 **Installation Commands (cloud storage — install only drivers you need):**
 
@@ -348,8 +356,10 @@ composer require league/flysystem-azure-blob-storage "^3.0"
 
 **Deliverables:**
 - All 11 Payload collections mapped to Filament resources (6 from Week 3 + 5 new)
-- 4 site config tables migrated + settings pages working
+- 4 site config tables migrated + 4 settings pages working
 - 3 settings pages (SiteInfo, Email, Media) reading/writing `settings` table
+- 87 tests passing (132 assertions)
+- 22 migrations total
 
 **Effort:** 40 hours
 
@@ -359,12 +369,18 @@ Split into must-have (5a) and nice-to-have (5b) to avoid overloading.
 
 **Week 5a — Must-Have:**
 - [ ] `UserResource` enhancements: `department` field for `department_admin` scoping, `last_login_at` display column, deactivate/reactivate user action, admin password reset action, bulk role assignment
-- [ ] `RoleResource`: CRUD for Spatie Permission roles + checkbox-based permission assignment per role (note: `RoleSeeder` already seeds all 6 roles + 55 permissions from Week 3)
+- [ ] `RoleResource`: CRUD for Spatie Permission roles + checkbox-based permission assignment per role (note: `RoleSeeder` already seeds all 6 roles + 60 permissions from Week 4)
 - [ ] Role-based access within Filament resources — Filament policies for all content resources, scoped by Spatie permissions
 - [ ] Draft/publish workflow: publish action button on list/edit pages, scheduled publishing via `published_at` (scheduler checks for publishable records)
 - [ ] Bulk actions in Filament: publish, unpublish, change status (extends existing `DeleteBulkAction`)
 - [ ] `StaticPage` + `PageCategory` models, migrations, Filament resources (from `database-schema.md`)
+- [ ] `Menu` + `MenuItem` models, migrations, Filament resource (`MenuResource` with nested items)
 - [ ] `ManageHomepage` settings page — homepage layout flags using `settings` table keys (deferred from Week 4; built now that Homepage data needs are clearer)
+- [ ] `MyProfile` Filament page — current user can manage their own profile:
+  - Edit name, email, avatar (file upload)
+  - Change password (current + new + confirm)
+  - Change preferred language (ms/en), stored as user preference
+  - Delete own account (with confirmation modal + password re-entry; blocked for `super_admin` role to prevent accidental lockout)
 
 **Week 5b — Nice-to-Have (can overlap with Week 6):**
 - [ ] Search indexing via PostgreSQL FTS — `searchable_content` migration + custom Scout driver; note: uses `TSVECTOR GENERATED ALWAYS AS (...)` which is PostgreSQL-only, tests need special handling
@@ -376,6 +392,7 @@ Split into must-have (5a) and nice-to-have (5b) to avoid overloading.
 - Full CMS parity with Payload (all 12 collections + all globals)
 - Draft → Publish workflow with permissions enforcement
 - User + role management in Filament
+- My Profile page with password reset, language change, and account deletion
 - Search indexing working (5b)
 
 **Effort:** 40 hours
@@ -758,7 +775,8 @@ class QuickLink extends Model {
 | 1 | ✅ Tooling Bootstrap | Laravel 12 + Octane + Filament + Boost + Blueprint all installed and verified — 2026-02-21 |
 | 2 | ✅ Design System & Base UI | Alpine.js + MyDS tokens + theme system + nav/footer + RBAC roles + 5 passing tests — 2026-02-21 |
 | 3 | ✅ Core Content Models | 6 models + Filament resources + 6 roles + 55 permissions + 53 tests passing — 2026-02-21 |
-| 5 | CMS Complete | All 12 collections manageable in Filament |
+| 4 | ✅ Directory, Files & Site Config | 5 content models + 4 site config tables + 7 settings pages + 87 tests passing — 2026-02-21 |
+| 5 | CMS Complete | All 12 collections manageable in Filament + My Profile page |
 | 9 | All Pages Complete | All 10 public pages functional in ms/en |
 | 11 | QA Complete | 90+ Lighthouse, WCAG AA, load test passed |
 | 12 | Go Live | Site deployed, content migrated |
