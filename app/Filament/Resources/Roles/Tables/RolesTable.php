@@ -15,6 +15,7 @@ class RolesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('filament.common.name'))
                     ->searchable()
                     ->sortable()
                     ->badge(),
@@ -27,6 +28,7 @@ class RolesTable
                     ->counts('users')
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('filament.common.created_at'))
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

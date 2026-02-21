@@ -75,6 +75,9 @@ return [
         'caption_bm' => 'Caption (BM)',
         'draft' => 'Draft',
         'status' => 'Status',
+        'name' => 'Name',
+        'password' => 'Password',
+        'created_at' => 'Created At',
         'department' => 'Department',
         'file_upload_placeholder' => 'Drag & drop your file or <span class="filepond--label-action">Browse</span>',
         'upload_help_avatar' => 'Max :size. JPG, PNG, GIF or WebP only.',
@@ -88,6 +91,7 @@ return [
         'reset' => 'Reset',
         'published_successfully' => 'Published successfully',
         'unpublished_successfully' => 'Unpublished successfully',
+        'activate' => 'Activate',
         'deactivate' => 'Deactivate',
         'reactivate' => 'Reactivate',
         'password_reset_successfully' => 'Password reset successfully',
@@ -334,6 +338,7 @@ return [
 
         'roles' => [
             'role_details' => 'Role Details',
+            'guard_name' => 'Guard Name',
         ],
 
         'search_overrides' => [
@@ -374,10 +379,13 @@ return [
         'users' => [
             'account' => 'Account',
             'profile' => 'Profile',
+            'avatar' => 'Avatar',
             'language' => 'Language',
             'last_login' => 'Last Login',
             'never' => 'Never',
             'active_status' => 'Active Status',
+            'reset_password' => 'Reset Password',
+            'new_password' => 'New Password',
         ],
     ],
 ];

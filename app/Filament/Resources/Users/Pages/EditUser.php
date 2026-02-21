@@ -25,11 +25,13 @@ class EditUser extends EditRecord
                     $this->refreshFormData(['is_active']);
                 }),
             Action::make('resetPassword')
+                ->label(__('filament.resource.users.reset_password'))
                 ->color('warning')
                 ->icon('heroicon-o-key')
                 ->requiresConfirmation()
                 ->form([
                     \Filament\Forms\Components\TextInput::make('new_password')
+                        ->label(__('filament.resource.users.new_password'))
                         ->password()
                         ->revealable()
                         ->required()

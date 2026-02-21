@@ -16,6 +16,7 @@ class RoleForm
                 Section::make(__('filament.resource.roles.role_details'))
                     ->schema([
                         TextInput::make('name')
+                            ->label(__('filament.common.name'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
@@ -24,6 +25,7 @@ class RoleForm
                                 'content_author', 'publisher', 'viewer',
                             ])),
                         TextInput::make('guard_name')
+                            ->label(__('filament.resource.roles.guard_name'))
                             ->default('web')
                             ->disabled()
                             ->dehydrated(),
@@ -31,6 +33,7 @@ class RoleForm
                 Section::make(__('filament.common.permissions'))
                     ->schema([
                         CheckboxList::make('permissions')
+                            ->label(__('filament.common.permissions'))
                             ->relationship('permissions', 'name')
                             ->columns(3)
                             ->searchable()

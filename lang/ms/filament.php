@@ -75,6 +75,9 @@ return [
         'caption_bm' => 'Kapsyen (BM)',
         'draft' => 'Draf',
         'status' => 'Status',
+        'name' => 'Nama',
+        'password' => 'Kata Laluan',
+        'created_at' => 'Dicipta Pada',
         'department' => 'Jabatan',
         'file_upload_placeholder' => 'Seret & lepas fail anda atau <span class="filepond--label-action">Semak Imbas</span>',
         'upload_help_avatar' => 'Maks :size. JPG, PNG, GIF atau WebP sahaja.',
@@ -88,6 +91,7 @@ return [
         'reset' => 'Set Semula',
         'published_successfully' => 'Berjaya diterbitkan',
         'unpublished_successfully' => 'Berjaya dinyahterbit',
+        'activate' => 'Aktifkan',
         'deactivate' => 'Nyahaktif',
         'reactivate' => 'Aktifkan Semula',
         'password_reset_successfully' => 'Kata laluan berjaya ditetapkan semula',
@@ -334,6 +338,7 @@ return [
 
         'roles' => [
             'role_details' => 'Butiran Peranan',
+            'guard_name' => 'Nama Guard',
         ],
 
         'search_overrides' => [
@@ -374,10 +379,13 @@ return [
         'users' => [
             'account' => 'Akaun',
             'profile' => 'Profil',
+            'avatar' => 'Avatar',
             'language' => 'Bahasa',
             'last_login' => 'Log Masuk Terakhir',
             'never' => 'Tidak Pernah',
             'active_status' => 'Status Aktif',
+            'reset_password' => 'Tetap Semula Kata Laluan',
+            'new_password' => 'Kata Laluan Baharu',
         ],
     ],
 ];

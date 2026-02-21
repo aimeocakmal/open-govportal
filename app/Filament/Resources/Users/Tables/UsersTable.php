@@ -19,15 +19,19 @@ class UsersTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('filament.common.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email')
+                    ->label(__('filament.common.email'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('roles.name')
+                    ->label(__('filament.common.roles'))
                     ->badge()
                     ->color('info'),
                 TextColumn::make('department')
+                    ->label(__('filament.common.department'))
                     ->searchable()
                     ->placeholder('—')
                     ->toggleable(),
@@ -40,6 +44,7 @@ class UsersTable
                     ->sortable()
                     ->placeholder(__('filament.resource.users.never')),
                 TextColumn::make('created_at')
+                    ->label(__('filament.common.created_at'))
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -55,11 +60,13 @@ class UsersTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('activate')
+                        ->label(__('filament.actions.activate'))
                         ->color('success')
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => true])),
                     BulkAction::make('deactivate')
+                        ->label(__('filament.actions.deactivate'))
                         ->color('danger')
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()

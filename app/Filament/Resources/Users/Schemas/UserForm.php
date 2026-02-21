@@ -19,14 +19,17 @@ class UserForm
                 Section::make(__('filament.resource.users.account'))
                     ->schema([
                         TextInput::make('name')
+                            ->label(__('filament.common.name'))
                             ->required()
                             ->maxLength(255),
                         TextInput::make('email')
+                            ->label(__('filament.common.email'))
                             ->email()
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         TextInput::make('password')
+                            ->label(__('filament.common.password'))
                             ->password()
                             ->revealable()
                             ->required(fn (string $operation): bool => $operation === 'create')
@@ -37,8 +40,10 @@ class UserForm
                 Section::make(__('filament.resource.users.profile'))
                     ->schema([
                         TextInput::make('department')
+                            ->label(__('filament.common.department'))
                             ->maxLength(255),
                         FileUpload::make('avatar')
+                            ->label(__('filament.resource.users.avatar'))
                             ->image()
                             ->avatar()
                             ->directory('avatars')
@@ -62,6 +67,7 @@ class UserForm
                 Section::make(__('filament.common.roles'))
                     ->schema([
                         CheckboxList::make('roles')
+                            ->label(__('filament.common.roles'))
                             ->relationship('roles', 'name')
                             ->columns(3),
                     ]),
