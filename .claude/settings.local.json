@@ -40,7 +40,9 @@
       "Bash(git status:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "mcp__laravel-boost__tinker",
+      "mcp__laravel-boost__get-absolute-url"
     ]
   }
 }
