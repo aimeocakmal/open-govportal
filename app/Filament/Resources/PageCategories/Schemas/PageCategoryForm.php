@@ -18,10 +18,10 @@ class PageCategoryForm
     {
         return $schema
             ->components([
-                Section::make('General')
+                Section::make(__('filament.common.general'))
                     ->schema([
                         Select::make('parent_id')
-                            ->label('Parent Category')
+                            ->label(__('filament.resource.page_categories.parent_category'))
                             ->relationship('parent', 'name_ms')
                             ->searchable()
                             ->preload()
@@ -30,21 +30,21 @@ class PageCategoryForm
                             ->required()
                             ->maxLength(300)
                             ->unique(ignoreRecord: true)
-                            ->helperText('URL-friendly identifier'),
+                            ->helperText(__('filament.resource.page_categories.slug_help')),
                         TextInput::make('sort_order')
                             ->numeric()
                             ->default(0),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('filament.common.active'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('name_ms')
-                                    ->label('Nama (BM)')
+                                    ->label(__('filament.common.name_bm'))
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
@@ -54,16 +54,16 @@ class PageCategoryForm
                                         }
                                     }),
                                 Textarea::make('description_ms')
-                                    ->label('Penerangan (BM)')
+                                    ->label(__('filament.common.description_bm'))
                                     ->rows(3),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('name_en')
-                                    ->label('Name (EN)')
+                                    ->label(__('filament.common.name_en'))
                                     ->maxLength(255),
                                 Textarea::make('description_en')
-                                    ->label('Description (EN)')
+                                    ->label(__('filament.common.description_en'))
                                     ->rows(3),
                             ]),
                     ])

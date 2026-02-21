@@ -26,7 +26,12 @@ class ManageMinisterProfile extends Page
 {
     protected string $view = 'filament.pages.manage-minister-profile';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = null;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.settings');
+    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUser;
 
@@ -53,35 +58,35 @@ class ManageMinisterProfile extends Page
             ->components([
                 Form::make([
                     TextInput::make('name')
-                        ->label('Full Name')
+                        ->label(__('filament.settings.minister.full_name'))
                         ->required()
                         ->maxLength(255),
                     TextInput::make('photo')
-                        ->label('Photo URL')
+                        ->label(__('filament.common.photo_url'))
                         ->url()
                         ->maxLength(2048),
                     DatePicker::make('appointed_at')
-                        ->label('Appointed Date'),
+                        ->label(__('filament.settings.minister.appointed_date')),
                     Toggle::make('is_current')
-                        ->label('Current Minister')
+                        ->label(__('filament.settings.minister.current_minister'))
                         ->default(true),
-                    Tabs::make('Locales')
+                    Tabs::make(__('filament.settings.minister.locales'))
                         ->tabs([
-                            Tab::make('Bahasa Malaysia')
+                            Tab::make(__('filament.common.bahasa_malaysia'))
                                 ->schema([
                                     TextInput::make('title_ms')
-                                        ->label('Title (BM)')
+                                        ->label(__('filament.settings.minister.title_bm'))
                                         ->maxLength(500),
                                     RichEditor::make('bio_ms')
-                                        ->label('Biography (BM)'),
+                                        ->label(__('filament.settings.minister.bio_bm')),
                                 ]),
-                            Tab::make('English')
+                            Tab::make(__('filament.common.english'))
                                 ->schema([
                                     TextInput::make('title_en')
-                                        ->label('Title (EN)')
+                                        ->label(__('filament.settings.minister.title_en'))
                                         ->maxLength(500),
                                     RichEditor::make('bio_en')
-                                        ->label('Biography (EN)'),
+                                        ->label(__('filament.settings.minister.bio_en')),
                                 ]),
                         ]),
                 ])
@@ -117,7 +122,7 @@ class ManageMinisterProfile extends Page
 
         Notification::make()
             ->success()
-            ->title('Minister profile saved')
+            ->title(__('filament.settings.minister.saved'))
             ->send();
     }
 

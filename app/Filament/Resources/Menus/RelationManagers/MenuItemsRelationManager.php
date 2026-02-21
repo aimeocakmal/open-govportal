@@ -29,48 +29,48 @@ class MenuItemsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('label_ms')
-                                    ->label('Label (BM)')
+                                    ->label(__('filament.common.label_bm'))
                                     ->required()
                                     ->maxLength(255),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('label_en')
-                                    ->label('Label (EN)')
+                                    ->label(__('filament.common.label_en'))
                                     ->maxLength(255),
                             ]),
                     ])
                     ->columnSpanFull(),
-                Section::make('Navigation')
+                Section::make(__('filament.resource.menu_items.navigation'))
                     ->schema([
                         TextInput::make('url')
-                            ->label('URL')
+                            ->label(__('filament.common.url'))
                             ->maxLength(2048)
-                            ->helperText('External or absolute URL'),
+                            ->helperText(__('filament.resource.menu_items.external_url_help')),
                         TextInput::make('route_name')
-                            ->label('Route Name')
+                            ->label(__('filament.resource.menu_items.route_name'))
                             ->maxLength(255)
-                            ->helperText('Named Laravel route (alternative to URL)'),
+                            ->helperText(__('filament.resource.menu_items.route_name_help')),
                         TextInput::make('icon')
                             ->maxLength(100)
-                            ->helperText('Heroicon name'),
+                            ->helperText(__('filament.resource.menu_items.icon_help')),
                         Select::make('target')
                             ->options([
-                                '_self' => 'Same Window',
-                                '_blank' => 'New Window',
+                                '_self' => __('filament.resource.menu_items.same_window'),
+                                '_blank' => __('filament.resource.menu_items.new_window'),
                             ])
                             ->default('_self'),
                     ])
                     ->columns(2),
-                Section::make('Hierarchy & Display')
+                Section::make(__('filament.resource.menu_items.hierarchy'))
                     ->schema([
                         Select::make('parent_id')
-                            ->label('Parent Item')
+                            ->label(__('filament.resource.menu_items.parent_item'))
                             ->relationship('parent', 'label_ms', fn ($query) => $query->where('menu_id', $this->getOwnerRecord()->id))
                             ->nullable()
                             ->searchable()
@@ -79,20 +79,20 @@ class MenuItemsRelationManager extends RelationManager
                             ->numeric()
                             ->default(0),
                         TextInput::make('mega_columns')
-                            ->label('Mega Menu Columns')
+                            ->label(__('filament.resource.menu_items.mega_columns'))
                             ->numeric()
                             ->default(1)
                             ->minValue(1)
                             ->maxValue(4),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('filament.common.active'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Section::make('Access Control')
+                Section::make(__('filament.resource.menu_items.access_control'))
                     ->schema([
                         CheckboxList::make('required_roles')
-                            ->label('Visible to Roles (leave empty for all)')
+                            ->label(__('filament.resource.menu_items.visible_to_roles'))
                             ->options(fn () => Role::pluck('name', 'name')->toArray())
                             ->columns(3),
                     ]),
@@ -104,19 +104,19 @@ class MenuItemsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('label_ms')
-                    ->label('Label (BM)')
+                    ->label(__('filament.common.label_bm'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('parent.label_ms')
-                    ->label('Parent')
-                    ->placeholder('Root'),
+                    ->label(__('filament.common.parent'))
+                    ->placeholder(__('filament.common.root')),
                 TextColumn::make('url')
                     ->limit(30)
                     ->placeholder('—'),
                 TextColumn::make('sort_order')
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('filament.common.active'))
                     ->boolean(),
             ])
             ->defaultSort('sort_order')

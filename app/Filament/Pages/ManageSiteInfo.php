@@ -28,9 +28,19 @@ class ManageSiteInfo extends Page
 
     protected static ?int $navigationSort = 1;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
-    protected static ?string $title = 'Site Info';
+    protected static ?string $title = null;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.settings');
+    }
+
+    public static function getLabel(): string
+    {
+        return __('filament.settings.site_info.title');
+    }
 
     protected string $view = 'filament.pages.manage-site-info';
 
@@ -68,104 +78,104 @@ class ManageSiteInfo extends Page
         return $schema
             ->components([
                 Form::make([
-                    Section::make('Site Identity')
-                        ->description('Configure site name and description for both languages.')
+                    Section::make(__('filament.settings.site_info.site_identity'))
+                        ->description(__('filament.settings.site_info.site_identity_desc'))
                         ->schema([
                             Tabs::make('site_identity_tabs')
                                 ->tabs([
-                                    Tab::make('Bahasa Malaysia')
+                                    Tab::make(__('filament.common.bahasa_malaysia'))
                                         ->schema([
                                             TextInput::make('site_name_ms')
-                                                ->label('Site Name (BM)')
+                                                ->label(__('filament.settings.site_info.site_name_bm'))
                                                 ->required()
                                                 ->maxLength(255),
                                             Textarea::make('site_description_ms')
-                                                ->label('Site Description (BM)')
+                                                ->label(__('filament.settings.site_info.site_desc_bm'))
                                                 ->rows(3)
                                                 ->maxLength(1000),
                                         ]),
-                                    Tab::make('English')
+                                    Tab::make(__('filament.common.english'))
                                         ->schema([
                                             TextInput::make('site_name_en')
-                                                ->label('Site Name (EN)')
+                                                ->label(__('filament.settings.site_info.site_name_en'))
                                                 ->maxLength(255),
                                             Textarea::make('site_description_en')
-                                                ->label('Site Description (EN)')
+                                                ->label(__('filament.settings.site_info.site_desc_en'))
                                                 ->rows(3)
                                                 ->maxLength(1000),
                                         ]),
                                 ]),
                         ]),
 
-                    Section::make('Branding')
-                        ->description('Upload logos and favicon for the site.')
+                    Section::make(__('filament.settings.site_info.branding'))
+                        ->description(__('filament.settings.site_info.branding_desc'))
                         ->schema([
                             FileUpload::make('site_logo')
-                                ->label('Site Logo (Light)')
+                                ->label(__('filament.settings.site_info.site_logo_light'))
                                 ->image()
                                 ->directory('branding')
                                 ->maxSize(2048),
                             FileUpload::make('site_logo_dark')
-                                ->label('Site Logo (Dark)')
+                                ->label(__('filament.settings.site_info.site_logo_dark'))
                                 ->image()
                                 ->directory('branding')
                                 ->maxSize(2048),
                             Tabs::make('logo_alt_tabs')
                                 ->tabs([
-                                    Tab::make('Bahasa Malaysia')
+                                    Tab::make(__('filament.common.bahasa_malaysia'))
                                         ->schema([
                                             TextInput::make('site_logo_alt_ms')
-                                                ->label('Logo Alt Text (BM)')
+                                                ->label(__('filament.settings.site_info.logo_alt_bm'))
                                                 ->maxLength(255),
                                         ]),
-                                    Tab::make('English')
+                                    Tab::make(__('filament.common.english'))
                                         ->schema([
                                             TextInput::make('site_logo_alt_en')
-                                                ->label('Logo Alt Text (EN)')
+                                                ->label(__('filament.settings.site_info.logo_alt_en'))
                                                 ->maxLength(255),
                                         ]),
                                 ]),
                             FileUpload::make('site_favicon')
-                                ->label('Favicon')
+                                ->label(__('filament.settings.site_info.favicon'))
                                 ->acceptedFileTypes(['image/x-icon', 'image/png', 'image/svg+xml'])
                                 ->directory('branding')
                                 ->maxSize(512),
                         ]),
 
-                    Section::make('Social Media')
-                        ->description('Links to official social media accounts.')
+                    Section::make(__('filament.settings.site_info.social_media'))
+                        ->description(__('filament.settings.site_info.social_media_desc'))
                         ->schema([
                             TextInput::make('facebook_url')
-                                ->label('Facebook URL')
+                                ->label(__('filament.settings.site_info.facebook_url'))
                                 ->url()
                                 ->maxLength(2048),
                             TextInput::make('twitter_url')
-                                ->label('Twitter / X URL')
+                                ->label(__('filament.settings.site_info.twitter_url'))
                                 ->url()
                                 ->maxLength(2048),
                             TextInput::make('instagram_url')
-                                ->label('Instagram URL')
+                                ->label(__('filament.settings.site_info.instagram_url'))
                                 ->url()
                                 ->maxLength(2048),
                             TextInput::make('youtube_url')
-                                ->label('YouTube URL')
+                                ->label(__('filament.settings.site_info.youtube_url'))
                                 ->url()
                                 ->maxLength(2048),
                         ])
                         ->columns(2),
 
-                    Section::make('Analytics')
-                        ->description('Tracking and theme configuration.')
+                    Section::make(__('filament.settings.site_info.analytics'))
+                        ->description(__('filament.settings.site_info.analytics_desc'))
                         ->schema([
                             TextInput::make('google_analytics_id')
-                                ->label('Google Analytics ID')
+                                ->label(__('filament.settings.site_info.google_analytics_id'))
                                 ->placeholder('G-XXXXXXXXXX')
                                 ->maxLength(50),
                             Select::make('site_default_theme')
-                                ->label('Default Theme')
+                                ->label(__('filament.settings.site_info.default_theme'))
                                 ->options([
-                                    'default' => 'Default',
-                                    'dark' => 'Dark',
+                                    'default' => __('filament.settings.site_info.theme_default'),
+                                    'dark' => __('filament.settings.site_info.theme_dark'),
                                 ])
                                 ->required(),
                         ])
@@ -211,7 +221,7 @@ class ManageSiteInfo extends Page
 
         Notification::make()
             ->success()
-            ->title('Site info saved')
+            ->title(__('filament.settings.site_info.saved'))
             ->send();
     }
 }

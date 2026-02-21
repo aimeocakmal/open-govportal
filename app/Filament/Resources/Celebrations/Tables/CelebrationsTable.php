@@ -18,12 +18,12 @@ class CelebrationsTable
         return $table
             ->columns([
                 TextColumn::make('title_ms')
-                    ->label('Tajuk (BM)')
+                    ->label(__('filament.common.title_bm'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
                 TextColumn::make('event_date')
-                    ->label('Event Date')
+                    ->label(__('filament.resource.celebrations.event_date'))
                     ->date('d M Y')
                     ->sortable()
                     ->placeholder('—'),
@@ -43,8 +43,8 @@ class CelebrationsTable
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draf',
-                        'published' => 'Diterbitkan',
+                        'draft' => __('filament.common.draft'),
+                        'published' => __('filament.common.published'),
                     ]),
             ])
             ->recordActions([

@@ -15,10 +15,10 @@ class StaffDirectoryForm
     {
         return $schema
             ->components([
-                Section::make('General')
+                Section::make(__('filament.common.general'))
                     ->schema([
                         TextInput::make('name')
-                            ->label('Nama / Name')
+                            ->label(__('filament.resource.staff_directories.name_label'))
                             ->required()
                             ->maxLength(255),
                         TextInput::make('email')
@@ -26,16 +26,16 @@ class StaffDirectoryForm
                             ->maxLength(255)
                             ->nullable(),
                         TextInput::make('phone')
-                            ->label('Telefon / Phone')
+                            ->label(__('filament.common.phone'))
                             ->tel()
                             ->maxLength(50)
                             ->nullable(),
                         TextInput::make('fax')
-                            ->label('Faks / Fax')
+                            ->label(__('filament.common.fax'))
                             ->maxLength(50)
                             ->nullable(),
                         TextInput::make('photo')
-                            ->label('Photo URL')
+                            ->label(__('filament.common.photo_url'))
                             ->maxLength(2048)
                             ->url()
                             ->nullable(),
@@ -43,34 +43,34 @@ class StaffDirectoryForm
                             ->numeric()
                             ->default(0),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('filament.common.active'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('position_ms')
-                                    ->label('Jawatan (BM)')
+                                    ->label(__('filament.resource.staff_directories.position_bm'))
                                     ->maxLength(500),
                                 TextInput::make('department_ms')
-                                    ->label('Jabatan (BM)')
+                                    ->label(__('filament.resource.staff_directories.department_bm'))
                                     ->maxLength(255),
                                 TextInput::make('division_ms')
-                                    ->label('Bahagian (BM)')
+                                    ->label(__('filament.resource.staff_directories.division_bm'))
                                     ->maxLength(255),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('position_en')
-                                    ->label('Position (EN)')
+                                    ->label(__('filament.resource.staff_directories.position_en'))
                                     ->maxLength(500),
                                 TextInput::make('department_en')
-                                    ->label('Department (EN)')
+                                    ->label(__('filament.resource.staff_directories.department_en'))
                                     ->maxLength(255),
                                 TextInput::make('division_en')
-                                    ->label('Division (EN)')
+                                    ->label(__('filament.resource.staff_directories.division_en'))
                                     ->maxLength(255),
                             ]),
                     ])

@@ -29,9 +29,19 @@ class ManageEmailSettings extends Page
 
     protected static ?int $navigationSort = 2;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
-    protected static ?string $title = 'Email Settings';
+    protected static ?string $title = null;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.settings');
+    }
+
+    public static function getLabel(): string
+    {
+        return __('filament.settings.email.title');
+    }
 
     protected string $view = 'filament.pages.manage-email-settings';
 
@@ -63,71 +73,71 @@ class ManageEmailSettings extends Page
         return $schema
             ->components([
                 Form::make([
-                    Section::make('Mail Driver')
-                        ->description('Select the mail transport to use for sending emails.')
+                    Section::make(__('filament.settings.email.mail_driver'))
+                        ->description(__('filament.settings.email.mail_driver_desc'))
                         ->schema([
                             Select::make('mail_mailer')
-                                ->label('Mail Driver')
+                                ->label(__('filament.settings.email.mail_driver'))
                                 ->options([
-                                    'ses' => 'Amazon SES',
-                                    'smtp' => 'SMTP',
-                                    'mailgun' => 'Mailgun',
-                                    'log' => 'Log (Testing)',
+                                    'ses' => __('filament.settings.email.ses'),
+                                    'smtp' => __('filament.settings.email.smtp'),
+                                    'mailgun' => __('filament.settings.email.mailgun'),
+                                    'log' => __('filament.settings.email.log'),
                                 ])
                                 ->required()
                                 ->live(),
                         ]),
 
-                    Section::make('SMTP Configuration')
-                        ->description('Configure SMTP server credentials. Only required when mail driver is SMTP.')
+                    Section::make(__('filament.settings.email.smtp_config'))
+                        ->description(__('filament.settings.email.smtp_config_desc'))
                         ->schema([
                             TextInput::make('mail_host')
-                                ->label('SMTP Host')
+                                ->label(__('filament.settings.email.smtp_host'))
                                 ->placeholder('smtp.example.com')
                                 ->maxLength(255),
                             TextInput::make('mail_port')
-                                ->label('SMTP Port')
+                                ->label(__('filament.settings.email.smtp_port'))
                                 ->placeholder('587')
                                 ->numeric()
                                 ->maxLength(5),
                             TextInput::make('mail_username')
-                                ->label('SMTP Username')
+                                ->label(__('filament.settings.email.smtp_username'))
                                 ->maxLength(255),
                             TextInput::make('mail_password')
-                                ->label('SMTP Password')
+                                ->label(__('filament.settings.email.smtp_password'))
                                 ->password()
                                 ->revealable()
                                 ->maxLength(255),
                             Select::make('mail_encryption')
-                                ->label('Encryption')
+                                ->label(__('filament.settings.email.encryption'))
                                 ->options([
-                                    'tls' => 'TLS',
-                                    'ssl' => 'SSL',
-                                    '' => 'None',
+                                    'tls' => __('filament.settings.email.tls'),
+                                    'ssl' => __('filament.settings.email.ssl'),
+                                    '' => __('filament.settings.email.none'),
                                 ]),
                         ])
                         ->columns(2)
                         ->visible(fn (Get $get): bool => $get('mail_mailer') === 'smtp'),
 
-                    Section::make('Sender Information')
-                        ->description('Configure the default sender address and display name.')
+                    Section::make(__('filament.settings.email.sender_info'))
+                        ->description(__('filament.settings.email.sender_info_desc'))
                         ->schema([
                             TextInput::make('mail_from_address')
-                                ->label('From Address')
+                                ->label(__('filament.settings.email.from_address'))
                                 ->email()
                                 ->maxLength(255),
                             Tabs::make('from_name_tabs')
                                 ->tabs([
-                                    Tab::make('Bahasa Malaysia')
+                                    Tab::make(__('filament.common.bahasa_malaysia'))
                                         ->schema([
                                             TextInput::make('mail_from_name_ms')
-                                                ->label('From Name (BM)')
+                                                ->label(__('filament.settings.email.from_name_bm'))
                                                 ->maxLength(255),
                                         ]),
-                                    Tab::make('English')
+                                    Tab::make(__('filament.common.english'))
                                         ->schema([
                                             TextInput::make('mail_from_name_en')
-                                                ->label('From Name (EN)')
+                                                ->label(__('filament.settings.email.from_name_en'))
                                                 ->maxLength(255),
                                         ]),
                                 ]),
@@ -168,7 +178,7 @@ class ManageEmailSettings extends Page
 
         Notification::make()
             ->success()
-            ->title('Email settings saved')
+            ->title(__('filament.settings.email.saved'))
             ->send();
     }
 

@@ -19,13 +19,13 @@ class BroadcastForm
     {
         return $schema
             ->components([
-                Section::make('General')
+                Section::make(__('filament.common.general'))
                     ->schema([
                         TextInput::make('slug')
                             ->required()
                             ->maxLength(600)
                             ->unique(ignoreRecord: true)
-                            ->helperText('URL-friendly identifier. Auto-generated from BM title if left empty.'),
+                            ->helperText(__('filament.resource.broadcasts.slug_help')),
                         Select::make('type')
                             ->options([
                                 'announcement' => 'Pengumuman / Announcement',
@@ -42,21 +42,21 @@ class BroadcastForm
                             ->default('draft')
                             ->required(),
                         DateTimePicker::make('published_at')
-                            ->label('Publish Date')
+                            ->label(__('filament.common.publish_date'))
                             ->nullable(),
                         TextInput::make('featured_image')
-                            ->label('Featured Image URL')
+                            ->label(__('filament.resource.broadcasts.featured_image'))
                             ->maxLength(2048)
                             ->url()
                             ->nullable(),
                     ])
                     ->columns(2),
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('title_ms')
-                                    ->label('Tajuk (BM)')
+                                    ->label(__('filament.common.title_bm'))
                                     ->required()
                                     ->maxLength(500)
                                     ->live(onBlur: true)
@@ -66,23 +66,23 @@ class BroadcastForm
                                         }
                                     }),
                                 RichEditor::make('content_ms')
-                                    ->label('Kandungan (BM)')
+                                    ->label(__('filament.common.content_bm'))
                                     ->columnSpanFull(),
                                 Textarea::make('excerpt_ms')
-                                    ->label('Ringkasan (BM)')
+                                    ->label(__('filament.common.excerpt_bm'))
                                     ->maxLength(1000)
                                     ->rows(3),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('title_en')
-                                    ->label('Title (EN)')
+                                    ->label(__('filament.common.title_en'))
                                     ->maxLength(500),
                                 RichEditor::make('content_en')
-                                    ->label('Content (EN)')
+                                    ->label(__('filament.common.content_en'))
                                     ->columnSpanFull(),
                                 Textarea::make('excerpt_en')
-                                    ->label('Excerpt (EN)')
+                                    ->label(__('filament.common.excerpt_en'))
                                     ->maxLength(1000)
                                     ->rows(3),
                             ]),

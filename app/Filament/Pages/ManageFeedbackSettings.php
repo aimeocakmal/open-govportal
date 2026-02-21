@@ -23,7 +23,12 @@ class ManageFeedbackSettings extends Page
 {
     protected string $view = 'filament.pages.manage-feedback-settings';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = null;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.settings');
+    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
@@ -55,17 +60,17 @@ class ManageFeedbackSettings extends Page
             ->components([
                 Form::make([
                     Toggle::make('is_enabled')
-                        ->label('Enable Feedback Form')
+                        ->label(__('filament.settings.feedback.enable_form'))
                         ->default(false),
                     TextInput::make('recipient_email')
-                        ->label('Recipient Email')
+                        ->label(__('filament.settings.feedback.recipient_email'))
                         ->email()
                         ->maxLength(255),
                     Textarea::make('success_message_ms')
-                        ->label('Success Message (BM)')
+                        ->label(__('filament.settings.feedback.success_message_bm'))
                         ->rows(3),
                     Textarea::make('success_message_en')
-                        ->label('Success Message (EN)')
+                        ->label(__('filament.settings.feedback.success_message_en'))
                         ->rows(3),
                 ])
                     ->livewireSubmitHandler('save')
@@ -91,7 +96,7 @@ class ManageFeedbackSettings extends Page
 
         Notification::make()
             ->success()
-            ->title('Feedback settings saved')
+            ->title(__('filament.settings.feedback.saved'))
             ->send();
     }
 }

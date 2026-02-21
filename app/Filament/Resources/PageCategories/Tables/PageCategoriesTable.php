@@ -18,20 +18,20 @@ class PageCategoriesTable
         return $table
             ->columns([
                 TextColumn::make('name_ms')
-                    ->label('Nama (BM)')
+                    ->label(__('filament.common.name_bm'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('parent.name_ms')
-                    ->label('Parent')
-                    ->placeholder('Root'),
+                    ->label(__('filament.common.parent'))
+                    ->placeholder(__('filament.common.root')),
                 TextColumn::make('static_pages_count')
-                    ->label('Pages')
+                    ->label(__('filament.resource.page_categories.pages'))
                     ->counts('staticPages')
                     ->sortable(),
                 TextColumn::make('sort_order')
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('filament.common.active'))
                     ->boolean(),
             ])
             ->defaultSort('sort_order')

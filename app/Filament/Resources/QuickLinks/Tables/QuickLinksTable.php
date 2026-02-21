@@ -19,27 +19,27 @@ class QuickLinksTable
         return $table
             ->columns([
                 TextColumn::make('label_ms')
-                    ->label('Label (BM)')
+                    ->label(__('filament.common.label_bm'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('url')
-                    ->label('URL')
+                    ->label(__('filament.common.url'))
                     ->limit(40),
                 TextColumn::make('icon')
-                    ->label('Icon')
+                    ->label(__('filament.common.icon'))
                     ->placeholder('—'),
                 TextColumn::make('sort_order')
-                    ->label('Order')
+                    ->label(__('filament.common.sort_order'))
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('filament.common.active'))
                     ->boolean(),
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active'),
+                    ->label(__('filament.common.active')),
             ])
             ->recordActions([
                 EditAction::make(),

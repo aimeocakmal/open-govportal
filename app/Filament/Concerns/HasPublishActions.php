@@ -20,7 +20,7 @@ trait HasPublishActions
                     'published_at' => $this->record->published_at ?? now(),
                 ]);
                 $this->refreshFormData(['status', 'published_at']);
-                Notification::make()->success()->title('Published successfully')->send();
+                Notification::make()->success()->title(__('filament.actions.published_successfully'))->send();
             });
     }
 
@@ -34,7 +34,7 @@ trait HasPublishActions
             ->action(function () {
                 $this->record->update(['status' => 'draft']);
                 $this->refreshFormData(['status']);
-                Notification::make()->success()->title('Unpublished successfully')->send();
+                Notification::make()->success()->title(__('filament.actions.unpublished_successfully'))->send();
             });
     }
 }

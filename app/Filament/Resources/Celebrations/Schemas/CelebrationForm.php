@@ -19,13 +19,13 @@ class CelebrationForm
     {
         return $schema
             ->components([
-                Section::make('General')
+                Section::make(__('filament.common.general'))
                     ->schema([
                         TextInput::make('slug')
                             ->maxLength(600)
                             ->unique(ignoreRecord: true),
                         DatePicker::make('event_date')
-                            ->label('Event Date')
+                            ->label(__('filament.resource.celebrations.event_date'))
                             ->nullable(),
                         Select::make('status')
                             ->options([
@@ -35,20 +35,20 @@ class CelebrationForm
                             ->default('draft')
                             ->required(),
                         DateTimePicker::make('published_at')
-                            ->label('Publish Date')
+                            ->label(__('filament.common.publish_date'))
                             ->nullable(),
                         TextInput::make('image')
-                            ->label('Image URL')
+                            ->label(__('filament.common.image_url'))
                             ->maxLength(2048)
                             ->nullable(),
                     ])
                     ->columns(2),
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('title_ms')
-                                    ->label('Tajuk (BM)')
+                                    ->label(__('filament.common.title_bm'))
                                     ->required()
                                     ->maxLength(500)
                                     ->live(onBlur: true)
@@ -58,17 +58,17 @@ class CelebrationForm
                                         }
                                     }),
                                 Textarea::make('description_ms')
-                                    ->label('Keterangan (BM)')
+                                    ->label(__('filament.common.description_bm'))
                                     ->rows(5)
                                     ->columnSpanFull(),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('title_en')
-                                    ->label('Title (EN)')
+                                    ->label(__('filament.common.title_en'))
                                     ->maxLength(500),
                                 Textarea::make('description_en')
-                                    ->label('Description (EN)')
+                                    ->label(__('filament.common.description_en'))
                                     ->rows(5)
                                     ->columnSpanFull(),
                             ]),

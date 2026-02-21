@@ -14,7 +14,7 @@ class FeedbackForm
     {
         return $schema
             ->components([
-                Section::make('Submission Details')
+                Section::make(__('filament.resource.feedback.submission_details'))
                     ->schema([
                         Placeholder::make('name')
                             ->content(fn ($record): string => $record?->name ?? '—'),
@@ -23,23 +23,23 @@ class FeedbackForm
                         Placeholder::make('subject')
                             ->content(fn ($record): string => $record?->subject ?? '—'),
                         Placeholder::make('message_content')
-                            ->label('Message')
+                            ->label(__('filament.resource.feedback.message'))
                             ->content(fn ($record): string => $record?->message ?? '—'),
                         Placeholder::make('page_url')
-                            ->label('Page URL')
+                            ->label(__('filament.resource.feedback.page_url'))
                             ->content(fn ($record): string => $record?->page_url ?? '—'),
                         Placeholder::make('rating_display')
-                            ->label('Rating')
+                            ->label(__('filament.resource.feedback.rating'))
                             ->content(fn ($record): string => $record?->rating ? $record->rating.'/5' : '—'),
                         Placeholder::make('ip_address')
-                            ->label('IP Address')
+                            ->label(__('filament.resource.feedback.ip_address'))
                             ->content(fn ($record): string => $record?->ip_address ?? '—'),
                         Placeholder::make('submitted_at')
-                            ->label('Submitted')
+                            ->label(__('filament.resource.feedback.submitted'))
                             ->content(fn ($record): string => $record?->created_at?->format('d M Y H:i') ?? '—'),
                     ])
                     ->columns(2),
-                Section::make('Admin Response')
+                Section::make(__('filament.resource.feedback.admin_response'))
                     ->schema([
                         Select::make('status')
                             ->options([
@@ -50,7 +50,7 @@ class FeedbackForm
                             ])
                             ->required(),
                         Textarea::make('reply')
-                            ->label('Reply')
+                            ->label(__('filament.resource.feedback.reply'))
                             ->rows(5)
                             ->columnSpanFull(),
                     ]),

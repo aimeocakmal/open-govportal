@@ -19,25 +19,25 @@ class HeroBannersTable
         return $table
             ->columns([
                 TextColumn::make('title_ms')
-                    ->label('Tajuk (BM)')
+                    ->label(__('filament.common.title_bm'))
                     ->searchable()
                     ->limit(50),
                 TextColumn::make('cta_url')
-                    ->label('CTA URL')
+                    ->label(__('filament.resource.hero_banners.cta_url'))
                     ->limit(40)
                     ->placeholder('—'),
                 TextColumn::make('sort_order')
-                    ->label('Order')
+                    ->label(__('filament.resource.hero_banners.order'))
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('filament.common.active'))
                     ->boolean(),
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active'),
+                    ->label(__('filament.common.active')),
             ])
             ->recordActions([
                 EditAction::make(),

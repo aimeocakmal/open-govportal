@@ -19,11 +19,11 @@ class RolesTable
                     ->sortable()
                     ->badge(),
                 TextColumn::make('permissions_count')
-                    ->label('Permissions')
+                    ->label(__('filament.common.permissions'))
                     ->counts('permissions')
                     ->sortable(),
                 TextColumn::make('users_count')
-                    ->label('Users')
+                    ->label(__('filament.common.users'))
                     ->counts('users')
                     ->sortable(),
                 TextColumn::make('created_at')

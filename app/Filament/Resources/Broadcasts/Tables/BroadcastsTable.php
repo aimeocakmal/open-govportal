@@ -18,7 +18,7 @@ class BroadcastsTable
         return $table
             ->columns([
                 TextColumn::make('title_ms')
-                    ->label('Tajuk (BM)')
+                    ->label(__('filament.common.title_bm'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
@@ -38,7 +38,7 @@ class BroadcastsTable
                         default => 'gray',
                     }),
                 TextColumn::make('published_at')
-                    ->label('Published')
+                    ->label(__('filament.common.published'))
                     ->dateTime('d M Y H:i')
                     ->sortable()
                     ->placeholder('—'),
@@ -51,14 +51,14 @@ class BroadcastsTable
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'announcement' => 'Pengumuman',
-                        'press_release' => 'Siaran Akhbar',
-                        'news' => 'Berita',
+                        'announcement' => __('filament.resource.broadcasts.type_announcement'),
+                        'press_release' => __('filament.resource.broadcasts.type_press_release'),
+                        'news' => __('filament.resource.broadcasts.type_news'),
                     ]),
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draf',
-                        'published' => 'Diterbitkan',
+                        'draft' => __('filament.common.draft'),
+                        'published' => __('filament.common.published'),
                     ]),
             ])
             ->recordActions([

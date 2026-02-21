@@ -18,7 +18,7 @@ class PoliciesTable
         return $table
             ->columns([
                 TextColumn::make('title_ms')
-                    ->label('Tajuk (BM)')
+                    ->label(__('filament.common.title_bm'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
@@ -33,10 +33,10 @@ class PoliciesTable
                         default => 'gray',
                     }),
                 TextColumn::make('download_count')
-                    ->label('Downloads')
+                    ->label(__('filament.common.downloads'))
                     ->sortable(),
                 TextColumn::make('published_at')
-                    ->label('Published')
+                    ->label(__('filament.common.published'))
                     ->dateTime('d M Y')
                     ->sortable()
                     ->placeholder('—'),
@@ -49,16 +49,16 @@ class PoliciesTable
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draf',
-                        'published' => 'Diterbitkan',
+                        'draft' => __('filament.common.draft'),
+                        'published' => __('filament.common.published'),
                     ]),
                 SelectFilter::make('category')
                     ->options([
-                        'keselamatan' => 'Keselamatan',
-                        'data' => 'Data',
-                        'digital' => 'Digital',
-                        'ict' => 'ICT',
-                        'perkhidmatan' => 'Perkhidmatan',
+                        'keselamatan' => __('filament.resource.policies.cat_keselamatan'),
+                        'data' => __('filament.resource.policies.cat_data'),
+                        'digital' => __('filament.resource.policies.cat_digital'),
+                        'ict' => __('filament.resource.policies.cat_ict'),
+                        'perkhidmatan' => __('filament.resource.policies.cat_perkhidmatan'),
                     ]),
             ])
             ->recordActions([

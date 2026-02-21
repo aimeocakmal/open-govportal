@@ -28,9 +28,19 @@ class ManageMediaSettings extends Page
 
     protected static ?int $navigationSort = 3;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
-    protected static ?string $title = 'Media Settings';
+    protected static ?string $title = null;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.settings');
+    }
+
+    public static function getLabel(): string
+    {
+        return __('filament.settings.media.title');
+    }
 
     protected string $view = 'filament.pages.manage-media-settings';
 
@@ -94,122 +104,122 @@ class ManageMediaSettings extends Page
         return $schema
             ->components([
                 Form::make([
-                    Section::make('Storage Driver')
-                        ->description('Select where uploaded media files will be stored.')
+                    Section::make(__('filament.settings.media.storage_driver'))
+                        ->description(__('filament.settings.media.storage_driver_desc'))
                         ->schema([
                             Select::make('media_disk')
-                                ->label('Media Disk')
+                                ->label(__('filament.settings.media.media_disk'))
                                 ->options([
-                                    'local' => 'Local Filesystem',
-                                    's3' => 'Amazon S3',
-                                    'r2' => 'Cloudflare R2',
-                                    'gcs' => 'Google Cloud Storage',
-                                    'azure' => 'Azure Blob Storage',
+                                    'local' => __('filament.settings.media.local'),
+                                    's3' => __('filament.settings.media.amazon_s3'),
+                                    'r2' => __('filament.settings.media.cloudflare_r2'),
+                                    'gcs' => __('filament.settings.media.google_cloud'),
+                                    'azure' => __('filament.settings.media.azure_blob'),
                                 ])
                                 ->required()
                                 ->live(),
                         ]),
 
-                    Section::make('Amazon S3')
-                        ->description('Credentials for AWS S3 storage.')
+                    Section::make(__('filament.settings.media.amazon_s3'))
+                        ->description(__('filament.settings.media.s3_desc'))
                         ->schema([
                             TextInput::make('media_s3_key')
-                                ->label('Access Key ID')
+                                ->label(__('filament.settings.media.access_key_id'))
                                 ->password()
                                 ->revealable()
                                 ->maxLength(255),
                             TextInput::make('media_s3_secret')
-                                ->label('Secret Access Key')
+                                ->label(__('filament.settings.media.secret_access_key'))
                                 ->password()
                                 ->revealable()
                                 ->maxLength(255),
                             TextInput::make('media_s3_region')
-                                ->label('Region')
+                                ->label(__('filament.settings.media.region'))
                                 ->placeholder('ap-southeast-1')
                                 ->maxLength(50),
                             TextInput::make('media_s3_bucket')
-                                ->label('Bucket')
+                                ->label(__('filament.settings.media.bucket'))
                                 ->maxLength(255),
                             TextInput::make('media_s3_url')
-                                ->label('CDN / Public URL')
+                                ->label(__('filament.settings.media.cdn_url'))
                                 ->url()
                                 ->placeholder('https://cdn.example.com')
-                                ->helperText('Optional. Leave blank for auto-generated AWS URL.')
+                                ->helperText(__('filament.settings.media.cdn_url_help'))
                                 ->maxLength(2048),
                             TextInput::make('media_s3_endpoint')
-                                ->label('Custom Endpoint')
+                                ->label(__('filament.settings.media.custom_endpoint'))
                                 ->url()
                                 ->placeholder('https://s3.example.com')
-                                ->helperText('Leave blank for standard AWS S3. Set for S3-compatible services.')
+                                ->helperText(__('filament.settings.media.custom_endpoint_help'))
                                 ->maxLength(2048),
                         ])
                         ->columns(2)
                         ->visible(fn (Get $get): bool => $get('media_disk') === 's3'),
 
-                    Section::make('Cloudflare R2')
-                        ->description('Credentials for Cloudflare R2 storage (S3-compatible).')
+                    Section::make(__('filament.settings.media.cloudflare_r2'))
+                        ->description(__('filament.settings.media.r2_desc'))
                         ->schema([
                             TextInput::make('media_r2_account_id')
-                                ->label('Cloudflare Account ID')
+                                ->label(__('filament.settings.media.r2_account_id'))
                                 ->maxLength(255),
                             TextInput::make('media_r2_access_key')
-                                ->label('Access Key')
+                                ->label(__('filament.settings.media.r2_access_key'))
                                 ->password()
                                 ->revealable()
                                 ->maxLength(255),
                             TextInput::make('media_r2_secret_key')
-                                ->label('Secret Key')
+                                ->label(__('filament.settings.media.r2_secret_key'))
                                 ->password()
                                 ->revealable()
                                 ->maxLength(255),
                             TextInput::make('media_r2_bucket')
-                                ->label('Bucket')
+                                ->label(__('filament.settings.media.bucket'))
                                 ->maxLength(255),
                             TextInput::make('media_r2_public_url')
-                                ->label('Public URL')
+                                ->label(__('filament.settings.media.r2_public_url'))
                                 ->url()
                                 ->placeholder('https://media.example.com')
-                                ->helperText('Custom domain or Workers URL for public access.')
+                                ->helperText(__('filament.settings.media.r2_public_url_help'))
                                 ->maxLength(2048),
                         ])
                         ->columns(2)
                         ->visible(fn (Get $get): bool => $get('media_disk') === 'r2'),
 
-                    Section::make('Google Cloud Storage')
-                        ->description('Credentials for GCP Cloud Storage.')
+                    Section::make(__('filament.settings.media.google_cloud'))
+                        ->description(__('filament.settings.media.gcs_desc'))
                         ->schema([
                             TextInput::make('media_gcs_project_id')
-                                ->label('Project ID')
+                                ->label(__('filament.settings.media.gcs_project_id'))
                                 ->maxLength(255),
                             TextInput::make('media_gcs_bucket')
-                                ->label('Bucket')
+                                ->label(__('filament.settings.media.bucket'))
                                 ->maxLength(255),
                             Textarea::make('media_gcs_key_json')
-                                ->label('Service Account Key (JSON)')
+                                ->label(__('filament.settings.media.gcs_key_json'))
                                 ->rows(6)
-                                ->helperText('Paste the full JSON key file content. It will be encrypted at rest.'),
+                                ->helperText(__('filament.settings.media.gcs_key_json_help')),
                         ])
                         ->visible(fn (Get $get): bool => $get('media_disk') === 'gcs'),
 
-                    Section::make('Azure Blob Storage')
-                        ->description('Credentials for Azure Blob Storage.')
+                    Section::make(__('filament.settings.media.azure_blob'))
+                        ->description(__('filament.settings.media.azure_desc'))
                         ->schema([
                             TextInput::make('media_azure_account')
-                                ->label('Storage Account Name')
+                                ->label(__('filament.settings.media.azure_account'))
                                 ->maxLength(255),
                             TextInput::make('media_azure_key')
-                                ->label('Account Key')
+                                ->label(__('filament.settings.media.azure_key'))
                                 ->password()
                                 ->revealable()
                                 ->maxLength(255),
                             TextInput::make('media_azure_container')
-                                ->label('Container')
+                                ->label(__('filament.settings.media.azure_container'))
                                 ->maxLength(255),
                             TextInput::make('media_azure_url')
-                                ->label('CDN / Custom Domain URL')
+                                ->label(__('filament.settings.media.azure_url'))
                                 ->url()
                                 ->placeholder('https://media.example.com')
-                                ->helperText('Optional custom domain URL.')
+                                ->helperText(__('filament.settings.media.azure_url_help'))
                                 ->maxLength(2048),
                         ])
                         ->columns(2)
@@ -257,7 +267,7 @@ class ManageMediaSettings extends Page
 
         Notification::make()
             ->success()
-            ->title('Media settings saved')
+            ->title(__('filament.settings.media.saved'))
             ->send();
     }
 

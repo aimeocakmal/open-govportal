@@ -13,29 +13,29 @@ class QuickLinkForm
     {
         return $schema
             ->components([
-                Section::make('Quick Link')
+                Section::make(__('filament.resource.quick_links.quick_link'))
                     ->schema([
                         TextInput::make('label_ms')
-                            ->label('Label (BM)')
+                            ->label(__('filament.common.label_bm'))
                             ->required()
                             ->maxLength(200),
                         TextInput::make('label_en')
-                            ->label('Label (EN)')
+                            ->label(__('filament.common.label_en'))
                             ->maxLength(200),
                         TextInput::make('url')
-                            ->label('URL')
+                            ->label(__('filament.common.url'))
                             ->required()
                             ->maxLength(2048),
                         TextInput::make('icon')
-                            ->label('Icon')
+                            ->label(__('filament.common.icon'))
                             ->maxLength(100)
-                            ->helperText('Heroicon name or icon identifier'),
+                            ->helperText(__('filament.resource.quick_links.icon_help')),
                         TextInput::make('sort_order')
-                            ->label('Sort Order')
+                            ->label(__('filament.common.sort_order'))
                             ->numeric()
                             ->default(0),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('filament.common.active'))
                             ->default(true),
                     ])
                     ->columns(2),

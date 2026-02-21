@@ -19,22 +19,22 @@ class MediaTable
                     ->sortable()
                     ->limit(40),
                 TextColumn::make('original_name')
-                    ->label('Original')
+                    ->label(__('filament.resource.media.original'))
                     ->searchable()
                     ->limit(30)
                     ->toggleable(),
                 TextColumn::make('mime_type')
-                    ->label('Type')
+                    ->label(__('filament.resource.media.type'))
                     ->sortable(),
                 TextColumn::make('file_size')
-                    ->label('Size')
+                    ->label(__('filament.common.size'))
                     ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 0).' KB' : '—')
                     ->sortable(),
                 TextColumn::make('width')
-                    ->label('W')
+                    ->label(__('filament.resource.media.width'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('height')
-                    ->label('H')
+                    ->label(__('filament.resource.media.height'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime('d M Y')

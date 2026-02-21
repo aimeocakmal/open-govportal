@@ -24,7 +24,12 @@ class ManageFooter extends Page
 {
     protected string $view = 'filament.pages.manage-footer';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = null;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.settings');
+    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBars3BottomLeft;
 
@@ -60,33 +65,33 @@ class ManageFooter extends Page
             ->components([
                 Form::make([
                     Repeater::make('items')
-                        ->label('Footer Links')
+                        ->label(__('filament.settings.footer.footer_links'))
                         ->schema([
                             Select::make('section')
                                 ->options([
-                                    'links' => 'Links',
-                                    'social' => 'Social',
-                                    'legal' => 'Legal',
+                                    'links' => __('filament.settings.footer.section_links'),
+                                    'social' => __('filament.settings.footer.section_social'),
+                                    'legal' => __('filament.settings.footer.section_legal'),
                                 ])
                                 ->required(),
                             TextInput::make('label_ms')
-                                ->label('Label (BM)')
+                                ->label(__('filament.common.label_bm'))
                                 ->required()
                                 ->maxLength(200),
                             TextInput::make('label_en')
-                                ->label('Label (EN)')
+                                ->label(__('filament.common.label_en'))
                                 ->required()
                                 ->maxLength(200),
                             TextInput::make('url')
-                                ->label('URL')
+                                ->label(__('filament.common.url'))
                                 ->url()
                                 ->maxLength(2048),
                             TextInput::make('sort_order')
-                                ->label('Sort Order')
+                                ->label(__('filament.common.sort_order'))
                                 ->numeric()
                                 ->default(0),
                             Toggle::make('is_active')
-                                ->label('Active')
+                                ->label(__('filament.common.active'))
                                 ->default(true),
                         ])
                         ->columns(3)
@@ -126,7 +131,7 @@ class ManageFooter extends Page
 
         Notification::make()
             ->success()
-            ->title('Footer settings saved')
+            ->title(__('filament.settings.footer.saved'))
             ->send();
     }
 }

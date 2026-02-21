@@ -13,20 +13,20 @@ class MenuForm
     {
         return $schema
             ->components([
-                Section::make('Menu Details')
+                Section::make(__('filament.resource.menus.menu_details'))
                     ->schema([
                         TextInput::make('name')
                             ->disabled()
                             ->maxLength(100),
                         TextInput::make('label_ms')
-                            ->label('Label (BM)')
+                            ->label(__('filament.common.label_bm'))
                             ->required()
                             ->maxLength(255),
                         TextInput::make('label_en')
-                            ->label('Label (EN)')
+                            ->label(__('filament.common.label_en'))
                             ->maxLength(255),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('filament.common.active'))
                             ->default(true),
                     ])
                     ->columns(2),

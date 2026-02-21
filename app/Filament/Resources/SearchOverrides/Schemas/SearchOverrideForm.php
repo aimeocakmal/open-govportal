@@ -16,44 +16,44 @@ class SearchOverrideForm
     {
         return $schema
             ->components([
-                Section::make('Search Rule')
+                Section::make(__('filament.resource.search_overrides.search_rule'))
                     ->schema([
                         TextInput::make('query')
-                            ->label('Search Query')
+                            ->label(__('filament.resource.search_overrides.search_query'))
                             ->required()
                             ->maxLength(500)
-                            ->helperText('The keyword(s) this override matches.'),
+                            ->helperText(__('filament.resource.search_overrides.search_query_help')),
                         TextInput::make('url')
-                            ->label('Target URL')
+                            ->label(__('filament.resource.search_overrides.target_url'))
                             ->maxLength(2048)
                             ->nullable(),
                         TextInput::make('priority')
                             ->numeric()
                             ->default(0)
-                            ->helperText('Higher priority = shown first.'),
+                            ->helperText(__('filament.resource.search_overrides.priority_help')),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('filament.common.active'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('title_ms')
-                                    ->label('Tajuk (BM)')
+                                    ->label(__('filament.common.title_bm'))
                                     ->maxLength(500),
                                 Textarea::make('description_ms')
-                                    ->label('Keterangan (BM)')
+                                    ->label(__('filament.common.description_bm'))
                                     ->rows(3),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('title_en')
-                                    ->label('Title (EN)')
+                                    ->label(__('filament.common.title_en'))
                                     ->maxLength(500),
                                 Textarea::make('description_en')
-                                    ->label('Description (EN)')
+                                    ->label(__('filament.common.description_en'))
                                     ->rows(3),
                             ]),
                     ])

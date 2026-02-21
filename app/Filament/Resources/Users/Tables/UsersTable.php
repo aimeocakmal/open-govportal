@@ -32,13 +32,13 @@ class UsersTable
                     ->placeholder('—')
                     ->toggleable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('filament.common.active'))
                     ->boolean(),
                 TextColumn::make('last_login_at')
-                    ->label('Last Login')
+                    ->label(__('filament.resource.users.last_login'))
                     ->dateTime('d M Y H:i')
                     ->sortable()
-                    ->placeholder('Never'),
+                    ->placeholder(__('filament.resource.users.never')),
                 TextColumn::make('created_at')
                     ->dateTime('d M Y')
                     ->sortable()
@@ -47,7 +47,7 @@ class UsersTable
             ->defaultSort('created_at', 'desc')
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active Status'),
+                    ->label(__('filament.resource.users.active_status')),
             ])
             ->recordActions([
                 EditAction::make(),

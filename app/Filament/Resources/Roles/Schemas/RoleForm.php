@@ -13,7 +13,7 @@ class RoleForm
     {
         return $schema
             ->components([
-                Section::make('Role Details')
+                Section::make(__('filament.resource.roles.role_details'))
                     ->schema([
                         TextInput::make('name')
                             ->required()
@@ -28,7 +28,7 @@ class RoleForm
                             ->disabled()
                             ->dehydrated(),
                     ]),
-                Section::make('Permissions')
+                Section::make(__('filament.common.permissions'))
                     ->schema([
                         CheckboxList::make('permissions')
                             ->relationship('permissions', 'name')

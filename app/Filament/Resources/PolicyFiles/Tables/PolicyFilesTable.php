@@ -18,7 +18,7 @@ class PolicyFilesTable
         return $table
             ->columns([
                 TextColumn::make('title_ms')
-                    ->label('Tajuk (BM)')
+                    ->label(__('filament.common.title_bm'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
@@ -35,15 +35,15 @@ class PolicyFilesTable
                         default => 'gray',
                     }),
                 TextColumn::make('file_size')
-                    ->label('Size')
+                    ->label(__('filament.common.size'))
                     ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 0).' KB' : '—')
                     ->sortable(),
                 TextColumn::make('download_count')
-                    ->label('Downloads')
+                    ->label(__('filament.common.downloads'))
                     ->sortable()
                     ->toggleable(),
                 IconColumn::make('is_public')
-                    ->label('Public')
+                    ->label(__('filament.common.public'))
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime('d M Y')
@@ -54,13 +54,13 @@ class PolicyFilesTable
             ->filters([
                 SelectFilter::make('category')
                     ->options([
-                        'pekeliling' => 'Pekeliling',
-                        'garis_panduan' => 'Garis Panduan',
-                        'laporan' => 'Laporan',
-                        'borang' => 'Borang',
+                        'pekeliling' => __('filament.resource.policy_files.cat_pekeliling'),
+                        'garis_panduan' => __('filament.resource.policy_files.cat_garis_panduan'),
+                        'laporan' => __('filament.resource.policy_files.cat_laporan'),
+                        'borang' => __('filament.resource.policy_files.cat_borang'),
                     ]),
                 TernaryFilter::make('is_public')
-                    ->label('Public'),
+                    ->label(__('filament.common.public')),
             ])
             ->recordActions([
                 EditAction::make(),

@@ -21,10 +21,10 @@ class EditProfile extends BaseEditProfile
                     ->avatar()
                     ->directory('avatars'),
                 Select::make('preferred_locale')
-                    ->label('Language / Bahasa')
+                    ->label(__('filament.profile.language'))
                     ->options([
-                        'ms' => 'Bahasa Malaysia',
-                        'en' => 'English',
+                        'ms' => __('filament.common.bahasa_malaysia'),
+                        'en' => __('filament.common.english'),
                     ]),
                 $this->getPasswordFormComponent(),
                 $this->getPasswordConfirmationFormComponent(),

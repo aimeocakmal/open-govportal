@@ -19,21 +19,21 @@ class SearchOverridesTable
         return $table
             ->columns([
                 TextColumn::make('query')
-                    ->label('Search Query')
+                    ->label(__('filament.resource.search_overrides.search_query'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('title_ms')
-                    ->label('Tajuk (BM)')
+                    ->label(__('filament.common.title_bm'))
                     ->searchable()
                     ->limit(40),
                 TextColumn::make('url')
-                    ->label('URL')
+                    ->label(__('filament.common.url'))
                     ->limit(40)
                     ->toggleable(),
                 TextColumn::make('priority')
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('filament.common.active'))
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime('d M Y')
@@ -43,7 +43,7 @@ class SearchOverridesTable
             ->defaultSort('priority', 'desc')
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active'),
+                    ->label(__('filament.common.active')),
             ])
             ->recordActions([
                 EditAction::make(),

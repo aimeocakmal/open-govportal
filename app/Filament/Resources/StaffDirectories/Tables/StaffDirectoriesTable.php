@@ -19,25 +19,25 @@ class StaffDirectoriesTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama / Name')
+                    ->label(__('filament.resource.staff_directories.name_label'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('position_ms')
-                    ->label('Jawatan (BM)')
+                    ->label(__('filament.resource.staff_directories.position_bm'))
                     ->searchable()
                     ->limit(40),
                 TextColumn::make('department_ms')
-                    ->label('Jabatan (BM)')
+                    ->label(__('filament.resource.staff_directories.department_bm'))
                     ->searchable()
                     ->limit(30),
                 TextColumn::make('email')
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('phone')
-                    ->label('Telefon')
+                    ->label(__('filament.common.phone'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('filament.common.active'))
                     ->boolean(),
                 TextColumn::make('sort_order')
                     ->sortable()
@@ -46,7 +46,7 @@ class StaffDirectoriesTable
             ->defaultSort('sort_order', 'asc')
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active'),
+                    ->label(__('filament.common.active')),
             ])
             ->recordActions([
                 EditAction::make(),

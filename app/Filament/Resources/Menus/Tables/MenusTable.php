@@ -17,14 +17,14 @@ class MenusTable
                     ->badge()
                     ->sortable(),
                 TextColumn::make('label_ms')
-                    ->label('Label (BM)')
+                    ->label(__('filament.common.label_bm'))
                     ->searchable(),
                 TextColumn::make('items_count')
-                    ->label('Items')
+                    ->label(__('filament.resource.menus.items'))
                     ->counts('items')
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('filament.common.active'))
                     ->boolean(),
             ])
             ->defaultSort('name')

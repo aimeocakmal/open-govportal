@@ -16,7 +16,7 @@ class EditUser extends EditRecord
     {
         return [
             Action::make('toggleActive')
-                ->label(fn () => $this->record->is_active ? 'Deactivate' : 'Reactivate')
+                ->label(fn () => $this->record->is_active ? __('filament.actions.deactivate') : __('filament.actions.reactivate'))
                 ->color(fn () => $this->record->is_active ? 'danger' : 'success')
                 ->icon(fn () => $this->record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                 ->requiresConfirmation()
@@ -39,7 +39,7 @@ class EditUser extends EditRecord
                     $this->record->update(['password' => Hash::make($data['new_password'])]);
                     \Filament\Notifications\Notification::make()
                         ->success()
-                        ->title('Password reset successfully')
+                        ->title(__('filament.actions.password_reset_successfully'))
                         ->send();
                 }),
             DeleteAction::make(),

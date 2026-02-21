@@ -15,55 +15,55 @@ class HeroBannerForm
     {
         return $schema
             ->components([
-                Section::make('Banner Settings')
+                Section::make(__('filament.resource.hero_banners.banner_settings'))
                     ->schema([
                         TextInput::make('image')
-                            ->label('Image URL')
+                            ->label(__('filament.common.image_url'))
                             ->required()
                             ->maxLength(2048),
                         TextInput::make('cta_url')
-                            ->label('CTA URL')
+                            ->label(__('filament.resource.hero_banners.cta_url'))
                             ->maxLength(2048)
                             ->nullable(),
                         TextInput::make('sort_order')
-                            ->label('Sort Order')
+                            ->label(__('filament.common.sort_order'))
                             ->numeric()
                             ->default(0),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('filament.common.active'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('title_ms')
-                                    ->label('Tajuk (BM)')
+                                    ->label(__('filament.common.title_bm'))
                                     ->maxLength(500),
                                 TextInput::make('subtitle_ms')
-                                    ->label('Subtajuk (BM)')
+                                    ->label(__('filament.resource.hero_banners.subtitle_bm'))
                                     ->maxLength(1000),
                                 TextInput::make('image_alt_ms')
-                                    ->label('Image Alt (BM)')
+                                    ->label(__('filament.resource.hero_banners.image_alt_bm'))
                                     ->maxLength(500),
                                 TextInput::make('cta_label_ms')
-                                    ->label('CTA Label (BM)')
+                                    ->label(__('filament.resource.hero_banners.cta_label_bm'))
                                     ->maxLength(200),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('title_en')
-                                    ->label('Title (EN)')
+                                    ->label(__('filament.common.title_en'))
                                     ->maxLength(500),
                                 TextInput::make('subtitle_en')
-                                    ->label('Subtitle (EN)')
+                                    ->label(__('filament.resource.hero_banners.subtitle_en'))
                                     ->maxLength(1000),
                                 TextInput::make('image_alt_en')
-                                    ->label('Image Alt (EN)')
+                                    ->label(__('filament.resource.hero_banners.image_alt_en'))
                                     ->maxLength(500),
                                 TextInput::make('cta_label_en')
-                                    ->label('CTA Label (EN)')
+                                    ->label(__('filament.resource.hero_banners.cta_label_en'))
                                     ->maxLength(200),
                             ]),
                     ])

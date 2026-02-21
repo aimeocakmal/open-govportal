@@ -24,7 +24,12 @@ class ManageAddresses extends Page
 {
     protected string $view = 'filament.pages.manage-addresses';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = null;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.settings');
+    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
 
@@ -60,43 +65,43 @@ class ManageAddresses extends Page
             ->components([
                 Form::make([
                     Repeater::make('items')
-                        ->label('Addresses')
+                        ->label(__('filament.settings.addresses.addresses'))
                         ->schema([
                             TextInput::make('label_ms')
-                                ->label('Label (BM)')
+                                ->label(__('filament.common.label_bm'))
                                 ->required()
                                 ->maxLength(200),
                             TextInput::make('label_en')
-                                ->label('Label (EN)')
+                                ->label(__('filament.common.label_en'))
                                 ->required()
                                 ->maxLength(200),
                             Textarea::make('address_ms')
-                                ->label('Address (BM)')
+                                ->label(__('filament.settings.addresses.address_bm'))
                                 ->rows(3),
                             Textarea::make('address_en')
-                                ->label('Address (EN)')
+                                ->label(__('filament.settings.addresses.address_en'))
                                 ->rows(3),
                             TextInput::make('phone')
-                                ->label('Phone')
+                                ->label(__('filament.common.phone'))
                                 ->tel()
                                 ->maxLength(50),
                             TextInput::make('fax')
-                                ->label('Fax')
+                                ->label(__('filament.common.fax'))
                                 ->maxLength(50),
                             TextInput::make('email')
-                                ->label('Email')
+                                ->label(__('filament.common.email'))
                                 ->email()
                                 ->maxLength(255),
                             TextInput::make('google_maps_url')
-                                ->label('Google Maps URL')
+                                ->label(__('filament.settings.addresses.google_maps_url'))
                                 ->url()
                                 ->maxLength(2048),
                             TextInput::make('sort_order')
-                                ->label('Sort Order')
+                                ->label(__('filament.common.sort_order'))
                                 ->numeric()
                                 ->default(0),
                             Toggle::make('is_active')
-                                ->label('Active')
+                                ->label(__('filament.common.active'))
                                 ->default(true),
                         ])
                         ->columns(2)
@@ -140,7 +145,7 @@ class ManageAddresses extends Page
 
         Notification::make()
             ->success()
-            ->title('Addresses saved')
+            ->title(__('filament.settings.addresses.saved'))
             ->send();
     }
 }

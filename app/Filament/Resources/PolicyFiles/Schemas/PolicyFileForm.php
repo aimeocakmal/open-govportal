@@ -17,20 +17,20 @@ class PolicyFileForm
     {
         return $schema
             ->components([
-                Section::make('File Details')
+                Section::make(__('filament.common.file_details'))
                     ->schema([
                         TextInput::make('filename')
                             ->required()
                             ->maxLength(500),
                         TextInput::make('file_url')
-                            ->label('File URL / S3 Key')
+                            ->label(__('filament.common.file_url'))
                             ->required()
                             ->maxLength(2048),
                         TextInput::make('mime_type')
                             ->maxLength(100)
                             ->nullable(),
                         TextInput::make('file_size')
-                            ->label('File Size (bytes)')
+                            ->label(__('filament.common.file_size'))
                             ->numeric()
                             ->nullable(),
                         Select::make('category')
@@ -42,28 +42,28 @@ class PolicyFileForm
                             ])
                             ->nullable(),
                         Toggle::make('is_public')
-                            ->label('Public')
+                            ->label(__('filament.common.public'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('title_ms')
-                                    ->label('Tajuk (BM)')
+                                    ->label(__('filament.common.title_bm'))
                                     ->maxLength(500),
                                 Textarea::make('description_ms')
-                                    ->label('Keterangan (BM)')
+                                    ->label(__('filament.common.description_bm'))
                                     ->rows(3),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('title_en')
-                                    ->label('Title (EN)')
+                                    ->label(__('filament.common.title_en'))
                                     ->maxLength(500),
                                 Textarea::make('description_en')
-                                    ->label('Description (EN)')
+                                    ->label(__('filament.common.description_en'))
                                     ->rows(3),
                             ]),
                     ])

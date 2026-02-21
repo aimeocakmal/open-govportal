@@ -18,7 +18,7 @@ class StaticPagesTable
         return $table
             ->columns([
                 TextColumn::make('title_ms')
-                    ->label('Tajuk (BM)')
+                    ->label(__('filament.common.title_bm'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
@@ -26,7 +26,7 @@ class StaticPagesTable
                     ->searchable()
                     ->limit(30),
                 TextColumn::make('category.name_ms')
-                    ->label('Category')
+                    ->label(__('filament.common.category'))
                     ->placeholder('—'),
                 TextColumn::make('status')
                     ->badge()
@@ -43,8 +43,8 @@ class StaticPagesTable
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draf',
-                        'published' => 'Diterbitkan',
+                        'draft' => __('filament.common.draft'),
+                        'published' => __('filament.common.published'),
                     ]),
             ])
             ->recordActions([

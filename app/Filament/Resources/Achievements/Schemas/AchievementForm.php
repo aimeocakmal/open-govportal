@@ -20,7 +20,7 @@ class AchievementForm
     {
         return $schema
             ->components([
-                Section::make('General')
+                Section::make(__('filament.common.general'))
                     ->schema([
                         TextInput::make('slug')
                             ->required()
@@ -36,22 +36,22 @@ class AchievementForm
                             ->default('draft')
                             ->required(),
                         DateTimePicker::make('published_at')
-                            ->label('Publish Date')
+                            ->label(__('filament.common.publish_date'))
                             ->nullable(),
                         Toggle::make('is_featured')
-                            ->label('Featured'),
+                            ->label(__('filament.common.featured')),
                         TextInput::make('icon')
-                            ->label('Icon URL')
+                            ->label(__('filament.resource.achievements.icon_url'))
                             ->maxLength(2048)
                             ->nullable(),
                     ])
                     ->columns(2),
-                Tabs::make('Content')
+                Tabs::make(__('filament.common.content'))
                     ->tabs([
-                        Tab::make('Bahasa Malaysia')
+                        Tab::make(__('filament.common.bahasa_malaysia'))
                             ->schema([
                                 TextInput::make('title_ms')
-                                    ->label('Tajuk (BM)')
+                                    ->label(__('filament.common.title_bm'))
                                     ->required()
                                     ->maxLength(500)
                                     ->live(onBlur: true)
@@ -61,17 +61,17 @@ class AchievementForm
                                         }
                                     }),
                                 Textarea::make('description_ms')
-                                    ->label('Keterangan (BM)')
+                                    ->label(__('filament.common.description_bm'))
                                     ->rows(5)
                                     ->columnSpanFull(),
                             ]),
-                        Tab::make('English')
+                        Tab::make(__('filament.common.english'))
                             ->schema([
                                 TextInput::make('title_en')
-                                    ->label('Title (EN)')
+                                    ->label(__('filament.common.title_en'))
                                     ->maxLength(500),
                                 Textarea::make('description_en')
-                                    ->label('Description (EN)')
+                                    ->label(__('filament.common.description_en'))
                                     ->rows(5)
                                     ->columnSpanFull(),
                             ]),

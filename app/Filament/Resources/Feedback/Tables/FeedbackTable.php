@@ -37,7 +37,7 @@ class FeedbackTable
                         default => 'gray',
                     }),
                 TextColumn::make('created_at')
-                    ->label('Submitted')
+                    ->label(__('filament.resource.feedback.submitted'))
                     ->dateTime('d M Y H:i')
                     ->sortable(),
             ])
@@ -45,10 +45,10 @@ class FeedbackTable
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'new' => 'Baru / New',
-                        'read' => 'Dibaca / Read',
-                        'replied' => 'Dijawab / Replied',
-                        'archived' => 'Diarkib / Archived',
+                        'new' => __('filament.resource.feedback.status_new'),
+                        'read' => __('filament.resource.feedback.status_read'),
+                        'replied' => __('filament.resource.feedback.status_replied'),
+                        'archived' => __('filament.resource.feedback.status_archived'),
                     ]),
             ])
             ->recordActions([

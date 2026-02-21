@@ -16,7 +16,7 @@ class UserForm
     {
         return $schema
             ->components([
-                Section::make('Account')
+                Section::make(__('filament.resource.users.account'))
                     ->schema([
                         TextInput::make('name')
                             ->required()
@@ -34,7 +34,7 @@ class UserForm
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                Section::make('Profile')
+                Section::make(__('filament.resource.users.profile'))
                     ->schema([
                         TextInput::make('department')
                             ->maxLength(255),
@@ -43,19 +43,19 @@ class UserForm
                             ->avatar()
                             ->directory('avatars'),
                         Select::make('preferred_locale')
-                            ->label('Language')
+                            ->label(__('filament.resource.users.language'))
                             ->options([
-                                'ms' => 'Bahasa Malaysia',
-                                'en' => 'English',
+                                'ms' => __('filament.common.bahasa_malaysia'),
+                                'en' => __('filament.common.english'),
                             ])
                             ->default('ms')
                             ->required(),
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('filament.common.active'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Section::make('Roles')
+                Section::make(__('filament.common.roles'))
                     ->schema([
                         CheckboxList::make('roles')
                             ->relationship('roles', 'name')

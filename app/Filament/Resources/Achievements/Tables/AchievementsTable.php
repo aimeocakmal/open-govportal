@@ -20,7 +20,7 @@ class AchievementsTable
         return $table
             ->columns([
                 TextColumn::make('title_ms')
-                    ->label('Tajuk (BM)')
+                    ->label(__('filament.common.title_bm'))
                     ->searchable()
                     ->sortable()
                     ->limit(50),
@@ -28,7 +28,7 @@ class AchievementsTable
                     ->date('d M Y')
                     ->sortable(),
                 IconColumn::make('is_featured')
-                    ->label('Featured')
+                    ->label(__('filament.common.featured'))
                     ->boolean(),
                 TextColumn::make('status')
                     ->badge()
@@ -46,11 +46,11 @@ class AchievementsTable
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draf',
-                        'published' => 'Diterbitkan',
+                        'draft' => __('filament.common.draft'),
+                        'published' => __('filament.common.published'),
                     ]),
                 TernaryFilter::make('is_featured')
-                    ->label('Featured'),
+                    ->label(__('filament.common.featured')),
             ])
             ->recordActions([
                 EditAction::make(),
