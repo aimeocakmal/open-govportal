@@ -37,9 +37,14 @@ class ManageSiteInfo extends Page
         return __('filament.nav.settings');
     }
 
-    public static function getLabel(): string
+    public static function getNavigationLabel(): string
     {
         return __('filament.settings.site_info.title');
+    }
+
+    public function getTitle(): string
+    {
+        return static::getNavigationLabel();
     }
 
     protected string $view = 'filament.pages.manage-site-info';

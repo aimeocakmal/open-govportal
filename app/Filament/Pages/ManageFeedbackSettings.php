@@ -30,6 +30,16 @@ class ManageFeedbackSettings extends Page
         return __('filament.nav.settings');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.settings.feedback.title');
+    }
+
+    public function getTitle(): string
+    {
+        return static::getNavigationLabel();
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
     protected static ?int $navigationSort = 23;

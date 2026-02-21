@@ -33,6 +33,16 @@ class ManageMinisterProfile extends Page
         return __('filament.nav.settings');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.settings.minister.title');
+    }
+
+    public function getTitle(): string
+    {
+        return static::getNavigationLabel();
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUser;
 
     protected static ?int $navigationSort = 21;

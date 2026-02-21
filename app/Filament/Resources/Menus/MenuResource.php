@@ -20,9 +20,24 @@ class MenuResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBars3;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.settings');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return trans_choice('filament.models.menu', 1);
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return trans_choice('filament.models.menu', 2);
+    }
 
     public static function canCreate(): bool
     {

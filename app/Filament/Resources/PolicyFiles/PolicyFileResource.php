@@ -20,9 +20,24 @@ class PolicyFileResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperClip;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Content';
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 6;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.content');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return trans_choice('filament.models.policy_file', 1);
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return trans_choice('filament.models.policy_file', 2);
+    }
 
     public static function form(Schema $schema): Schema
     {

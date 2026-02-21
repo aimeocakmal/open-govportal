@@ -6,7 +6,28 @@ return [
     'nav' => [
         'settings' => 'Tetapan',
         'content' => 'Kandungan',
+        'homepage' => 'Laman Utama',
         'user_management' => 'Pengurusan Pengguna',
+    ],
+
+    // ── Label model sumber ──────────────────────────────────────────
+    'models' => [
+        'broadcast' => 'Siaran|Siaran',
+        'achievement' => 'Pencapaian|Pencapaian',
+        'celebration' => 'Sambutan|Sambutan',
+        'policy' => 'Dasar|Dasar',
+        'policy_file' => 'Fail Dasar|Fail Dasar',
+        'staff_directory' => 'Direktori Kakitangan|Direktori Kakitangan',
+        'hero_banner' => 'Sepanduk Utama|Sepanduk Utama',
+        'quick_link' => 'Pautan Pantas|Pautan Pantas',
+        'media' => 'Media|Media',
+        'feedback' => 'Maklum Balas|Maklum Balas',
+        'search_override' => 'Pengatasan Carian|Pengatasan Carian',
+        'menu' => 'Menu|Menu',
+        'page_category' => 'Kategori Halaman|Kategori Halaman',
+        'static_page' => 'Halaman Statik|Halaman Statik',
+        'user' => 'Pengguna|Pengguna',
+        'role' => 'Peranan|Peranan',
     ],
 
     // ── Label dikongsi (digunakan di banyak fail) ────────────────────
@@ -174,6 +195,7 @@ return [
         ],
 
         'feedback' => [
+            'title' => 'Tetapan Maklum Balas',
             'enable_form' => 'Dayakan Borang Maklum Balas',
             'recipient_email' => 'Emel Penerima',
             'success_message_bm' => 'Mesej Kejayaan (BM)',
@@ -182,6 +204,7 @@ return [
         ],
 
         'footer' => [
+            'title' => 'Kaki Halaman',
             'footer_links' => 'Pautan Kaki Halaman',
             'section_links' => 'Pautan',
             'section_social' => 'Sosial',
@@ -190,6 +213,7 @@ return [
         ],
 
         'addresses' => [
+            'title' => 'Alamat',
             'addresses' => 'Alamat',
             'address_bm' => 'Alamat (BM)',
             'address_en' => 'Alamat (EN)',
@@ -198,6 +222,7 @@ return [
         ],
 
         'minister' => [
+            'title' => 'Profil Menteri',
             'full_name' => 'Nama Penuh',
             'appointed_date' => 'Tarikh Perlantikan',
             'current_minister' => 'Menteri Semasa',

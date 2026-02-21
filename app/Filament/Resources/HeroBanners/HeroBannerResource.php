@@ -20,9 +20,24 @@ class HeroBannerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Homepage';
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.nav.homepage');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return trans_choice('filament.models.hero_banner', 1);
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return trans_choice('filament.models.hero_banner', 2);
+    }
 
     public static function form(Schema $schema): Schema
     {

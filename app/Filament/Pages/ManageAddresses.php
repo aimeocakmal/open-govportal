@@ -31,6 +31,16 @@ class ManageAddresses extends Page
         return __('filament.nav.settings');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.settings.addresses.title');
+    }
+
+    public function getTitle(): string
+    {
+        return static::getNavigationLabel();
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
 
     protected static ?int $navigationSort = 22;

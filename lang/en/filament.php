@@ -6,7 +6,28 @@ return [
     'nav' => [
         'settings' => 'Settings',
         'content' => 'Content',
+        'homepage' => 'Homepage',
         'user_management' => 'User Management',
+    ],
+
+    // ── Resource model labels ───────────────────────────────────────
+    'models' => [
+        'broadcast' => 'Broadcast|Broadcasts',
+        'achievement' => 'Achievement|Achievements',
+        'celebration' => 'Celebration|Celebrations',
+        'policy' => 'Policy|Policies',
+        'policy_file' => 'Policy File|Policy Files',
+        'staff_directory' => 'Staff Directory|Staff Directories',
+        'hero_banner' => 'Hero Banner|Hero Banners',
+        'quick_link' => 'Quick Link|Quick Links',
+        'media' => 'Media|Media',
+        'feedback' => 'Feedback|Feedback',
+        'search_override' => 'Search Override|Search Overrides',
+        'menu' => 'Menu|Menus',
+        'page_category' => 'Page Category|Page Categories',
+        'static_page' => 'Static Page|Static Pages',
+        'user' => 'User|Users',
+        'role' => 'Role|Roles',
     ],
 
     // ── Shared labels (used across many files) ───────────────────────
@@ -174,6 +195,7 @@ return [
         ],
 
         'feedback' => [
+            'title' => 'Feedback Settings',
             'enable_form' => 'Enable Feedback Form',
             'recipient_email' => 'Recipient Email',
             'success_message_bm' => 'Success Message (BM)',
@@ -182,6 +204,7 @@ return [
         ],
 
         'footer' => [
+            'title' => 'Footer',
             'footer_links' => 'Footer Links',
             'section_links' => 'Links',
             'section_social' => 'Social',
@@ -190,6 +213,7 @@ return [
         ],
 
         'addresses' => [
+            'title' => 'Addresses',
             'addresses' => 'Addresses',
             'address_bm' => 'Address (BM)',
             'address_en' => 'Address (EN)',
@@ -198,6 +222,7 @@ return [
         ],
 
         'minister' => [
+            'title' => 'Minister Profile',
             'full_name' => 'Full Name',
             'appointed_date' => 'Appointed Date',
             'current_minister' => 'Current Minister',

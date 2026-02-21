@@ -38,9 +38,14 @@ class ManageEmailSettings extends Page
         return __('filament.nav.settings');
     }
 
-    public static function getLabel(): string
+    public static function getNavigationLabel(): string
     {
         return __('filament.settings.email.title');
+    }
+
+    public function getTitle(): string
+    {
+        return static::getNavigationLabel();
     }
 
     protected string $view = 'filament.pages.manage-email-settings';
