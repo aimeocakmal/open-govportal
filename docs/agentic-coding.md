@@ -122,8 +122,8 @@ Consistent names are required. Agents must not invent alternatives.
 
 ### Models (`app/Models/`)
 
-| Payload Collection | Laravel Model | File |
-|-------------------|---------------|------|
+| Payload Collection / Source | Laravel Model | File |
+|-----------------------------|---------------|------|
 | Broadcast | `Broadcast` | `app/Models/Broadcast.php` |
 | Achievement | `Achievement` | `app/Models/Achievement.php` |
 | Celebration | `Celebration` | `app/Models/Celebration.php` |
@@ -135,6 +135,10 @@ Consistent names are required. Agents must not invent alternatives.
 | Policy | `Policy` | `app/Models/Policy.php` |
 | QuickLink | `QuickLink` | `app/Models/QuickLink.php` |
 | Search-Overrides | `SearchOverride` | `app/Models/SearchOverride.php` |
+| New — CMS static pages | `StaticPage` | `app/Models/StaticPage.php` |
+| New — hierarchical categories | `PageCategory` | `app/Models/PageCategory.php` |
+| New — menu registry | `Menu` | `app/Models/Menu.php` |
+| New — menu items (4-level) | `MenuItem` | `app/Models/MenuItem.php` |
 
 ### Route Files (`routes/`)
 
@@ -175,6 +179,7 @@ Both `routes/public.php` and `routes/admin.php` are loaded via `require` inside 
 | `GET /{locale}/penafian` | `StaticPageController` | `penafian` |
 | `GET /{locale}/dasar-privasi` | `StaticPageController` | `dasarPrivasi` |
 | `GET /{locale}/carian` | `SearchController` | `index` |
+| `GET /{locale}/{slug}` | `StaticPageController` | `show` (**must be last** route in `/{locale}/` prefix group — catch-all for CMS static pages) |
 
 **API controllers** (`app/Http/Controllers/Api/` — registered in `routes/api.php`, Phase 4):
 
@@ -192,7 +197,9 @@ Both `routes/public.php` and `routes/admin.php` are loaded via `require` inside 
 
 Naming pattern: `{Model}Resource.php`
 
-Examples: `BroadcastResource`, `AchievementResource`, `StaffDirectoryResource`
+Examples: `BroadcastResource`, `AchievementResource`, `StaffDirectoryResource`, `StaticPageResource`, `PageCategoryResource`, `MenuResource`
+
+> **`MenuResource`** manages both `Menu` and `MenuItem` in a single resource with a nested items form (or a relation manager). Do not create separate `MenuItemResource` — items are managed in context of their parent menu.
 
 ### Livewire Components (`app/Livewire/`)
 
@@ -269,8 +276,7 @@ resources/views/
   hubungi-kami/
     index.blade.php             ← embeds <livewire:contact-form />
   static/
-    penafian.blade.php
-    dasar-privasi.blade.php
+    show.blade.php              ← shared template for all StaticPage records (replaces penafian/dasar-privasi)
   carian/
     index.blade.php             ← embeds <livewire:search-results />
   livewire/
@@ -285,7 +291,7 @@ Consistent naming is required. Do not invent alternatives.
 | Class | File | Purpose |
 |-------|------|---------|
 | `AiChat` | `app/Livewire/AiChat.php` | Public chatbot Livewire component |
-| `AiService` | `app/Services/AiService.php` | Single entry point for all Prism PHP calls (Claude + OpenAI) |
+| `AiService` | `app/Services/AiService.php` | Single entry point for all Prism PHP calls (admin-configured LLM + embedding provider) |
 | `RagService` | `app/Services/RagService.php` | RAG pipeline: embed query → pgvector search → context assembly |
 | `EmbeddingObserver` | `app/Observers/EmbeddingObserver.php` | Fires on model `saved`/`deleted`; dispatches `GenerateEmbeddingJob` |
 | `GenerateEmbeddingJob` | `app/Jobs/GenerateEmbeddingJob.php` | Queued; chunks + embeds content; upserts `content_embeddings` |

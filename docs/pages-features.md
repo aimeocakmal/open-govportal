@@ -40,6 +40,9 @@ These decisions are final. Do not reopen them without a documented reason.
 | AI provider config | **`ManageAiSettings`** Filament settings page — LLM provider, model, API key, base URL; embedding provider, model, key; feature flags | Provider-agnostic: Anthropic, OpenAI, Google, Groq, Mistral, Ollama, OpenAI-compatible (Qwen, Moonshot, etc.) |
 | RAG embedding pipeline | **Observer → queued Job**: `EmbeddingObserver` dispatches `GenerateEmbeddingJob` on model save | Async; admin-configured embedding provider via Prism PHP; dimension must match pgvector column |
 | Vector storage | **pgvector** in existing PostgreSQL cluster — `content_embeddings` table | No separate vector DB; cosine similarity search; re-index required if embedding dimension changes |
+| Static page management | **`StaticPage` model + `StaticPageResource`** — all CMS-managed static pages stored in `static_pages` table; served via `StaticPageController@show` catch-all at `/{locale}/{slug}` | Penafian and Dasar Privasi become rows in `static_pages`; no longer in `settings` table |
+| Page categories | **`PageCategory` model** with self-referential `parent_id` — unlimited nesting depth enforced at app layer; used by `StaticPage` | Managed via `PageCategoryResource` in Filament with tree view |
+| Menu system | **`Menu` + `MenuItem` models** replace `navigation_items` table and `ManageHeader` settings page | 4-level mega menu; manages both public and admin page navigation; role-based visibility per item |
 
 ---
 
@@ -306,25 +309,23 @@ protected $rules = [
 
 ### 9. Penafian (`/penafian`) — **Status: Planned**
 
-**Laravel route:** `GET /{locale}/penafian` → `StaticPageController@penafian`
-**Source:** Content from `settings` table, keys `disclaimer_ms` and `disclaimer_en`.
-
-**Implementation note:** Content editable in Filament's `ManageSiteInfo` settings page. Falls back to `lang/{locale}/penafian.php` if settings keys are empty.
+**Laravel route:** `GET /{locale}/penafian` → served by the generic static page catch-all route `GET /{locale}/{slug}` → `StaticPageController@show`
+**Source:** `static_pages` table, row with `slug = 'penafian'`. Managed via `StaticPageResource` in Filament.
 
 **Cache:** Tag `static-pages`, TTL 24 hours.
 
-**Blade view:** `resources/views/static/penafian.blade.php`
+**Blade view:** `resources/views/static/show.blade.php` (shared static page template)
 
 ---
 
 ### 10. Dasar Privasi (`/dasar-privasi`) — **Status: Planned**
 
-**Laravel route:** `GET /{locale}/dasar-privasi` → `StaticPageController@dasarPrivasi`
-**Source:** Content from `settings` table, keys `privacy_policy_ms` and `privacy_policy_en`.
+**Laravel route:** `GET /{locale}/dasar-privasi` → `StaticPageController@show` (catch-all)
+**Source:** `static_pages` table, row with `slug = 'dasar-privasi'`. Managed via `StaticPageResource` in Filament.
 
 **Cache:** Tag `static-pages`, TTL 24 hours.
 
-**Blade view:** `resources/views/static/dasar-privasi.blade.php`
+**Blade view:** `resources/views/static/show.blade.php`
 
 ---
 
@@ -332,18 +333,32 @@ protected $rules = [
 
 ### Navigation / Header — **Status: Planned**
 
-**Payload global:** `Header`
 **Blade component:** `resources/views/components/layout/navbar.blade.php`
+**Data source:** `menu_items` table, `menu_id` where `menus.name = 'public_header'`
+
+**Mega Menu — 4 Levels:**
+
+```
+Level 1 (Main menu)       → top-level items (parent_id IS NULL) in public_header menu
+  Level 2 (Sub menu)      → children of Level 1
+    Level 3 (Inner menu)  → children of Level 2
+      Level 4 (Child menu)→ children of Level 3 (leaf nodes — no further nesting)
+```
 
 **Elements:**
 - Ministry logo (from `settings.site_logo`)
-- Main navigation links (from `navigation_items` table, top-level items ordered by `sort_order`)
-- Dropdown for items with `parent_id` children
+- 4-level mega menu (from `menu_items` table, tree loaded server-side, cached)
 - Language switcher: `ms` / `en` (preserves current path, swaps locale segment)
-- Mobile hamburger menu (Alpine.js toggle)
+- Mobile hamburger menu (Alpine.js toggle — collapses all levels into accordion)
 - Search icon → opens search overlay
+- **Role-based visibility:** menu items with `required_roles` not empty are hidden unless the current user has one of the required roles (public menu items typically have `required_roles = null` = visible to all)
 
-**Cache:** Navigation data cached with tag `navigation`, TTL 24 hours. Invalidate on `navigation_items` save.
+**Rendering:**
+- Tree built server-side in `AppServiceProvider` → shared as `$publicMenu` view variable
+- Alpine.js for hover/click interactions (dropdown open, mega panel show) — no server calls
+- Pure Blade iteration over the pre-built nested tree
+
+**Cache:** Tag `navigation`, TTL 24 hours. Invalidate on any `MenuItem` or `Menu` save.
 
 ---
 
@@ -379,6 +394,72 @@ protected $rules = [
 - Placed in nav or footer — exact placement determined during Week 2 build
 
 **Cache:** No cache invalidation needed — theme is per-user (cookie). Admin `site_default_theme` change invalidates `navigation` tag (covers layout re-render).
+
+---
+
+### Static Pages (`/{locale}/{slug}`) — **Status: Planned**
+
+**Laravel route:** `GET /{locale}/{slug}` → `StaticPageController@show` (catch-all, must be the **last** route in the `/{locale}/` prefix group so named routes are matched first)
+**Model:** `StaticPage` — managed in Filament via `StaticPageResource`
+
+**Features:**
+- Any number of CMS-managed pages (not limited to Penafian/Dasar Privasi)
+- Bilingual content (`title_ms`, `title_en`, `content_ms`, `content_en`)
+- Optional page category (`page_category_id` FK → `page_categories`)
+- SEO fields: `meta_title_{locale}`, `meta_desc_{locale}`
+- Draft/published status; excluded from sitemap if `is_in_sitemap = false`
+- 404 response if slug not found or status is `draft`
+
+**Cache:** Tag `static-pages`, TTL 24 hours. Invalidate on `StaticPage` save.
+
+**Blade view:** `resources/views/static/show.blade.php` (single shared template for all static pages)
+
+**Seeded rows:** `penafian`, `dasar-privasi` (migrated from `settings` table; add more as needed)
+
+---
+
+### Menu Management — **Status: Planned**
+
+**Models:** `Menu` (registry) + `MenuItem` (individual items)
+**Managed via:** `MenuResource` in Filament (replaces `ManageHeader` settings page)
+
+**Named menus (pre-seeded in `menus` table):**
+
+| `menus.name` | Purpose |
+|-------------|---------|
+| `public_header` | Public site mega menu (4-level) |
+| `public_footer` | Footer navigation links |
+| `admin_sidebar` | Extra navigation items in Filament admin sidebar |
+
+**4-Level menu structure (public_header):**
+
+```
+Level 1 — Main menu       (parent_id IS NULL in menu_items)
+  Level 2 — Sub menu      (children of Level 1)
+    Level 3 — Inner menu  (children of Level 2)
+      Level 4 — Child menu (children of Level 3 — leaf nodes, no further nesting allowed)
+```
+
+**Per-item configuration:**
+- `label_ms` / `label_en` — bilingual label
+- `url` — external link (absolute URL)
+- `route_name` + `route_params` (JSON) — internal named route (use `route()` helper)
+- `icon` — Heroicon or icon identifier (used in admin sidebar and mobile nav)
+- `sort_order` — drag-and-drop ordering in Filament
+- `target` — `_self` or `_blank`
+- `is_active` — toggleable without deleting
+- `required_roles` (JSON array, nullable) — which Spatie roles can **see** this item:
+  - `null` → visible to everyone (public users included)
+  - `["super_admin", "publisher"]` → only those Filament roles see it in admin nav
+  - For public menu items: role filtering applies when logged-in users view the portal
+- `mega_columns` (int, Level 1 items only) — number of columns for Level 2 children in the mega panel (1–4)
+
+**Rendering logic:**
+- Public site: `AppServiceProvider` loads `public_header` tree → shared as `$publicMenu`; Alpine.js for hover panels
+- Admin sidebar: Filament `PanelProvider` reads `admin_sidebar` items and registers them as `NavigationItem` objects filtered by the current user's roles
+- Role filter applied server-side — hidden items never reach the DOM
+
+**Cache:** Tag `navigation`, TTL 24 hours. Invalidate on any `Menu` or `MenuItem` save.
 
 ---
 
@@ -447,8 +528,8 @@ Replaces Payload CMS admin at `/admin`.
 
 ### Filament Resources
 
-| Resource | Model | Payload Collection | Status |
-|----------|-------|--------------------|--------|
+| Resource | Model | Payload Collection / Source | Status |
+|----------|-------|-----------------------------|--------|
 | `BroadcastResource` | `Broadcast` | Broadcast | Planned |
 | `AchievementResource` | `Achievement` | Achievement | Planned |
 | `CelebrationResource` | `Celebration` | Celebration | Planned |
@@ -461,19 +542,24 @@ Replaces Payload CMS admin at `/admin`.
 | `FeedbackResource` | `Feedback` | Feedback (read-only) | Planned |
 | `SearchOverrideResource` | `SearchOverride` | Search-Overrides | Planned |
 | `UserResource` | `User` | Users | Planned |
+| `StaticPageResource` | `StaticPage` | New — CMS-managed static pages | Planned |
+| `PageCategoryResource` | `PageCategory` | New — hierarchical categories for static pages | Planned |
+| `MenuResource` | `Menu` + `MenuItem` | New — mega menu with 4-level nesting and role visibility | Planned |
 
 ### Filament Settings Pages (Globals)
 
 | Class | Replaces Payload Global | Status |
 |-------|------------------------|--------|
 | `ManageSiteInfo` | SiteInfo | Planned |
-| `ManageHeader` | Header (navigation items) | Planned |
+| ~~`ManageHeader`~~ | ~~Header (navigation items)~~ | **Replaced** by `MenuResource` |
 | `ManageFooter` | Footer | Planned |
 | `ManageHomepage` | Homepage | Planned |
 | `ManageMinisterProfile` | MinisterProfile | Planned |
 | `ManageAddresses` | Addresses | Planned |
 | `ManageFeedbackSettings` | FeedbackSettings | Planned |
 | `ManageAiSettings` | AI configuration (Phase 6) | Planned |
+
+> **Note:** `ManageHeader` is **not built** — the `MenuResource` Filament resource handles all menu management (public and admin navigation) through the `menus` + `menu_items` tables, providing richer nesting and role control than a settings page would allow.
 
 ### Admin AI Content Editor — **Status: Planned** (Phase 6)
 
@@ -630,12 +716,15 @@ When a model is saved, these cache tags must be flushed:
 | `Celebration` | `celebrations` |
 | `StaffDirectory` | `direktori` |
 | `Policy` | `policies` |
-| `NavigationItem` | `navigation` |
+| `Menu` | `navigation` |
+| `MenuItem` | `navigation` |
 | `FooterSetting` | `footer` |
 | `Setting` (site info) | `navigation`, `footer`, `profil-kementerian`, `static-pages` |
 | `MinisterProfile` | `profil-kementerian` |
 | `Address` | `hubungi-kami` |
 | `Setting` (`site_default_theme` key) | `navigation` |
+| `StaticPage` | `static-pages`, `static-page:{slug}` |
+| `PageCategory` | `static-pages` |
 | Any embeddable model saved | No page cache tag — triggers `GenerateEmbeddingJob` instead (pgvector update) |
 
 Implement invalidation via a `CacheObserver` registered on each model in `AppServiceProvider`.

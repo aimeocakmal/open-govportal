@@ -88,8 +88,8 @@ Every feature must work for both locales. A task is not done until both are test
 ### Models
 Follow the Payload collection → Laravel model mapping exactly:
 
-| Payload | Laravel |
-|---------|---------|
+| Payload / Source | Laravel |
+|------------------|---------|
 | Broadcast | `Broadcast` |
 | Achievement | `Achievement` |
 | Celebration | `Celebration` |
@@ -101,6 +101,10 @@ Follow the Payload collection → Laravel model mapping exactly:
 | Policy | `Policy` |
 | QuickLink | `QuickLink` |
 | Search-Overrides | `SearchOverride` |
+| New — CMS static pages | `StaticPage` |
+| New — hierarchical page categories | `PageCategory` |
+| New — menu registry | `Menu` |
+| New — 4-level menu items with role visibility | `MenuItem` |
 
 ### Controllers
 Match the route-to-controller table in [docs/agentic-coding.md](docs/agentic-coding.md) exactly. Do not rename.

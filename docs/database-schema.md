@@ -28,12 +28,17 @@ Content Tables (public-facing):
 
 Site Configuration Tables:
   settings            ← Payload Global: SiteInfo
-  navigation_items    ← Payload Global: Header
+  menus               ← Registry of named menus (replaces navigation_items)
+  menu_items          ← 4-level menu items with role visibility
   footer_settings     ← Payload Global: Footer
   homepage_settings   ← Payload Global: Homepage
   minister_profiles   ← Payload Global: MinisterProfile
   addresses           ← Payload Global: Addresses
   feedback_settings   ← Payload Global: FeedbackSettings
+
+CMS Extensions (beyond Payload parity):
+  static_pages        ← Admin-managed static content pages (slug-based)
+  page_categories     ← Hierarchical categories for static pages
 ```
 
 ---
@@ -407,23 +412,137 @@ CREATE INDEX idx_ce_morphic ON content_embeddings (embeddable_type, embeddable_i
 - To use a different embedding model with different dimensions, set `PGVECTOR_DIMENSION` before migrations and re-run `php artisan govportal:reindex-embeddings`
 - `metadata.provider` and `metadata.model` record which provider/model generated this embedding (for audit and re-index detection)
 
-### `navigation_items`
+### `menus`
 
-Replaces Payload Global: `Header`
+Registry of named menus. Replaces Payload Global: `Header` (previously `navigation_items`).
 
 ```sql
-CREATE TABLE navigation_items (
+CREATE TABLE menus (
+    id          BIGSERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL UNIQUE,  -- 'public_header' | 'public_footer' | 'admin_sidebar'
+    label_ms    VARCHAR(255) NOT NULL,
+    label_en    VARCHAR(255),
+    is_active   BOOLEAN DEFAULT TRUE,
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Pre-seeded rows:
+INSERT INTO menus (name, label_ms, label_en) VALUES
+    ('public_header', 'Menu Utama', 'Main Menu'),
+    ('public_footer', 'Menu Footer', 'Footer Menu'),
+    ('admin_sidebar', 'Menu Admin', 'Admin Menu');
+```
+
+### `menu_items`
+
+Individual items within a named menu. Supports 4-level nesting via self-referential `parent_id`. Level depth is enforced at the application layer (Filament validation), not the database.
+
+```sql
+CREATE TABLE menu_items (
     id              BIGSERIAL PRIMARY KEY,
-    label_ms        VARCHAR(200) NOT NULL,
-    label_en        VARCHAR(200),
-    url             VARCHAR(2048),
-    parent_id       BIGINT REFERENCES navigation_items(id) ON DELETE CASCADE,
-    sort_order      INTEGER DEFAULT 0,
+    menu_id         BIGINT NOT NULL REFERENCES menus(id) ON DELETE CASCADE,
+    parent_id       BIGINT REFERENCES menu_items(id) ON DELETE CASCADE,
+                                            -- null = Level 1; 1 hop = Level 2; 2 hops = Level 3; 3 hops = Level 4 (max)
+    label_ms        VARCHAR(255) NOT NULL,
+    label_en        VARCHAR(255),
+    url             VARCHAR(2048),          -- external absolute URL (nullable if route_name set)
+    route_name      VARCHAR(255),           -- named Laravel route (nullable if url set)
+    route_params    JSONB,                  -- params for route() helper, e.g. {"locale":"ms"}
+    icon            VARCHAR(100),           -- Heroicon name or custom icon identifier
+    sort_order      SMALLINT DEFAULT 0,
+    target          VARCHAR(10) DEFAULT '_self',  -- '_self' | '_blank'
     is_active       BOOLEAN DEFAULT TRUE,
-    opens_new_tab   BOOLEAN DEFAULT FALSE,
+    required_roles  JSONB,                  -- null = visible to all; ["super_admin","publisher"] = restricted
+                                            -- applied server-side; filtered items never reach DOM
+    mega_columns    SMALLINT DEFAULT 1,     -- Level 1 only: how many columns for Level 2 children in mega panel (1–4)
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX idx_menu_items_menu ON menu_items (menu_id, sort_order);
+CREATE INDEX idx_menu_items_parent ON menu_items (parent_id);
+```
+
+**Level rules (enforced by application):**
+
+| Level | `parent_id` depth | Can have children? |
+|-------|--------------------|-------------------|
+| 1 — Main menu | `IS NULL` | Yes (Level 2) |
+| 2 — Sub menu | 1 hop from root | Yes (Level 3) |
+| 3 — Inner menu | 2 hops from root | Yes (Level 4) |
+| 4 — Child menu | 3 hops from root | **No** — leaf node |
+
+### `static_pages`
+
+CMS-managed static pages served at `/{locale}/{slug}`. Replaces hard-coded Penafian/Dasar Privasi settings.
+
+```sql
+CREATE TABLE static_pages (
+    id              BIGSERIAL PRIMARY KEY,
+    category_id     BIGINT REFERENCES page_categories(id) ON DELETE SET NULL,
+    title_ms        VARCHAR(500) NOT NULL,
+    title_en        VARCHAR(500),
+    slug            VARCHAR(600) NOT NULL UNIQUE,
+    content_ms      TEXT,
+    content_en      TEXT,
+    excerpt_ms      VARCHAR(1000),
+    excerpt_en      VARCHAR(1000),
+    status          VARCHAR(20) DEFAULT 'draft',   -- 'draft' | 'published'
+    is_in_sitemap   BOOLEAN DEFAULT TRUE,
+    meta_title_ms   VARCHAR(255),
+    meta_title_en   VARCHAR(255),
+    meta_desc_ms    VARCHAR(500),
+    meta_desc_en    VARCHAR(500),
+    sort_order      SMALLINT DEFAULT 0,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_static_pages_slug ON static_pages (slug);
+CREATE INDEX idx_static_pages_category ON static_pages (category_id);
+
+-- Pre-seeded rows (migrated from settings table):
+INSERT INTO static_pages (title_ms, title_en, slug, status) VALUES
+    ('Penafian', 'Disclaimer', 'penafian', 'published'),
+    ('Dasar Privasi', 'Privacy Policy', 'dasar-privasi', 'published');
+```
+
+### `page_categories`
+
+Hierarchical categories for static pages. Self-referential — unlimited nesting depth, enforced at the application layer.
+
+```sql
+CREATE TABLE page_categories (
+    id              BIGSERIAL PRIMARY KEY,
+    parent_id       BIGINT REFERENCES page_categories(id) ON DELETE SET NULL,
+                                            -- null = root category; children reference their parent
+    name_ms         VARCHAR(255) NOT NULL,
+    name_en         VARCHAR(255),
+    slug            VARCHAR(300) NOT NULL UNIQUE,
+    description_ms  TEXT,
+    description_en  TEXT,
+    sort_order      SMALLINT DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_page_categories_parent ON page_categories (parent_id);
+```
+
+**Nesting example:**
+
+```
+Maklumat Korporat (root)
+  └── Latar Belakang
+  └── Visi & Misi
+  └── Struktur Organisasi
+Dasar & Undang-Undang (root)
+  └── Dasar Nasional
+      └── Dasar Digital
+      └── Dasar ICT
+  └── Undang-Undang
 ```
 
 ### `footer_settings`
