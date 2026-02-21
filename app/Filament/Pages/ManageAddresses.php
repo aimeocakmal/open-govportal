@@ -15,6 +15,7 @@ use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @property-read Schema $form
@@ -33,6 +34,11 @@ class ManageAddresses extends Page
      * @var array<string, mixed>|null
      */
     public ?array $data = [];
+
+    public static function canAccess(): bool
+    {
+        return Auth::user()?->can('manage_settings') ?? false;
+    }
 
     public function mount(): void
     {

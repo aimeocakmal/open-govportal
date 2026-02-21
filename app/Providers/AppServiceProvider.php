@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Policies\RolePolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,6 +17,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Gate::policy(Role::class, RolePolicy::class);
+
         /*
          * Share navigation items with all views that include the nav component.
          *
@@ -37,10 +42,10 @@ class AppServiceProvider extends ServiceProvider
          * `footer_settings` tables, cached with tag `footer`, TTL 24h.
          */
         View::share('footerData', [
-            'facebook_url'  => '',
-            'twitter_url'   => '',
+            'facebook_url' => '',
+            'twitter_url' => '',
             'instagram_url' => '',
-            'youtube_url'   => '',
+            'youtube_url' => '',
         ]);
     }
 }

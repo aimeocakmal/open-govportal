@@ -17,6 +17,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 /**
@@ -36,6 +37,11 @@ class ManageEmailSettings extends Page
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];
+
+    public static function canAccess(): bool
+    {
+        return Auth::user()?->can('manage_settings') ?? false;
+    }
 
     public function mount(): void
     {

@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\Policies\Tables;
 
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class PoliciesTable
 {
@@ -64,6 +66,23 @@ class PoliciesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('publish')
+                        ->color('success')
+                        ->icon('heroicon-o-check-circle')
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(fn (Collection $records) => $records->each->update([
+                            'status' => 'published',
+                            'published_at' => now(),
+                        ])),
+                    BulkAction::make('unpublish')
+                        ->color('warning')
+                        ->icon('heroicon-o-x-circle')
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(fn (Collection $records) => $records->each->update([
+                            'status' => 'draft',
+                        ])),
                     DeleteBulkAction::make(),
                 ]),
             ]);

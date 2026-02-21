@@ -10,6 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,
+            UserSeeder::class,
             SettingsSeeder::class,
             BroadcastSeeder::class,
             AchievementSeeder::class,
@@ -26,6 +27,9 @@ class DatabaseSeeder extends Seeder
             MinisterProfileSeeder::class,
             AddressSeeder::class,
             FeedbackSettingSeeder::class,
+            MenuSeeder::class,
+            PageCategorySeeder::class,
+            StaticPageSeeder::class,
         ]);
     }
 }

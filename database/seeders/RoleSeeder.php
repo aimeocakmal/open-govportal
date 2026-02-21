@@ -26,6 +26,8 @@ class RoleSeeder extends Seeder
             'media',
             'feedbacks',
             'search_overrides',
+            'static_pages',
+            'page_categories',
         ];
 
         // Create content permissions

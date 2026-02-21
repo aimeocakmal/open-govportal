@@ -16,6 +16,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 /**
@@ -49,6 +50,11 @@ class ManageMediaSettings extends Page
         'media_gcs_key_json',
         'media_azure_key',
     ];
+
+    public static function canAccess(): bool
+    {
+        return Auth::user()?->can('manage_settings') ?? false;
+    }
 
     public function mount(): void
     {
