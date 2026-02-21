@@ -6,6 +6,7 @@ use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\App;
 
 class EditProfile extends BaseEditProfile
 {
@@ -28,6 +29,20 @@ class EditProfile extends BaseEditProfile
                 $this->getPasswordFormComponent(),
                 $this->getPasswordConfirmationFormComponent(),
             ]);
+    }
+
+    protected function afterSave(): void
+    {
+        $locale = $this->getUser()->preferred_locale;
+
+        if ($locale && $locale !== App::getLocale()) {
+            App::setLocale($locale);
+        }
+    }
+
+    protected function getRedirectUrl(): ?string
+    {
+        return filament()->getProfileUrl();
     }
 
     protected function getDeleteAccountAction(): ?\Filament\Actions\Action

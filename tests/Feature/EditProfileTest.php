@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Pages\Auth\EditProfile;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class EditProfileTest extends TestCase
@@ -41,5 +43,24 @@ class EditProfileTest extends TestCase
         $this->actingAs($user)
             ->get('/admin/profile')
             ->assertForbidden();
+    }
+
+    public function test_preferred_locale_is_saved(): void
+    {
+        $user = User::factory()->create(['preferred_locale' => 'ms']);
+        $user->assignRole('content_editor');
+
+        $this->actingAs($user);
+
+        Livewire::test(EditProfile::class)
+            ->assertFormSet(['preferred_locale' => 'ms'])
+            ->fillForm(['preferred_locale' => 'en'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'preferred_locale' => 'en',
+        ]);
     }
 }
