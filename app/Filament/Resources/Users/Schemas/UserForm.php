@@ -41,7 +41,8 @@ class UserForm
                         FileUpload::make('avatar')
                             ->image()
                             ->avatar()
-                            ->directory('avatars'),
+                            ->directory('avatars')
+                            ->placeholder(__('filament.common.file_upload_placeholder')),
                         Select::make('preferred_locale')
                             ->label(__('filament.resource.users.language'))
                             ->options([

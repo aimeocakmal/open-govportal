@@ -55,6 +55,7 @@ return [
         'draft' => 'Draf',
         'status' => 'Status',
         'department' => 'Jabatan',
+        'file_upload_placeholder' => 'Seret & lepas fail anda atau <span class="filepond--label-action">Semak Imbas</span>',
     ],
 
     // ── Tindakan & pemberitahuan ─────────────────────────────────────

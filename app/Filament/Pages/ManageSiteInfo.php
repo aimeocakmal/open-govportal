@@ -114,12 +114,14 @@ class ManageSiteInfo extends Page
                                 ->label(__('filament.settings.site_info.site_logo_light'))
                                 ->image()
                                 ->directory('branding')
-                                ->maxSize(2048),
+                                ->maxSize(2048)
+                                ->placeholder(__('filament.common.file_upload_placeholder')),
                             FileUpload::make('site_logo_dark')
                                 ->label(__('filament.settings.site_info.site_logo_dark'))
                                 ->image()
                                 ->directory('branding')
-                                ->maxSize(2048),
+                                ->maxSize(2048)
+                                ->placeholder(__('filament.common.file_upload_placeholder')),
                             Tabs::make('logo_alt_tabs')
                                 ->tabs([
                                     Tab::make(__('filament.common.bahasa_malaysia'))
@@ -139,7 +141,8 @@ class ManageSiteInfo extends Page
                                 ->label(__('filament.settings.site_info.favicon'))
                                 ->acceptedFileTypes(['image/x-icon', 'image/png', 'image/svg+xml'])
                                 ->directory('branding')
-                                ->maxSize(512),
+                                ->maxSize(512)
+                                ->placeholder(__('filament.common.file_upload_placeholder')),
                         ]),
 
                     Section::make(__('filament.settings.site_info.social_media'))

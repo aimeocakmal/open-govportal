@@ -55,6 +55,7 @@ return [
         'draft' => 'Draft',
         'status' => 'Status',
         'department' => 'Department',
+        'file_upload_placeholder' => 'Drag & drop your file or <span class="filepond--label-action">Browse</span>',
     ],
 
     // ── Actions & notifications ──────────────────────────────────────
