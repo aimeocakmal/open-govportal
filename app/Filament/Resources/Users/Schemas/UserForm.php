@@ -42,7 +42,10 @@ class UserForm
                             ->image()
                             ->avatar()
                             ->directory('avatars')
-                            ->placeholder(__('filament.common.file_upload_placeholder')),
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                            ->maxSize(1024)
+                            ->placeholder(__('filament.common.file_upload_placeholder'))
+                            ->helperText(__('filament.common.upload_help_avatar', ['size' => '1 MB'])),
                         Select::make('preferred_locale')
                             ->label(__('filament.resource.users.language'))
                             ->options([

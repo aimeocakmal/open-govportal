@@ -56,10 +56,15 @@ return [
         'status' => 'Status',
         'department' => 'Jabatan',
         'file_upload_placeholder' => 'Seret & lepas fail anda atau <span class="filepond--label-action">Semak Imbas</span>',
+        'upload_help_avatar' => 'Maks :size. JPG, PNG, GIF atau WebP sahaja.',
+        'upload_help_image' => 'Maks :size. JPG, PNG, GIF, WebP atau SVG sahaja.',
+        'upload_help_favicon' => 'Maks :size. ICO, PNG atau SVG sahaja.',
     ],
 
     // ── Tindakan & pemberitahuan ─────────────────────────────────────
     'actions' => [
+        'save' => 'Simpan',
+        'reset' => 'Set Semula',
         'published_successfully' => 'Berjaya diterbitkan',
         'unpublished_successfully' => 'Berjaya dinyahterbit',
         'deactivate' => 'Nyahaktif',

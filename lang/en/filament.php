@@ -56,10 +56,15 @@ return [
         'status' => 'Status',
         'department' => 'Department',
         'file_upload_placeholder' => 'Drag & drop your file or <span class="filepond--label-action">Browse</span>',
+        'upload_help_avatar' => 'Max :size. JPG, PNG, GIF or WebP only.',
+        'upload_help_image' => 'Max :size. JPG, PNG, GIF, WebP or SVG only.',
+        'upload_help_favicon' => 'Max :size. ICO, PNG or SVG only.',
     ],
 
     // ── Actions & notifications ──────────────────────────────────────
     'actions' => [
+        'save' => 'Save',
+        'reset' => 'Reset',
         'published_successfully' => 'Published successfully',
         'unpublished_successfully' => 'Unpublished successfully',
         'deactivate' => 'Deactivate',

@@ -114,14 +114,18 @@ class ManageSiteInfo extends Page
                                 ->label(__('filament.settings.site_info.site_logo_light'))
                                 ->image()
                                 ->directory('branding')
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
                                 ->maxSize(2048)
-                                ->placeholder(__('filament.common.file_upload_placeholder')),
+                                ->placeholder(__('filament.common.file_upload_placeholder'))
+                                ->helperText(__('filament.common.upload_help_image', ['size' => '2 MB'])),
                             FileUpload::make('site_logo_dark')
                                 ->label(__('filament.settings.site_info.site_logo_dark'))
                                 ->image()
                                 ->directory('branding')
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'])
                                 ->maxSize(2048)
-                                ->placeholder(__('filament.common.file_upload_placeholder')),
+                                ->placeholder(__('filament.common.file_upload_placeholder'))
+                                ->helperText(__('filament.common.upload_help_image', ['size' => '2 MB'])),
                             Tabs::make('logo_alt_tabs')
                                 ->tabs([
                                     Tab::make(__('filament.common.bahasa_malaysia'))
@@ -142,7 +146,8 @@ class ManageSiteInfo extends Page
                                 ->acceptedFileTypes(['image/x-icon', 'image/png', 'image/svg+xml'])
                                 ->directory('branding')
                                 ->maxSize(512)
-                                ->placeholder(__('filament.common.file_upload_placeholder')),
+                                ->placeholder(__('filament.common.file_upload_placeholder'))
+                                ->helperText(__('filament.common.upload_help_favicon', ['size' => '512 KB'])),
                         ]),
 
                     Section::make(__('filament.settings.site_info.social_media'))
@@ -188,8 +193,13 @@ class ManageSiteInfo extends Page
                     ->footer([
                         Actions::make([
                             Action::make('save')
+                                ->label(__('filament.actions.save'))
                                 ->submit('save')
                                 ->keyBindings(['mod+s']),
+                            Action::make('reset')
+                                ->label(__('filament.actions.reset'))
+                                ->color('gray')
+                                ->action(fn () => $this->mount()),
                         ]),
                     ]),
             ])

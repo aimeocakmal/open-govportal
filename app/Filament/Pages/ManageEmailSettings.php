@@ -147,8 +147,13 @@ class ManageEmailSettings extends Page
                     ->footer([
                         Actions::make([
                             Action::make('save')
+                                ->label(__('filament.actions.save'))
                                 ->submit('save')
                                 ->keyBindings(['mod+s']),
+                            Action::make('reset')
+                                ->label(__('filament.actions.reset'))
+                                ->color('gray')
+                                ->action(fn () => $this->mount()),
                         ]),
                     ]),
             ])
