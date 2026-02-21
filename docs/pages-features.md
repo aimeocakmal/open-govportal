@@ -43,6 +43,10 @@ These decisions are final. Do not reopen them without a documented reason.
 | Static page management | **`StaticPage` model + `StaticPageResource`** — all CMS-managed static pages stored in `static_pages` table; served via `StaticPageController@show` catch-all at `/{locale}/{slug}` | Penafian and Dasar Privasi become rows in `static_pages`; no longer in `settings` table |
 | Page categories | **`PageCategory` model** with self-referential `parent_id` — unlimited nesting depth enforced at app layer; used by `StaticPage` | Managed via `PageCategoryResource` in Filament with tree view |
 | Menu system | **`Menu` + `MenuItem` models** replace `navigation_items` table and `ManageHeader` settings page | 4-level mega menu; manages both public and admin page navigation; role-based visibility per item |
+| Site settings management | **Four Filament settings pages**: `ManageSiteInfo` (branding, logo, favicon, social URLs, GA ID, theme), `ManageEmailSettings` (mail driver, SMTP config), `ManageMediaSettings` (storage driver + cloud credentials), `ManageAiSettings` (AI provider, model, system prompt, feature flags) — all stored in `settings` table | Admins configure site without touching `.env`; sensitive values (`mail_password`, cloud keys, AI keys) stored via `Crypt::encrypt()` with `type = 'encrypted'` |
+| Media storage | **`ManageMediaSettings`** Filament page — admin selects disk driver (`local`, `s3`, `r2`, `gcs`, `azure`) and fills credentials for the active provider only; `SettingObserver` applies disk config at runtime without Octane restart | Supports: local filesystem, AWS S3, Cloudflare R2 (S3-compatible), GCP Cloud Storage, Azure Blob Storage; each provider's credentials shown/hidden via Filament conditional field visibility |
+| User management | **`UserResource`** in Filament — create/edit/deactivate CMS users, assign Spatie roles, `department` field scopes `department_admin` access, last-login display, admin password reset action | Single resource manages all Filament admin accounts |
+| Role management | **`RoleResource`** wrapping Spatie Permission — CRUD for roles, checkbox-based permission assignment; **6 roles seeded**: `super_admin`, `department_admin`, `content_editor`, `content_author`, `publisher`, `viewer` | Uses `spatie/laravel-permission` (installed Week 2); `viewer` = "regular user" with read-only access |
 
 ---
 
@@ -545,21 +549,28 @@ Replaces Payload CMS admin at `/admin`.
 | `StaticPageResource` | `StaticPage` | New — CMS-managed static pages | Planned |
 | `PageCategoryResource` | `PageCategory` | New — hierarchical categories for static pages | Planned |
 | `MenuResource` | `Menu` + `MenuItem` | New — mega menu with 4-level nesting and role visibility | Planned |
+| `RoleResource` | `Role` (Spatie Permission) | New — manage roles and assign permissions for all CMS users | Planned |
 
 ### Filament Settings Pages (Globals)
 
-| Class | Replaces Payload Global | Status |
-|-------|------------------------|--------|
-| `ManageSiteInfo` | SiteInfo | Planned |
-| ~~`ManageHeader`~~ | ~~Header (navigation items)~~ | **Replaced** by `MenuResource` |
-| `ManageFooter` | Footer | Planned |
-| `ManageHomepage` | Homepage | Planned |
-| `ManageMinisterProfile` | MinisterProfile | Planned |
-| `ManageAddresses` | Addresses | Planned |
-| `ManageFeedbackSettings` | FeedbackSettings | Planned |
-| `ManageAiSettings` | AI configuration (Phase 6) | Planned |
+| Class | Replaces Payload Global | Key Fields | Status |
+|-------|------------------------|------------|--------|
+| `ManageSiteInfo` | SiteInfo | Site name (ms/en), description, logo (S3), dark-mode logo (S3), favicon (S3), social URLs (FB/Twitter/IG/YouTube), GA tracking ID, default theme | Planned |
+| `ManageEmailSettings` | — (CMS extension) | Mail driver (ses/smtp/mailgun/log), SMTP host/port/username/password (encrypted)/encryption, from address, from name (ms/en) | Planned |
+| ~~`ManageHeader`~~ | ~~Header (navigation items)~~ | — | **Replaced** by `MenuResource` |
+| `ManageFooter` | Footer | Footer link sections (label ms/en + URL, grouped by `section`), social media links | Planned |
+| `ManageHomepage` | Homepage | Homepage layout flags and section ordering | Planned |
+| `ManageMinisterProfile` | MinisterProfile | Minister photo (S3), name, title (ms/en), bio (ms/en), appointment date | Planned |
+| `ManageAddresses` | Addresses | Ministry office addresses with phone/fax/email/Google Maps URL | Planned |
+| `ManageFeedbackSettings` | FeedbackSettings | Enable/disable feedback widget, recipient email, success message (ms/en) | Planned |
+| `ManageMediaSettings` | — (CMS extension) | Storage driver (local/s3/r2/gcs/azure); AWS S3 key/secret/region/bucket/URL; Cloudflare R2 account ID/keys/bucket/public URL; GCP project/bucket/service-account JSON; Azure account/key/container/URL | Planned |
+| `ManageAiSettings` | — (Phase 6) | LLM provider/model/API key (encrypted)/base URL, system prompt (ms/en), embedding provider/model/key (encrypted)/dimension, chatbot rate limit, feature flags | Planned |
 
 > **Note:** `ManageHeader` is **not built** — the `MenuResource` Filament resource handles all menu management (public and admin navigation) through the `menus` + `menu_items` tables, providing richer nesting and role control than a settings page would allow.
+
+> **`ManageEmailSettings` note:** When `mail_mailer = ses`, SMTP credential fields are unused — SES uses AWS IAM credentials from `.env`. A `SettingObserver` calls `Config::set('mail.*')` after any save so changes apply to running Octane workers without restart.
+
+> **`ManageMediaSettings` note:** Only credentials for the active `media_disk` driver are shown (Filament `hidden()` conditional). Cloudflare R2 reuses the AWS S3 Flysystem adapter with `endpoint` set to `https://{account_id}.r2.cloudflarestorage.com`. GCP requires `league/flysystem-google-cloud-storage`; Azure requires `league/flysystem-azure-blob-storage` — install only what's needed. The `SettingObserver` rebuilds `Config::set('filesystems.disks.active_media', [...])` on save.
 
 ### Admin AI Content Editor — **Status: Planned** (Phase 6)
 

@@ -40,7 +40,7 @@ This project uses the full **TALL stack**: Tailwind CSS, Alpine.js, Laravel, Liv
 | Templates | Blade | All views; Livewire components extend Blade |
 | Database | PostgreSQL | |
 | Cache | Redis (tagged cache) | |
-| File storage | AWS S3 | |
+| File storage | **Admin-configurable**: local filesystem, AWS S3, Cloudflare R2, GCP Cloud Storage, Azure Blob Storage | `ManageMediaSettings` Filament page; credentials in `settings` table (encrypted); active disk applied at runtime via `Config::set()` |
 | Email | AWS SES (Laravel SES mail driver) | |
 | Auth/RBAC | Spatie Laravel Permission | |
 | Search | PostgreSQL FTS via `searchable_content` table | |
@@ -145,6 +145,8 @@ Use only the tag names defined in [docs/pages-features.md](docs/pages-features.m
 | Admin AI editor | Filament custom actions on RichEditor fields; any admin-configured LLM provider |
 | AI provider selection | `ManageAiSettings` Filament page; LLM + embedding provider/model/key configurable without code changes |
 | RAG pipeline | Model saved → `EmbeddingObserver` → `GenerateEmbeddingJob` (queued) → admin-configured embedding provider → pgvector |
+| Site settings management | `ManageSiteInfo` (branding, logo, favicon, social), `ManageEmailSettings` (SMTP/mail driver), `ManageMediaSettings` (storage driver + cloud credentials), `ManageAiSettings` (AI provider + system prompt) — all in `settings` table; encrypted for passwords and API keys |
+| User & role management | `UserResource` (create/edit/deactivate users, assign roles, `department` field for scoping) + `RoleResource` (Spatie Permission CRUD); **6 roles**: `super_admin`, `department_admin`, `content_editor`, `content_author`, `publisher`, `viewer` |
 
 ---
 

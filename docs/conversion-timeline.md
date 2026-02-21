@@ -305,9 +305,29 @@ Map all Payload CMS collections to Laravel models + Filament resources:
 - [ ] `Media` model + migration + Filament resource
 - [ ] `Feedback` model + migration + Filament resource
 - [ ] `SearchOverride` model + Filament resource
-- [ ] Settings models: SiteInfo, Header nav, Footer, MinisterProfile, Addresses
-- [ ] Homepage configuration in Filament (global settings)
+- [ ] Filament settings pages (replacing Payload CMS Globals):
+  - [ ] `ManageSiteInfo` — site name (ms/en), description, logo (S3 upload), dark-mode logo (S3), favicon (S3), social media URLs, GA tracking ID, default theme
+  - [ ] `ManageEmailSettings` — mail driver (ses/smtp/mailgun/log), SMTP host/port/credentials (encrypted), from address/name (ms/en); `SettingObserver` applies `Config::set('mail.*')` at runtime without Octane restart
+  - [ ] `ManageFooter` — footer link sections (label ms/en + URL) and social media links
+  - [ ] `ManageHomepage` — homepage layout flags and section ordering
+  - [ ] `ManageMinisterProfile` — current minister photo (S3), name, bilingual title and bio, appointment date
+  - [ ] `ManageAddresses` — office addresses with phone/fax/email/Google Maps URL
+  - [ ] `ManageFeedbackSettings` — enable/disable widget, recipient email, success messages (ms/en)
+  - [ ] `ManageMediaSettings` — storage driver selector (local/s3/r2/gcs/azure) with conditional credential fields per provider; `SettingObserver` rebuilds active disk config at runtime; requires cloud Flysystem packages below
 - [ ] Rich text editor integration (Filament RichEditor or Tiptap)
+
+**Installation Commands (cloud storage — install only drivers you need):**
+
+```bash
+# AWS S3 and Cloudflare R2 (R2 reuses the S3 adapter with a custom endpoint)
+composer require league/flysystem-aws-s3-v3 "^3.0"
+
+# GCP Cloud Storage
+composer require league/flysystem-google-cloud-storage "^3.0"
+
+# Azure Blob Storage
+composer require league/flysystem-azure-blob-storage "^3.0"
+```
 
 **Deliverables:**
 - All Payload collections mapped to Filament
@@ -326,6 +346,8 @@ Map all Payload CMS collections to Laravel models + Filament resources:
 - [ ] Image optimization on upload
 - [ ] Content preview from admin
 - [ ] Role-based access within Filament resources
+- [ ] `UserResource` enhancements: `department` field for `department_admin` scoping, last-login display column, deactivate/reactivate user action, admin password reset action, bulk role assignment
+- [ ] `RoleResource`: CRUD for Spatie Permission roles + checkbox-based permission assignment per role; update `RoleSeeder` to seed all 6 roles (`super_admin`, `department_admin`, `content_editor`, `content_author`, `publisher`, `viewer`) with default permissions per content type plus `manage_users`, `manage_roles`, `manage_settings`
 
 **Deliverables:**
 - Full CMS parity with Payload

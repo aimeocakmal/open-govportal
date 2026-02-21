@@ -358,6 +358,55 @@ INSERT INTO settings VALUES
     ('site_default_theme', 'default', 'string', NOW()),
                                             -- valid values: keys in config/themes.php valid_themes array
 
+    -- Site branding — managed via ManageSiteInfo
+    ('site_logo',         '',                              'string',  NOW()),  -- S3 key or URL for header logo (light mode)
+    ('site_logo_dark',    '',                              'string',  NOW()),  -- S3 key or URL for dark-mode logo (optional)
+    ('site_logo_alt_ms',  'Kementerian Digital Malaysia',  'string',  NOW()),  -- logo alt text BM
+    ('site_logo_alt_en',  'Ministry of Digital Malaysia',  'string',  NOW()),  -- logo alt text EN
+    ('site_favicon',      '',                              'string',  NOW()),  -- S3 key or URL for favicon (.ico or .png)
+
+    -- Email / SMTP — managed via ManageEmailSettings
+    -- When mail_mailer = 'ses', host/port/username/password are unused; SES uses AWS IAM from .env
+    ('mail_mailer',       'ses',                           'string',    NOW()),  -- ses | smtp | mailgun | log
+    ('mail_host',         '',                              'string',    NOW()),  -- SMTP host (only used when mail_mailer = smtp)
+    ('mail_port',         '587',                           'integer',   NOW()),  -- SMTP port
+    ('mail_username',     '',                              'string',    NOW()),  -- SMTP username
+    ('mail_password',     '',                              'encrypted', NOW()),  -- SMTP password (encrypted via Crypt::encrypt())
+    ('mail_encryption',   'tls',                           'string',    NOW()),  -- tls | ssl | null
+    ('mail_from_address', '',                              'string',    NOW()),  -- sender email address
+    ('mail_from_name_ms', 'Kementerian Digital Malaysia',  'string',    NOW()),  -- sender display name BM
+    ('mail_from_name_en', 'Ministry of Digital Malaysia',  'string',    NOW()),  -- sender display name EN
+
+    -- Media / file storage — managed via ManageMediaSettings
+    -- Fill credentials only for the active driver; others are ignored at runtime
+    ('media_disk',             'local',           'string',    NOW()),  -- local | s3 | r2 | gcs | azure
+
+    -- AWS S3 (active when media_disk = s3)
+    ('media_s3_key',           '',                'encrypted', NOW()),
+    ('media_s3_secret',        '',                'encrypted', NOW()),
+    ('media_s3_region',        'ap-southeast-1',  'string',    NOW()),
+    ('media_s3_bucket',        '',                'string',    NOW()),
+    ('media_s3_url',           '',                'string',    NOW()),  -- CDN / public URL override (optional; blank = auto)
+    ('media_s3_endpoint',      '',                'string',    NOW()),  -- leave blank for AWS; set for S3-compatible services
+
+    -- Cloudflare R2 (active when media_disk = r2; uses S3-compatible API internally)
+    ('media_r2_account_id',    '',                'string',    NOW()),  -- Cloudflare account ID
+    ('media_r2_access_key',    '',                'encrypted', NOW()),
+    ('media_r2_secret_key',    '',                'encrypted', NOW()),
+    ('media_r2_bucket',        '',                'string',    NOW()),
+    ('media_r2_public_url',    '',                'string',    NOW()),  -- custom domain / Workers URL for public access
+
+    -- GCP Cloud Storage (active when media_disk = gcs)
+    ('media_gcs_project_id',   '',                'string',    NOW()),
+    ('media_gcs_bucket',       '',                'string',    NOW()),
+    ('media_gcs_key_json',     '',                'encrypted', NOW()),  -- full service account JSON (encrypted at rest)
+
+    -- Azure Blob Storage (active when media_disk = azure)
+    ('media_azure_account',    '',                'string',    NOW()),
+    ('media_azure_key',        '',                'encrypted', NOW()),
+    ('media_azure_container',  '',                'string',    NOW()),
+    ('media_azure_url',        '',                'string',    NOW()),  -- optional CDN / custom domain URL
+
     -- AI configuration (Phase 6) — managed via ManageAiSettings Filament page
     ('ai_llm_provider',          'anthropic',                 'string',    NOW()),
     ('ai_llm_model',             'claude-sonnet-4-6',         'string',    NOW()),
@@ -374,11 +423,17 @@ INSERT INTO settings VALUES
 
     ('ai_chatbot_enabled',       'false',                     'boolean',   NOW()),
     ('ai_admin_editor_enabled',  'false',                     'boolean',   NOW()),
-    ('ai_chatbot_rate_limit',    '10',                        'integer',   NOW());
+    ('ai_chatbot_rate_limit',    '10',                        'integer',   NOW()),
     -- ai_chatbot_rate_limit: messages per hour per IP address
+
+    -- AI persona / system prompt — bilingual; AiChat uses the locale-matching prompt as the LLM system message
+    ('ai_system_prompt_ms', 'Anda adalah pembantu AI rasmi Kementerian Digital Malaysia. Jawab soalan berdasarkan konteks yang disediakan sahaja. Jangan mendedahkan maklumat peribadi.', 'string', NOW()),
+    ('ai_system_prompt_en', 'You are the official AI assistant for the Ministry of Digital Malaysia. Answer questions using only the provided context. Do not disclose personal information.', 'string', NOW());
 ```
 
-> **Encrypted settings:** Keys with `type = 'encrypted'` are stored via `Crypt::encrypt()` and read via `Crypt::decrypt()` in `AiService`. The `Setting::get()` helper handles encryption/decryption transparently when `type = 'encrypted'`.
+> **Encrypted settings:** Keys with `type = 'encrypted'` are stored via `Crypt::encrypt()` and read via `Crypt::decrypt()`. The `Setting::get()` helper handles encryption/decryption transparently. Affected keys: cloud storage credentials (`media_s3_key`, `media_s3_secret`, `media_r2_access_key`, `media_r2_secret_key`, `media_gcs_key_json`, `media_azure_key`), email password (`mail_password`), and all AI API keys (`ai_llm_api_key`, `ai_embedding_api_key`).
+
+> **Runtime disk switching:** When `media_disk` changes, a `SettingObserver` calls `Config::set('filesystems.default', ...)` and rebuilds the active disk config so Octane workers pick up the new driver without restart. The Flysystem driver packages must be installed for the selected provider (see Week 4 installation commands).
 
 ### `content_embeddings` (Phase 6 — AI)
 
@@ -636,6 +691,8 @@ CREATE TABLE users (
     name            VARCHAR(255) NOT NULL,
     email           VARCHAR(255) NOT NULL UNIQUE,
     password        VARCHAR(255) NOT NULL,
+    department      VARCHAR(255),               -- scopes department_admin role: only sees/publishes content for this department
+    avatar          VARCHAR(2048),              -- S3 key for profile photo (optional)
     is_active       BOOLEAN DEFAULT TRUE,
     last_login_at   TIMESTAMPTZ,
     remember_token  VARCHAR(100),
@@ -656,20 +713,26 @@ roles                  — named roles (super_admin, content_editor, publisher)
 permissions            — named permissions (view broadcasts, create broadcasts, etc.)
 ```
 
-**Default Roles (seeded):**
+**Default Roles (seeded — 6 total):**
 
 | Role | Description |
 |------|-------------|
-| `super_admin` | Full system access |
-| `content_editor` | Create and edit content; cannot publish |
-| `publisher` | Approve and publish content |
-| `viewer` | Read-only CMS access |
+| `super_admin` | Full system access — manage users, roles, settings, all content |
+| `department_admin` | Manage and publish content scoped to their `users.department` value only |
+| `content_editor` | Create and edit any content draft; cannot publish or manage settings/users |
+| `content_author` | Create and edit **own** drafts only; cannot edit others' content or publish |
+| `publisher` | Review and publish any content submitted by editors and authors |
+| `viewer` | Read-only access to admin panel (the "regular user" role) |
+
+**`department_admin` scoping rule:** When a user with `department_admin` role logs in, Filament resource queries are automatically filtered by `created_by_department = auth()->user()->department`. This requires content models to store `department` on creation.
 
 **Default Permissions (seeded):**
 
 Each content type gets: `view_*`, `create_*`, `edit_*`, `delete_*`, `publish_*`
 
 Content types: `broadcasts`, `achievements`, `celebrations`, `staff_directories`, `policies`, `files`, `hero_banners`, `quick_links`, `media`, `feedbacks`
+
+Additional permissions: `manage_users`, `manage_roles`, `manage_settings`, `manage_email_settings`, `manage_ai_settings`
 
 ---
 
@@ -730,11 +793,14 @@ Run migrations in this order to respect foreign key constraints:
 13. `search_overrides`
 14. `searchable_content`
 15. `settings`
-16. `navigation_items`
-17. `footer_settings`
-18. `minister_profiles`
-19. `addresses`
-20. `feedback_settings`
+16. `menus`
+17. `menu_items`
+18. `footer_settings`
+19. `minister_profiles`
+20. `addresses`
+21. `feedback_settings`
+22. `page_categories`
+23. `static_pages`
 
 ---
 
