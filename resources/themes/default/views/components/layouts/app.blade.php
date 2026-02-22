@@ -16,8 +16,19 @@
     <link rel="alternate" hreflang="ms" href="{{ preg_replace('#/(ms|en)(/)#', '/ms$2', url()->current()) }}">
     <link rel="alternate" hreflang="en" href="{{ preg_replace('#/(ms|en)(/)#', '/en$2', url()->current()) }}">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite([$themeViteEntries['css'], $themeViteEntries['js']])
     @livewireStyles
+
+    {{-- Google Analytics --}}
+    @if($gaId = \App\Models\Setting::get('google_analytics_id'))
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaId }}"></script>
+        <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ $gaId }}');</script>
+    @endif
+
+    {{-- Custom analytics (Facebook Pixel, Hotjar, etc.) --}}
+    @if($customScript = \App\Models\Setting::get('custom_analytics_script'))
+        {!! $customScript !!}
+    @endif
 </head>
 <body class="bg-bg text-text font-sans antialiased flex flex-col min-h-full">
 

@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\Setting;
+use App\Services\ThemeService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -79,6 +80,7 @@ class ManageSiteInfo extends Page
             'instagram_url' => Setting::get('instagram_url', ''),
             'youtube_url' => Setting::get('youtube_url', ''),
             'google_analytics_id' => Setting::get('google_analytics_id', ''),
+            'custom_analytics_script' => Setting::get('custom_analytics_script', ''),
             'site_default_theme' => Setting::get('site_default_theme', 'default'),
         ]);
     }
@@ -182,6 +184,15 @@ class ManageSiteInfo extends Page
                         ])
                         ->columns(2),
 
+                    Section::make(__('filament.settings.site_info.theme'))
+                        ->description(__('filament.settings.site_info.theme_desc'))
+                        ->schema([
+                            Select::make('site_default_theme')
+                                ->label(__('filament.settings.site_info.default_theme'))
+                                ->options(fn () => app(ThemeService::class)->getThemeOptions('en'))
+                                ->required(),
+                        ]),
+
                     Section::make(__('filament.settings.site_info.analytics'))
                         ->description(__('filament.settings.site_info.analytics_desc'))
                         ->schema([
@@ -189,15 +200,12 @@ class ManageSiteInfo extends Page
                                 ->label(__('filament.settings.site_info.google_analytics_id'))
                                 ->placeholder('G-XXXXXXXXXX')
                                 ->maxLength(50),
-                            Select::make('site_default_theme')
-                                ->label(__('filament.settings.site_info.default_theme'))
-                                ->options([
-                                    'default' => __('filament.settings.site_info.theme_default'),
-                                    'dark' => __('filament.settings.site_info.theme_dark'),
-                                ])
-                                ->required(),
-                        ])
-                        ->columns(2),
+                            Textarea::make('custom_analytics_script')
+                                ->label(__('filament.settings.site_info.custom_analytics_script'))
+                                ->helperText(__('filament.settings.site_info.custom_analytics_script_help'))
+                                ->rows(6)
+                                ->maxLength(5000),
+                        ]),
                 ])
                     ->livewireSubmitHandler('save')
                     ->footer([
@@ -235,6 +243,7 @@ class ManageSiteInfo extends Page
             'instagram_url',
             'youtube_url',
             'google_analytics_id',
+            'custom_analytics_script',
             'site_default_theme',
         ];
 

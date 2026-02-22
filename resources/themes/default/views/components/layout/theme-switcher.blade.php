@@ -1,5 +1,5 @@
 @php
-    $themes = config('themes.valid_themes', ['default' => 'Default']);
+    $themes = app(\App\Services\ThemeService::class)->getThemeOptions(app()->getLocale());
 @endphp
 
 @if (count($themes) > 1)
@@ -8,8 +8,8 @@
         theme: document.documentElement.dataset.theme || 'default',
         set(name) {
             this.theme = name;
-            document.documentElement.dataset.theme = name;
             document.cookie = 'govportal_theme=' + name + ';path=/;max-age=31536000;SameSite=Lax';
+            window.location.reload();
         }
     }"
     class="flex items-center gap-1"

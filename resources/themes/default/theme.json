@@ -1,0 +1,11 @@
+{
+    "name": "default",
+    "label": {
+        "ms": "GovPortal 1.0 - Tema Standard",
+        "en": "GovPortal 1.0 - Standard Theme"
+    },
+    "version": "1.0.0",
+    "author": "GovPortal",
+    "css": "css/app.css",
+    "js": "js/app.js"
+}

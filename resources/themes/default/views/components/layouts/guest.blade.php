@@ -11,7 +11,7 @@
 
     <title>{{ isset($title) ? $title . ' — ' : '' }}{{ config('app.name') }}</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite([$themeViteEntries['css'], $themeViteEntries['js']])
     @livewireStyles
 </head>
 <body class="bg-surface text-text font-sans antialiased flex items-center justify-center min-h-full">

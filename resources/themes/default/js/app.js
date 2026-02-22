@@ -1,4 +1,4 @@
-import './bootstrap';
+import '../../../js/bootstrap';
 import Alpine from 'alpinejs';
 import EmblaCarousel from 'embla-carousel';
 

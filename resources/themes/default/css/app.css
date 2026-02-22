@@ -4,13 +4,13 @@
 @import 'tailwindcss';
 
 /* Tell Tailwind where to look for class usage */
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@source '../../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
 
-/* Default theme (MyDS Blue, light mode) */
-@import './themes/default.css';
+/* Default theme tokens */
+@import './theme.css';
 
 /* @theme inline — generate Tailwind utility classes from CSS variables.
  * Using `inline` means Tailwind does NOT set :root values itself;

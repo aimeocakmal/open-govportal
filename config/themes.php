@@ -2,21 +2,20 @@
 
 return [
     /*
-     * Themes available on the public portal.
-     * Add a key here when a new resources/css/themes/{key}.css file is created.
-     * The value is the human-readable display name.
-     *
-     * The active theme is stored in the `govportal_theme` cookie and falls back
-     * to the `site_default_theme` key in the settings table.
+     * Base path where theme directories are stored.
+     * Each theme is a subdirectory containing a theme.json manifest.
      */
-    'valid_themes' => [
-        'default' => 'Default',
-        // 'dark' => 'Dark',  // Phase 4
-    ],
+    'path' => resource_path('themes'),
 
     /*
      * Fallback theme used when the cookie is absent and the settings table
      * cannot be queried (e.g. during installation before migrations run).
      */
     'fallback' => 'default',
+
+    /*
+     * How long (in seconds) to cache the discovered themes list.
+     * Set to 0 to disable caching (useful during development).
+     */
+    'cache_ttl' => env('THEME_CACHE_TTL', 86400),
 ];
