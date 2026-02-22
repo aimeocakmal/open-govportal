@@ -32,11 +32,11 @@ class DirektoriSearch extends Component
 
         $staff = StaffDirectory::active()
             ->when($this->query, function ($q) use ($locale) {
-                $search = '%'.$this->query.'%';
+                $search = '%'.mb_strtolower($this->query).'%';
                 $q->where(function ($sub) use ($search, $locale) {
-                    $sub->where('name', 'like', $search)
-                        ->orWhere("position_{$locale}", 'like', $search)
-                        ->orWhere("department_{$locale}", 'like', $search);
+                    $sub->whereRaw('LOWER(name) like ?', [$search])
+                        ->orWhereRaw("LOWER(position_{$locale}) like ?", [$search])
+                        ->orWhereRaw("LOWER(department_{$locale}) like ?", [$search]);
                 });
             })
             ->when($this->jabatan, fn ($q) => $q->where($departmentField, $this->jabatan))

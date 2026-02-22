@@ -1,69 +1,66 @@
 import '../../../js/bootstrap';
-import Alpine from 'alpinejs';
 import EmblaCarousel from 'embla-carousel';
 
-window.Alpine = Alpine;
-
 /**
- * Alpine.js data component for the hero banner carousel.
- * Uses Embla Carousel (vanilla) for smooth, accessible sliding.
+ * Register Alpine.js data components via Livewire's bundled Alpine.
+ * Livewire 4 bundles Alpine — do NOT import or start Alpine manually.
  */
-Alpine.data('heroCarousel', () => ({
-    embla: null,
-    current: 0,
-    total: 0,
-    autoplayTimer: null,
+document.addEventListener('alpine:init', () => {
+    window.Alpine.data('heroCarousel', () => ({
+        embla: null,
+        current: 0,
+        total: 0,
+        autoplayTimer: null,
 
-    init() {
-        const viewport = this.$refs.viewport;
-        if (!viewport) return;
+        init() {
+            const viewport = this.$refs.viewport;
+            if (!viewport) return;
 
-        this.embla = EmblaCarousel(viewport, {
-            loop: true,
-            align: 'start',
-            containScroll: 'trimSnaps',
-        });
+            this.embla = EmblaCarousel(viewport, {
+                loop: true,
+                align: 'start',
+                containScroll: 'trimSnaps',
+            });
 
-        this.total = this.embla.scrollSnapList().length;
-        this.current = this.embla.selectedScrollSnap();
-
-        this.embla.on('select', () => {
+            this.total = this.embla.scrollSnapList().length;
             this.current = this.embla.selectedScrollSnap();
-        });
 
-        this.startAutoplay();
-    },
+            this.embla.on('select', () => {
+                this.current = this.embla.selectedScrollSnap();
+            });
 
-    prev() {
-        this.embla?.scrollPrev();
-        this.resetAutoplay();
-    },
+            this.startAutoplay();
+        },
 
-    next() {
-        this.embla?.scrollNext();
-        this.resetAutoplay();
-    },
+        prev() {
+            this.embla?.scrollPrev();
+            this.resetAutoplay();
+        },
 
-    goTo(index) {
-        this.embla?.scrollTo(index);
-        this.resetAutoplay();
-    },
-
-    startAutoplay() {
-        this.autoplayTimer = setInterval(() => {
+        next() {
             this.embla?.scrollNext();
-        }, 5000);
-    },
+            this.resetAutoplay();
+        },
 
-    resetAutoplay() {
-        clearInterval(this.autoplayTimer);
-        this.startAutoplay();
-    },
+        goTo(index) {
+            this.embla?.scrollTo(index);
+            this.resetAutoplay();
+        },
 
-    destroy() {
-        clearInterval(this.autoplayTimer);
-        this.embla?.destroy();
-    },
-}));
+        startAutoplay() {
+            this.autoplayTimer = setInterval(() => {
+                this.embla?.scrollNext();
+            }, 5000);
+        },
 
-Alpine.start();
+        resetAutoplay() {
+            clearInterval(this.autoplayTimer);
+            this.startAutoplay();
+        },
+
+        destroy() {
+            clearInterval(this.autoplayTimer);
+            this.embla?.destroy();
+        },
+    }));
+});

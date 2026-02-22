@@ -458,20 +458,35 @@ Recreate homepage sections from kd-portal's `home/` components:
 #### Week 9: Static & Policy Pages
 
 **Tasks:**
-- [ ] `/dasar` — Policy documents listing + download links
-- [ ] `/profil-kementerian` — Ministry profile with minister info (MinisterProfile global)
-- [ ] `/hubungi-kami` — `ContactForm` Livewire component + addresses section (pure Blade)
-- [ ] Contact form submission via Livewire → Feedback collection + dispatch `SendFeedbackEmail` job (AWS SES)
-- [ ] `/penafian` — Disclaimer (static Blade view)
-- [ ] `/dasar-privasi` — Privacy policy (static Blade view)
-- [ ] Global site search at `/carian` — `SearchResults` Livewire component with `wire:model.live.debounce.500ms`
-- [ ] XML Sitemap generation
-- [ ] 404 and error pages
+- [ ] Lang files for all Week 9 pages (dasar, profil-kementerian, hubungi-kami, carian, errors — ms + en)
+- [ ] `DasarController` — index (policy listing with category filter via `?kategori=`) + download (increment `download_count`, signed URL)
+- [ ] `/dasar` views — `dasar/index.blade.php` + `components/dasar/policy-card.blade.php` (title, description, category badge, download button)
+- [ ] `ProfilKementerianController` — index (minister profile + vision/mission from settings)
+- [ ] `/profil-kementerian` views — `profil-kementerian/index.blade.php` + `components/profil/minister-card.blade.php`
+- [ ] `HubungiKamiController` — index (addresses section + ContactForm Livewire shell)
+- [ ] `AddressFactory` — needed for testing `/hubungi-kami`
+- [ ] `ContactForm` Livewire component — name/email/subject/message fields, `wire:model.blur` validation, rate limit (5/IP/hour)
+- [ ] Contact form submission → store to `feedbacks` table + dispatch `SendFeedbackEmail` queued job (AWS SES)
+- [ ] `SendFeedbackEmail` Mailable + queued job
+- [ ] `/hubungi-kami` views — `hubungi-kami/index.blade.php` + `livewire/contact-form.blade.php`
+- [ ] `StaticPageController@show` — catch-all `/{locale}/{slug}` route (must be last in group), renders `static/show.blade.php`
+- [ ] Static page seeder — seed `penafian` and `dasar-privasi` rows in `static_pages` table
+- [ ] `/penafian` + `/dasar-privasi` — `static/show.blade.php` shared template
+- [ ] `SearchController` — index (renders page shell for SearchResults Livewire)
+- [ ] `SearchResults` Livewire component — `wire:model.live.debounce.500ms`, PostgreSQL FTS via `searchable_content`, ranked by SearchOverride priority then `ts_rank`
+- [ ] SearchableContent sync observer — populate `searchable_content` on model save (Broadcast, Achievement, Policy, StaffDirectory)
+- [ ] `/carian` views — `carian/index.blade.php` + `livewire/search-results.blade.php`
+- [ ] XML Sitemap — `SitemapController` + `/sitemap.xml` route (root level, not locale-prefixed)
+- [ ] Error pages — `errors/404.blade.php`, `errors/500.blade.php`, `errors/403.blade.php`
+- [ ] Uncomment all Week 9 routes in `routes/public.php`
+- [ ] Tests for all Week 9 pages (DasarPageTest, ProfilKementerianPageTest, HubungiKamiPageTest, StaticPageTest, CarianPageTest, SitemapTest, ErrorPageTest)
+- [ ] Run full test suite + build + Pint
 
 **Deliverables:**
 - All 10 pages complete
 - Contact form sending email
 - Sitemap live
+- Error pages styled
 
 **Effort:** 40 hours
 
