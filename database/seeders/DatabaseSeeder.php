@@ -3,10 +3,16 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Activitylog\Facades\Activity;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
+    {
+        Activity::withoutLogs(fn () => $this->seedAll());
+    }
+
+    private function seedAll(): void
     {
         $this->call([
             RoleSeeder::class,

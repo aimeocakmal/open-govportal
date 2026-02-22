@@ -443,6 +443,7 @@ return [
             'event_created' => 'Dicipta',
             'event_updated' => 'Dikemas kini',
             'event_deleted' => 'Dipadam',
+            'event_logged_in' => 'Log Masuk',
             'unknown_module' => 'Tidak Diketahui',
             'changes' => 'Perubahan',
             'old_values' => 'Nilai Lama',

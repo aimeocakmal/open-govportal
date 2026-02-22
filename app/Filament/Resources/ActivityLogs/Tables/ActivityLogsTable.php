@@ -35,6 +35,7 @@ class ActivityLogsTable
                         'created' => 'success',
                         'updated' => 'info',
                         'deleted' => 'danger',
+                        'logged_in' => 'warning',
                         default => 'gray',
                     }),
                 TextColumn::make('subject_id')
@@ -49,6 +50,7 @@ class ActivityLogsTable
                         'created' => __('filament.resource.activity_logs.event_created'),
                         'updated' => __('filament.resource.activity_logs.event_updated'),
                         'deleted' => __('filament.resource.activity_logs.event_deleted'),
+                        'logged_in' => __('filament.resource.activity_logs.event_logged_in'),
                     ]),
                 SelectFilter::make('subject_type')
                     ->label(__('filament.resource.activity_logs.module'))

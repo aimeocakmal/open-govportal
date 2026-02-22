@@ -443,6 +443,7 @@ return [
             'event_created' => 'Created',
             'event_updated' => 'Updated',
             'event_deleted' => 'Deleted',
+            'event_logged_in' => 'Logged In',
             'unknown_module' => 'Unknown',
             'changes' => 'Changes',
             'old_values' => 'Old Values',

@@ -9,6 +9,7 @@ use App\Models\MenuItem;
 use App\Models\StaffDirectory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Models\Activity;
 use Tests\TestCase;
 
@@ -122,5 +123,46 @@ class ActivityLogTest extends TestCase
         $this->assertNotNull($activity);
         $this->assertArrayHasKey('name', $activity->properties['attributes']);
         $this->assertArrayNotHasKey('password', $activity->properties['attributes']);
+    }
+
+    public function test_login_activity_is_logged(): void
+    {
+        $user = User::factory()->create([
+            'is_active' => true,
+        ]);
+
+        Auth::login($user);
+
+        $activity = Activity::where('log_name', 'auth')
+            ->where('description', 'logged_in')
+            ->where('causer_id', $user->id)
+            ->first();
+
+        $this->assertNotNull($activity);
+        $this->assertEquals($user->id, $activity->causer_id);
+    }
+
+    public function test_activity_captures_causer_when_authenticated(): void
+    {
+        $user = User::factory()->create([
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($user);
+
+        $broadcast = Broadcast::factory()->create([
+            'title_ms' => 'Causer Test',
+            'status' => 'draft',
+            'slug' => 'causer-test',
+        ]);
+
+        $activity = Activity::where('subject_type', Broadcast::class)
+            ->where('subject_id', $broadcast->id)
+            ->where('description', 'created')
+            ->first();
+
+        $this->assertNotNull($activity);
+        $this->assertEquals($user->id, $activity->causer_id);
+        $this->assertEquals(User::class, $activity->causer_type);
     }
 }

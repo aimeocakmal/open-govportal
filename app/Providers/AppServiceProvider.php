@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\LogSuccessfulLogin;
 use App\Models\Achievement;
 use App\Models\Broadcast;
 use App\Models\Celebration;
@@ -14,6 +15,8 @@ use App\Policies\ActivityLogPolicy;
 use App\Policies\RolePolicy;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Activity::class, ActivityLogPolicy::class);
+
+        Event::listen(Login::class, LogSuccessfulLogin::class);
 
         // Register search content observer for FTS indexing
         $searchableModels = [Broadcast::class, Achievement::class, StaffDirectory::class, Policy::class];

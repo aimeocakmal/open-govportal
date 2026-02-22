@@ -7,8 +7,10 @@ use App\Filament\Resources\ActivityLogs\Pages\ListActivityLogs;
 use App\Filament\Resources\ActivityLogs\Pages\ViewActivityLog;
 use App\Filament\Resources\ActivityLogs\Tables\ActivityLogsTable;
 use BackedEnum;
-use Filament\Infolists;
+use Filament\Infolists\Components\KeyValueEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -52,41 +54,42 @@ class ActivityLogResource extends Resource
     {
         return $schema
             ->components([
-                Infolists\Components\Section::make(__('filament.resource.activity_logs.activity_details'))
+                Section::make(__('filament.resource.activity_logs.activity_details'))
                     ->schema([
-                        Infolists\Components\TextEntry::make('created_at')
+                        TextEntry::make('created_at')
                             ->label(__('filament.resource.activity_logs.timestamp'))
                             ->dateTime('d M Y H:i:s'),
-                        Infolists\Components\TextEntry::make('causer.name')
+                        TextEntry::make('causer.name')
                             ->label(__('filament.resource.activity_logs.user'))
                             ->placeholder(__('filament.resource.activity_logs.system')),
-                        Infolists\Components\TextEntry::make('causer.email')
+                        TextEntry::make('causer.email')
                             ->label(__('filament.common.email'))
                             ->placeholder('—'),
-                        Infolists\Components\TextEntry::make('description')
+                        TextEntry::make('description')
                             ->label(__('filament.resource.activity_logs.event'))
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'created' => 'success',
                                 'updated' => 'info',
                                 'deleted' => 'danger',
+                                'logged_in' => 'warning',
                                 default => 'gray',
                             }),
-                        Infolists\Components\TextEntry::make('subject_type')
+                        TextEntry::make('subject_type')
                             ->label(__('filament.resource.activity_logs.module'))
                             ->formatStateUsing(fn (?string $state) => static::getModuleName($state)),
-                        Infolists\Components\TextEntry::make('subject_id')
+                        TextEntry::make('subject_id')
                             ->label(__('filament.resource.activity_logs.record_id')),
                     ])
                     ->columns(3),
 
-                Infolists\Components\Section::make(__('filament.resource.activity_logs.changes'))
+                Section::make(__('filament.resource.activity_logs.changes'))
                     ->schema([
-                        Infolists\Components\KeyValueEntry::make('properties.old')
+                        KeyValueEntry::make('properties.old')
                             ->label(__('filament.resource.activity_logs.old_values'))
                             ->placeholder(__('filament.resource.activity_logs.no_changes'))
                             ->columnSpanFull(),
-                        Infolists\Components\KeyValueEntry::make('properties.attributes')
+                        KeyValueEntry::make('properties.attributes')
                             ->label(__('filament.resource.activity_logs.new_values'))
                             ->placeholder(__('filament.resource.activity_logs.no_changes'))
                             ->columnSpanFull(),

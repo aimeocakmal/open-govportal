@@ -42,7 +42,8 @@
       "Bash(git commit:*)",
       "Bash(grep:*)",
       "mcp__laravel-boost__tinker",
-      "mcp__laravel-boost__get-absolute-url"
+      "mcp__laravel-boost__get-absolute-url",
+      "mcp__laravel-boost__last-error"
     ]
   }
 }
