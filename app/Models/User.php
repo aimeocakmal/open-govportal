@@ -30,6 +30,7 @@ class User extends Authenticatable implements FilamentUser
         'avatar',
         'is_active',
         'preferred_locale',
+        'theme_color',
     ];
 
     /**

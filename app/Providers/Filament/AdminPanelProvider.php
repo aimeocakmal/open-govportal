@@ -78,7 +78,7 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->profile(\App\Filament\Pages\Auth\EditProfile::class, isSimple: false)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
             ->navigationGroups($this->buildNavigationGroups())
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

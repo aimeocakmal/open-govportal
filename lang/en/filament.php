@@ -119,6 +119,8 @@ return [
         'delete_account_warning' => 'Are you sure you want to delete your account? This action is permanent and cannot be undone. All your data will be removed.',
         'delete_account_confirm' => 'Yes, delete my account',
         'account_deleted' => 'Your account has been deleted.',
+        'theme_color' => 'Theme color',
+        'theme_color_desc' => 'Choose a preferred theme for the app.',
     ],
 
     // ── Settings pages ───────────────────────────────────────────────

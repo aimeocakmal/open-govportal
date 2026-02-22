@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Filament\Forms\Components\ThemeColorPicker;
 use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
@@ -35,6 +36,10 @@ class EditProfile extends BaseEditProfile
                         'ms' => __('filament.common.bahasa_malaysia'),
                         'en' => __('filament.common.english'),
                     ]),
+                ThemeColorPicker::make('theme_color')
+                    ->label(__('filament.profile.theme_color'))
+                    ->helperText(__('filament.profile.theme_color_desc'))
+                    ->default('blue'),
                 $this->getPasswordFormComponent(),
                 $this->getPasswordConfirmationFormComponent(),
             ]);

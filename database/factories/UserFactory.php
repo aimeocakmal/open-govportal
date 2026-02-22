@@ -25,6 +25,7 @@ class UserFactory extends Factory
             ]),
             'is_active' => true,
             'preferred_locale' => 'ms',
+            'theme_color' => 'blue',
             'remember_token' => Str::random(10),
         ];
     }

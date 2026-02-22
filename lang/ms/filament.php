@@ -119,6 +119,8 @@ return [
         'delete_account_warning' => 'Adakah anda pasti mahu memadamkan akaun anda? Tindakan ini kekal dan tidak boleh dibatalkan. Semua data anda akan dibuang.',
         'delete_account_confirm' => 'Ya, padam akaun saya',
         'account_deleted' => 'Akaun anda telah dipadamkan.',
+        'theme_color' => 'Warna tema',
+        'theme_color_desc' => 'Pilih tema pilihan untuk aplikasi.',
     ],
 
     // ── Halaman tetapan ──────────────────────────────────────────────
