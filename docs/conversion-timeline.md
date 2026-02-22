@@ -376,6 +376,7 @@ Split into must-have (5a) and nice-to-have (5b) to avoid overloading.
 - [ ] `StaticPage` + `PageCategory` models, migrations, Filament resources (from `database-schema.md`)
 - [ ] `Menu` + `MenuItem` models, migrations, Filament resource (`MenuResource` with nested items)
 - [ ] `ManageHomepage` settings page — homepage layout flags using `settings` table keys (deferred from Week 4; built now that Homepage data needs are clearer)
+- [ ] Wire `ManageMediaSettings` to Filament file uploads — create `MediaDiskService` (reads `media_disk` setting, decrypts cloud credentials, calls `Config::set()` at runtime); hook via `AdminPanelProvider::bootUsing()`; add `configureUsing()` defaults for `RichEditor` (directory) and `FileUpload` (visibility); map `local` → `public` disk so uploads are web-accessible; add `r2`/`gcs`/`azure` placeholder disks to `config/filesystems.php`; install `league/flysystem-aws-s3-v3` for S3/R2 support; zero changes to individual form schemas (global config handles all)
 - [ ] `MyProfile` Filament page — current user can manage their own profile:
   - Edit name, email, avatar (file upload)
   - Change password (current + new + confirm)
