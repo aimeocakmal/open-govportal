@@ -2,11 +2,16 @@
 
 namespace App\Filament\Pages\Auth;
 
+use Filament\Actions\Action;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 
 class EditProfile extends BaseEditProfile
 {
@@ -35,6 +40,57 @@ class EditProfile extends BaseEditProfile
             ]);
     }
 
+    public function content(Schema $schema): Schema
+    {
+        $components = [
+            $this->getFormContentComponent(),
+            ...Arr::wrap($this->getMultiFactorAuthenticationContentComponent()),
+        ];
+
+        $user = Auth::user();
+
+        if ($user && ! $user->hasRole('super_admin')) {
+            $components[] = $this->getDangerZoneSection();
+        }
+
+        return $schema->components($components);
+    }
+
+    protected function getDangerZoneSection(): Section
+    {
+        return Section::make(__('filament.profile.danger_zone'))
+            ->description(__('filament.profile.danger_zone_desc'))
+            ->schema([
+                \Filament\Schemas\Components\Actions::make([
+                    Action::make('deleteAccount')
+                        ->label(__('filament.profile.delete_account'))
+                        ->color('danger')
+                        ->icon('heroicon-o-trash')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('filament.profile.delete_account'))
+                        ->modalDescription(__('filament.profile.delete_account_warning'))
+                        ->modalSubmitActionLabel(__('filament.profile.delete_account_confirm'))
+                        ->action(function (): void {
+                            $user = Auth::user();
+                            Auth::logout();
+                            $user->update(['is_active' => false]);
+                            $user->delete();
+
+                            session()->invalidate();
+                            session()->regenerateToken();
+
+                            Notification::make()
+                                ->success()
+                                ->title(__('filament.profile.account_deleted'))
+                                ->send();
+
+                            $this->redirect(filament()->getLoginUrl());
+                        }),
+                ]),
+            ])
+            ->collapsed(false);
+    }
+
     protected function afterSave(): void
     {
         $locale = $this->getUser()->preferred_locale;
@@ -47,14 +103,5 @@ class EditProfile extends BaseEditProfile
     protected function getRedirectUrl(): ?string
     {
         return filament()->getProfileUrl();
-    }
-
-    protected function getDeleteAccountAction(): ?\Filament\Actions\Action
-    {
-        if (auth()->user()?->hasRole('super_admin')) {
-            return null;
-        }
-
-        return parent::getDeleteAccountAction();
     }
 }

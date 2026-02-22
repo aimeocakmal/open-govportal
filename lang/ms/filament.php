@@ -113,6 +113,12 @@ return [
     // ── Halaman profil ───────────────────────────────────────────────
     'profile' => [
         'language' => 'Bahasa / Language',
+        'danger_zone' => 'Zon Bahaya',
+        'danger_zone_desc' => 'Tindakan tidak boleh dibatalkan untuk akaun anda.',
+        'delete_account' => 'Padam Akaun',
+        'delete_account_warning' => 'Adakah anda pasti mahu memadamkan akaun anda? Tindakan ini kekal dan tidak boleh dibatalkan. Semua data anda akan dibuang.',
+        'delete_account_confirm' => 'Ya, padam akaun saya',
+        'account_deleted' => 'Akaun anda telah dipadamkan.',
     ],
 
     // ── Halaman tetapan ──────────────────────────────────────────────

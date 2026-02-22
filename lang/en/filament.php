@@ -113,6 +113,12 @@ return [
     // ── Profile page ─────────────────────────────────────────────────
     'profile' => [
         'language' => 'Language / Bahasa',
+        'danger_zone' => 'Danger Zone',
+        'danger_zone_desc' => 'Irreversible actions for your account.',
+        'delete_account' => 'Delete Account',
+        'delete_account_warning' => 'Are you sure you want to delete your account? This action is permanent and cannot be undone. All your data will be removed.',
+        'delete_account_confirm' => 'Yes, delete my account',
+        'account_deleted' => 'Your account has been deleted.',
     ],
 
     // ── Settings pages ───────────────────────────────────────────────
