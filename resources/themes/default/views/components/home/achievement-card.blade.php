@@ -14,9 +14,9 @@
     @endif
 
     {{-- Timeline dot --}}
-    <div class="absolute left-0 top-1.5 w-6 h-6 rounded-full border-2 border-primary bg-white flex items-center justify-center" aria-hidden="true">
+    <div class="absolute left-0 top-1.5 size-6 rounded-full border-2 border-primary bg-white flex items-center justify-center" aria-hidden="true">
         @if($achievement->is_featured)
-            <div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+            <div class="size-2.5 rounded-full bg-primary"></div>
         @endif
     </div>
 
@@ -26,20 +26,20 @@
         @if($achievement->date)
             <time
                 datetime="{{ $achievement->date->toDateString() }}"
-                class="text-xs font-medium text-muted uppercase tracking-wide"
+                class="text-body-xs font-medium text-muted uppercase tracking-wide"
             >
                 {{ $achievement->date->translatedFormat('d F Y') }}
             </time>
         @endif
 
         {{-- Title --}}
-        <h3 class="mt-1 font-semibold text-text group-hover:text-primary transition-colors">
+        <h3 class="mt-1 font-heading font-semibold text-text group-hover:text-primary transition-colors duration-short">
             <a href="{{ $url }}">{{ $title }}</a>
         </h3>
 
         {{-- Description --}}
         @if($description)
-            <p class="mt-1 text-sm text-muted line-clamp-3">
+            <p class="mt-1 text-body-sm text-muted line-clamp-3">
                 {{ strip_tags($description) }}
             </p>
         @endif

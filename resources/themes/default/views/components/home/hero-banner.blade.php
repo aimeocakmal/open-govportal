@@ -27,20 +27,20 @@
                                 <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
                             @else
                                 {{-- Fallback gradient --}}
-                                <div class="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary to-primary-light"></div>
+                                <div class="absolute inset-0 bg-gradient-to-br from-primary-800 via-primary-600 to-primary-400"></div>
                             @endif
 
                             {{-- Content --}}
                             <div class="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
                                 <div class="max-w-2xl">
                                     @if($banner->{'title_' . $locale})
-                                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                                        <h2 class="font-heading text-heading-md sm:text-heading-lg lg:text-heading-xl font-semibold text-white leading-tight">
                                             {{ $banner->{'title_' . $locale} }}
                                         </h2>
                                     @endif
 
                                     @if($banner->{'subtitle_' . $locale})
-                                        <p class="mt-4 text-lg sm:text-xl text-white/90 leading-relaxed">
+                                        <p class="mt-4 text-body-lg sm:text-body-xl text-white/90 leading-relaxed">
                                             {{ $banner->{'subtitle_' . $locale} }}
                                         </p>
                                     @endif
@@ -48,10 +48,10 @@
                                     @if($banner->cta_url && $banner->{'cta_label_' . $locale})
                                         <a
                                             href="{{ $banner->cta_url }}"
-                                            class="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-white text-primary font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                                            class="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-white text-primary font-semibold rounded-lg shadow-button hover:bg-gray-50 transition-colors duration-short"
                                         >
                                             {{ $banner->{'cta_label_' . $locale} }}
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                             </svg>
                                         </a>
@@ -68,20 +68,20 @@
         @if($banners->count() > 1)
             <button
                 @click="prev()"
-                class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-colors flex items-center justify-center"
+                class="absolute left-4 top-1/2 -translate-y-1/2 size-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-colors duration-short flex items-center justify-center"
                 aria-label="{{ __('common.pagination.previous') }}"
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                 </svg>
             </button>
 
             <button
                 @click="next()"
-                class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-colors flex items-center justify-center"
+                class="absolute right-4 top-1/2 -translate-y-1/2 size-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-colors duration-short flex items-center justify-center"
                 aria-label="{{ __('common.pagination.next') }}"
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
             </button>
@@ -94,7 +94,7 @@
                         :class="current === {{ $index }}
                             ? 'bg-white w-8 h-2'
                             : 'bg-white/50 w-2 h-2 hover:bg-white/70'"
-                        class="rounded-full transition-all duration-300"
+                        class="rounded-full transition-all duration-medium"
                         aria-label="Slide {{ $index + 1 }}"
                     ></button>
                 @endforeach
@@ -103,12 +103,12 @@
     </section>
 @else
     {{-- Default hero when no banners exist --}}
-    <section class="bg-gradient-to-br from-primary-dark via-primary to-primary-light py-20 sm:py-28">
+    <section class="bg-gradient-to-br from-primary-800 via-primary-600 to-primary-400 py-20 sm:py-28">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl sm:text-5xl font-bold text-white leading-tight">
+            <h1 class="font-heading text-heading-lg sm:text-heading-xl font-semibold text-white leading-tight">
                 {{ __('home.hero.default_title') }}
             </h1>
-            <p class="mt-4 text-lg sm:text-xl text-white/90">
+            <p class="mt-4 text-body-lg sm:text-body-xl text-white/90">
                 {{ __('home.hero.default_subtitle') }}
             </p>
         </div>

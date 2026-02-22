@@ -24,15 +24,15 @@
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             {{-- Section header --}}
                             <div class="flex items-center justify-between mb-8">
-                                <h2 id="broadcasts-heading" class="text-2xl sm:text-3xl font-bold text-text">
+                                <h2 id="broadcasts-heading" class="font-heading text-heading-sm font-semibold text-text">
                                     {{ __('home.broadcasts.title') }}
                                 </h2>
                                 <a
                                     href="/{{ $locale }}/siaran"
-                                    class="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                                    class="hidden sm:inline-flex items-center gap-1 text-body-sm font-medium text-primary hover:text-primary-dark transition-colors duration-short"
                                 >
                                     {{ __('home.broadcasts.view_all') }}
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                                     </svg>
                                 </a>
@@ -49,10 +49,10 @@
                             <div class="mt-8 text-center sm:hidden">
                                 <a
                                     href="/{{ $locale }}/siaran"
-                                    class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                                    class="inline-flex items-center gap-1 text-body-sm font-medium text-primary hover:text-primary-dark transition-colors duration-short"
                                 >
                                     {{ __('home.broadcasts.view_all') }}
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                                     </svg>
                                 </a>
@@ -64,23 +64,23 @@
 
             @case('achievements')
                 @if($showAchievements && $achievements->isNotEmpty())
-                    <section class="py-12 sm:py-16 bg-surface" aria-labelledby="achievements-heading">
+                    <section class="py-12 sm:py-16 bg-bg-washed" aria-labelledby="achievements-heading">
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
                                 {{-- Left: heading (sticky on desktop) --}}
                                 <div class="lg:sticky lg:top-24 lg:self-start">
-                                    <h2 id="achievements-heading" class="text-2xl sm:text-3xl font-bold text-text">
+                                    <h2 id="achievements-heading" class="font-heading text-heading-sm font-semibold text-text">
                                         {{ __('home.achievements.title') }}
                                     </h2>
-                                    <p class="mt-2 text-muted">
+                                    <p class="mt-2 text-body-md text-muted">
                                         {{ __('home.achievements.description') }}
                                     </p>
                                     <a
                                         href="/{{ $locale }}/pencapaian"
-                                        class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                                        class="mt-4 inline-flex items-center gap-1 text-body-sm font-medium text-primary hover:text-primary-dark transition-colors duration-short"
                                     >
                                         {{ __('home.achievements.view_all') }}
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </a>

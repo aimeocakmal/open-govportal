@@ -14,14 +14,14 @@
     }"
     class="flex items-center gap-1"
     role="group"
-    aria-label="{{ app()->getLocale() === 'ms' ? 'Pilih tema' : 'Choose theme' }}"
+    aria-label="{{ __('common.theme.choose') }}"
 >
     @foreach ($themes as $key => $label)
         <button
             @click="set('{{ $key }}')"
-            :class="{ 'ring-2 ring-primary text-primary': theme === '{{ $key }}' }"
-            class="px-2 py-1 rounded text-xs font-medium border border-border text-muted
-                   hover:text-primary hover:border-primary transition-colors"
+            :class="{ 'ring-2 ring-fr-primary text-primary': theme === '{{ $key }}' }"
+            class="px-2 py-1 rounded-md text-body-xs font-medium border border-border-light text-muted
+                   hover:text-primary hover:border-primary transition-colors duration-short"
             aria-label="{{ $label }}"
         >
             {{ $label }}

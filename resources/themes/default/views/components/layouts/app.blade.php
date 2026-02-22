@@ -30,11 +30,12 @@
         {!! $customScript !!}
     @endif
 </head>
-<body class="bg-bg text-text font-sans antialiased flex flex-col min-h-full">
+<body class="bg-bg text-text font-sans text-body-md antialiased flex flex-col min-h-full">
 
+    <x-layout.masthead />
     <x-layout.nav />
 
-    <main class="flex-1">
+    <main id="main-content" class="flex-1">
         {{ $slot }}
     </main>
 

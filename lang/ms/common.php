@@ -34,6 +34,20 @@ return [
         'choose' => 'Pilih tema',
     ],
 
+    'masthead' => [
+        'official' => 'Portal Rasmi Kerajaan Malaysia',
+        'how_to_identify' => 'Kenal pasti begini',
+        'govmy_title' => 'Pautan portal rasmi berakhir dengan .gov.my',
+        'govmy_desc_before' => 'Sekiranya anda melihat pautan selain ',
+        'govmy_domain' => '.gov.my',
+        'govmy_desc_after' => ', segera tutupkan halaman itu walaupun ia menyerupai portal rasmi!',
+        'secure_title' => 'Portal yang selamat menggunakan HTTPS',
+        'secure_desc_before' => 'Periksa ikon loker (',
+        'secure_desc_or' => ') atau ',
+        'secure_https' => 'https://',
+        'secure_desc_after' => ' di depan pautan. Sekiranya tiada, jangan kongsikan sebarang maklumat sensitif.',
+    ],
+
     'actions' => [
         'read_more' => 'Baca Selanjutnya',
         'view_all' => 'Lihat Semua',

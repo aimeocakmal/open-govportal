@@ -1,5 +1,5 @@
-/* Inter font — must be first @import before tailwindcss */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* MyDS Fonts — Poppins (headings) + Inter (body) + Roboto Mono (code) */
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Roboto+Mono:wght@400;500&display=swap");
 
 @import 'tailwindcss';
 
@@ -12,54 +12,274 @@
 /* Default theme tokens */
 @import './theme.css';
 
-/* @theme inline — generate Tailwind utility classes from CSS variables.
- * Using `inline` means Tailwind does NOT set :root values itself;
- * the actual values come from the theme files above. This allows runtime
- * theme switching via [data-theme] without recompiling CSS.
- */
+/* ================================================================
+ * @theme inline — register CSS variable-based tokens so Tailwind
+ * generates utility classes (e.g. bg-primary-600, text-gray-900).
+ * Values come from theme.css at runtime, enabling theme switching
+ * without recompiling CSS.
+ * ================================================================ */
 @theme inline {
-    /* Primary */
+    /* Primary scale */
+    --color-primary-50: initial;
+    --color-primary-100: initial;
+    --color-primary-200: initial;
+    --color-primary-300: initial;
+    --color-primary-400: initial;
+    --color-primary-500: initial;
+    --color-primary-600: initial;
+    --color-primary-700: initial;
+    --color-primary-800: initial;
+    --color-primary-900: initial;
+    --color-primary-950: initial;
+
+    /* Primary aliases */
     --color-primary: initial;
     --color-primary-dark: initial;
     --color-primary-light: initial;
 
-    /* Secondary */
-    --color-secondary: initial;
-    --color-secondary-dark: initial;
-    --color-secondary-light: initial;
+    /* Danger scale */
+    --color-danger-50: initial;
+    --color-danger-100: initial;
+    --color-danger-200: initial;
+    --color-danger-300: initial;
+    --color-danger-400: initial;
+    --color-danger-500: initial;
+    --color-danger-600: initial;
+    --color-danger-700: initial;
+    --color-danger-800: initial;
+    --color-danger-900: initial;
+    --color-danger-950: initial;
 
-    /* Semantic */
-    --color-success: initial;
-    --color-success-light: initial;
-    --color-warning: initial;
-    --color-warning-light: initial;
-    --color-error: initial;
-    --color-error-light: initial;
-    --color-info: initial;
-    --color-info-light: initial;
+    /* Success scale */
+    --color-success-50: initial;
+    --color-success-100: initial;
+    --color-success-200: initial;
+    --color-success-300: initial;
+    --color-success-400: initial;
+    --color-success-500: initial;
+    --color-success-600: initial;
+    --color-success-700: initial;
+    --color-success-800: initial;
+    --color-success-900: initial;
+    --color-success-950: initial;
 
-    /* Neutral */
-    --color-black: initial;
-    --color-gray-800: initial;
-    --color-gray-700: initial;
-    --color-gray-600: initial;
-    --color-gray-500: initial;
-    --color-gray-400: initial;
-    --color-gray-300: initial;
-    --color-gray-200: initial;
+    /* Warning scale */
+    --color-warning-50: initial;
+    --color-warning-100: initial;
+    --color-warning-200: initial;
+    --color-warning-300: initial;
+    --color-warning-400: initial;
+    --color-warning-500: initial;
+    --color-warning-600: initial;
+    --color-warning-700: initial;
+    --color-warning-800: initial;
+    --color-warning-900: initial;
+    --color-warning-950: initial;
+
+    /* Gray scale */
+    --color-gray-50: initial;
     --color-gray-100: initial;
-    --color-white: initial;
+    --color-gray-200: initial;
+    --color-gray-300: initial;
+    --color-gray-400: initial;
+    --color-gray-500: initial;
+    --color-gray-600: initial;
+    --color-gray-700: initial;
+    --color-gray-800: initial;
+    --color-gray-850: initial;
+    --color-gray-900: initial;
+    --color-gray-930: initial;
+    --color-gray-950: initial;
 
-    /* Surfaces */
+    /* Semantic surfaces */
     --color-bg: initial;
+    --color-bg-washed: initial;
     --color-surface: initial;
     --color-border: initial;
+    --color-border-light: initial;
     --color-text: initial;
+    --color-text-secondary: initial;
     --color-muted: initial;
+    --color-placeholder: initial;
+    --color-white: initial;
+    --color-black: initial;
+
+    /* Focus ring */
+    --color-fr-primary: initial;
+    --color-fr-danger: initial;
+
+    /* Shadows */
+    --shadow-button: initial;
+    --shadow-card: initial;
+    --shadow-context-menu: initial;
 }
 
-/* Non-theme tokens — typography and fonts */
+/* ================================================================
+ * @theme — static tokens (fonts, sizes, animations)
+ * These don't change between themes, only values in theme.css do.
+ * ================================================================ */
 @theme {
+    /* Font families (MyDS spec) */
+    --font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-mono: 'Roboto Mono', ui-monospace, monospace;
+
+    /* Heading scale — Poppins (MyDS spec) */
+    --text-heading-xl: 3.75rem;
+    --text-heading-xl--line-height: 4.5rem;
+    --text-heading-lg: 3rem;
+    --text-heading-lg--line-height: 3.75rem;
+    --text-heading-md: 2.25rem;
+    --text-heading-md--line-height: 2.75rem;
+    --text-heading-sm: 1.875rem;
+    --text-heading-sm--line-height: 2.375rem;
+    --text-heading-xs: 1.5rem;
+    --text-heading-xs--line-height: 2rem;
+    --text-heading-2xs: 1.25rem;
+    --text-heading-2xs--line-height: 1.75rem;
+
+    /* Body scale — Inter (MyDS spec) */
+    --text-body-xl: 1.25rem;
+    --text-body-xl--line-height: 1.875rem;
+    --text-body-lg: 1.125rem;
+    --text-body-lg--line-height: 1.625rem;
+    --text-body-md: 1rem;
+    --text-body-md--line-height: 1.5rem;
+    --text-body-sm: 0.875rem;
+    --text-body-sm--line-height: 1.25rem;
+    --text-body-xs: 0.75rem;
+    --text-body-xs--line-height: 1.125rem;
+
+    /* Border radius (MyDS spec) */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 14px;
+    --radius-full: 9999px;
+
+    /* Motion — easing */
+    --ease-linear: cubic-bezier(0, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.58, 1);
+    --ease-out-back: cubic-bezier(0.4, 1.4, 0.2, 1);
+
+    /* Motion — durations */
+    --duration-short: 200ms;
+    --duration-medium: 400ms;
+    --duration-long: 600ms;
+
+    /* Keyframe animations */
+    --animate-slide-up: slide-up 300ms var(--ease-out);
+    --animate-slide-down: slide-down 300ms var(--ease-out);
+    --animate-shimmer: shimmer 1200ms var(--ease-linear) infinite;
+    --animate-expire: expire 5s linear forwards;
+}
+
+/* ================================================================
+ * Keyframes
+ * ================================================================ */
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes expire {
+    0% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* ================================================================
+ * Base Styles — apply MyDS typography defaults
+ * ================================================================ */
+@layer base {
+    /* Headings use Poppins */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-heading);
+    }
+
+    h1 {
+        font-size: var(--text-heading-md);
+        line-height: var(--text-heading-md--line-height);
+    }
+
+    h2 {
+        font-size: var(--text-heading-sm);
+        line-height: var(--text-heading-sm--line-height);
+    }
+
+    h3 {
+        font-size: var(--text-heading-xs);
+        line-height: var(--text-heading-xs--line-height);
+    }
+
+    h4 {
+        font-size: var(--text-heading-2xs);
+        line-height: var(--text-heading-2xs--line-height);
+    }
+
+    h5 {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    h6 {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    /* Focus ring style (MyDS: primary-300 ring) */
+    :focus-visible {
+        outline: 2px solid var(--color-fr-primary);
+        outline-offset: 2px;
+    }
 }

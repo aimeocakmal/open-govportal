@@ -1,53 +1,134 @@
 /* MyDS Blue — Default Theme
- * All design tokens for the Malaysian Government Design System (MyDS).
- * Values are applied under [data-theme="default"] and :root so utilities
- * work regardless of whether the data-theme attribute is present.
+ * Malaysian Government Design System (MyDS) tokens.
+ * Full 11-shade color scales + semantic surface tokens + shadows + motion.
+ *
+ * Reference: https://design.digital.gov.my/en/docs/design
+ * Gray base: Zinc | Primary base: Blue
  */
 
 [data-theme="default"],
 :root {
-    /* Primary */
+    /* ----------------------------------------------------------------
+     * Primary (Blue) — 11 shades
+     * ---------------------------------------------------------------- */
+    --color-primary-50: #EFF6FF;
+    --color-primary-100: #DBEAFE;
+    --color-primary-200: #C2D5FF;
+    --color-primary-300: #96B7FF;
+    --color-primary-400: #6394FF;
+    --color-primary-500: #3A75F6;
+    --color-primary-600: #2563EB;
+    --color-primary-700: #1D4ED8;
+    --color-primary-800: #1E40AF;
+    --color-primary-900: #1E3A8A;
+    --color-primary-950: #172554;
+
+    /* Semantic primary aliases */
     --color-primary: #2563EB;
     --color-primary-dark: #1D4ED8;
     --color-primary-light: #3B82F6;
 
-    /* Secondary */
-    --color-secondary: #64748B;
-    --color-secondary-dark: #475569;
-    --color-secondary-light: #94A3B8;
+    /* ----------------------------------------------------------------
+     * Danger (Red) — 11 shades
+     * ---------------------------------------------------------------- */
+    --color-danger-50: #FEF2F2;
+    --color-danger-100: #FEE2E2;
+    --color-danger-200: #FECACA;
+    --color-danger-300: #FCA5A5;
+    --color-danger-400: #F87171;
+    --color-danger-500: #EF4444;
+    --color-danger-600: #DC2626;
+    --color-danger-700: #B91C1C;
+    --color-danger-800: #991B1B;
+    --color-danger-900: #7F1D1D;
+    --color-danger-950: #450A0A;
 
-    /* Semantic — Success */
-    --color-success: #10B981;
-    --color-success-light: #D1FAE5;
+    /* ----------------------------------------------------------------
+     * Success (Green) — 11 shades
+     * ---------------------------------------------------------------- */
+    --color-success-50: #F0FDF4;
+    --color-success-100: #DCFCE7;
+    --color-success-200: #BBF7D0;
+    --color-success-300: #83DAA3;
+    --color-success-400: #4ADE80;
+    --color-success-500: #22C55E;
+    --color-success-600: #16A34A;
+    --color-success-700: #15803D;
+    --color-success-800: #166534;
+    --color-success-900: #14532D;
+    --color-success-950: #052E16;
 
-    /* Semantic — Warning */
-    --color-warning: #F59E0B;
-    --color-warning-light: #FEF3C7;
+    /* ----------------------------------------------------------------
+     * Warning (Yellow/Amber) — 11 shades
+     * ---------------------------------------------------------------- */
+    --color-warning-50: #FEFCE8;
+    --color-warning-100: #FEF9C3;
+    --color-warning-200: #FEF08A;
+    --color-warning-300: #FDE047;
+    --color-warning-400: #FACC15;
+    --color-warning-500: #EAB308;
+    --color-warning-600: #CA8A04;
+    --color-warning-700: #A16207;
+    --color-warning-800: #854D0E;
+    --color-warning-900: #713F12;
+    --color-warning-950: #422006;
 
-    /* Semantic — Error */
-    --color-error: #EF4444;
-    --color-error-light: #FEE2E2;
+    /* ----------------------------------------------------------------
+     * Gray (Zinc) — 14 shades
+     * ---------------------------------------------------------------- */
+    --color-gray-50: #FAFAFA;
+    --color-gray-100: #F4F4F5;
+    --color-gray-200: #E4E4E7;
+    --color-gray-300: #D4D4D8;
+    --color-gray-400: #A1A1AA;
+    --color-gray-500: #6B6B74;
+    --color-gray-600: #52525B;
+    --color-gray-700: #3F3F46;
+    --color-gray-800: #27272A;
+    --color-gray-850: #1D1D21;
+    --color-gray-900: #18181B;
+    --color-gray-930: #161619;
+    --color-gray-950: #09090B;
 
-    /* Semantic — Info */
-    --color-info: #3B82F6;
-    --color-info-light: #DBEAFE;
-
-    /* Neutral (Grayscale) */
-    --color-black: #0F172A;
-    --color-gray-800: #1E293B;
-    --color-gray-700: #334155;
-    --color-gray-600: #475569;
-    --color-gray-500: #64748B;
-    --color-gray-400: #94A3B8;
-    --color-gray-300: #CBD5E1;
-    --color-gray-200: #E2E8F0;
-    --color-gray-100: #F1F5F9;
-    --color-white: #FFFFFF;
-
-    /* Surfaces */
+    /* ----------------------------------------------------------------
+     * Semantic Surface Tokens
+     * ---------------------------------------------------------------- */
     --color-bg: #FFFFFF;
-    --color-surface: #F1F5F9;
-    --color-border: #CBD5E1;
-    --color-text: #0F172A;
-    --color-muted: #64748B;
+    --color-bg-washed: var(--color-gray-50);
+    --color-surface: var(--color-gray-100);
+    --color-border: var(--color-gray-300);
+    --color-border-light: var(--color-gray-200);
+    --color-text: var(--color-gray-900);
+    --color-text-secondary: var(--color-gray-600);
+    --color-muted: var(--color-gray-500);
+    --color-placeholder: var(--color-gray-400);
+    --color-white: #FFFFFF;
+    --color-black: var(--color-gray-950);
+
+    /* ----------------------------------------------------------------
+     * Shadows (MyDS spec)
+     * ---------------------------------------------------------------- */
+    --shadow-button: 0px 1px 3px 0px rgba(0, 0, 0, 0.07);
+    --shadow-card: 0px 2px 6px 0px rgba(0, 0, 0, 0.05), 0px 6px 24px 0px rgba(0, 0, 0, 0.05);
+    --shadow-context-menu: 0px 2px 6px 0px rgba(0, 0, 0, 0.05), 0px 12px 50px 0px rgba(0, 0, 0, 0.10);
+
+    /* ----------------------------------------------------------------
+     * Focus Ring
+     * ---------------------------------------------------------------- */
+    --color-fr-primary: var(--color-primary-300);
+    --color-fr-danger: var(--color-danger-300);
+
+    /* ----------------------------------------------------------------
+     * Motion — Easing Curves
+     * ---------------------------------------------------------------- */
+    --ease-linear: cubic-bezier(0, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.58, 1);
+    --ease-out-back: cubic-bezier(0.4, 1.4, 0.2, 1);
+
+    /* ----------------------------------------------------------------
+     * Motion — Durations
+     * ---------------------------------------------------------------- */
+    --duration-short: 200ms;
+    --duration-medium: 400ms;
+    --duration-long: 600ms;
 }

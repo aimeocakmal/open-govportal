@@ -740,11 +740,11 @@ view('home.index')
 - [x] Set up theme system with `ThemeService`
 - [x] Create and register `ApplyTheme` middleware
 - [x] Apply `data-theme` attribute to `<html>` in layout
-- [ ] Add MyDS shadow tokens (`shadow-button`, `shadow-card`, `shadow-context-menu`)
-- [ ] Add MyDS motion tokens (easing curves, durations)
-- [ ] Add MyDS typography tokens (heading + body font sizes)
-- [ ] Add MyDS radius tokens (`rounded-xs` through `rounded-xl`)
-- [ ] Add MyDS grid system (12-8-4 responsive)
+- [x] Add MyDS shadow tokens (`shadow-button`, `shadow-card`, `shadow-context-menu`)
+- [x] Add MyDS motion tokens (easing curves, durations)
+- [x] Add MyDS typography tokens (heading + body font sizes)
+- [x] Add MyDS radius tokens (`rounded-xs` through `rounded-xl`)
+- [x] Add MyDS grid system (12-8-4 responsive)
 
 ### Components (Blade + Alpine.js)
 - [x] Hero banner carousel (Embla.js)
@@ -753,7 +753,7 @@ view('home.index')
 - [x] Footer
 - [x] Theme switcher
 - [x] Quick links grid
-- [ ] Masthead (government bar)
+- [x] Masthead (government bar)
 - [ ] Breadcrumb
 - [ ] Button variants (all 8 MyDS variants)
 - [ ] Form inputs (text, select, textarea, checkbox, radio)

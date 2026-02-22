@@ -5,30 +5,26 @@
     $currentYear = date('Y');
 @endphp
 
-<footer class="bg-gray-800 text-gray-300 mt-auto">
+<footer class="bg-gray-900 text-gray-400 mt-auto">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
             {{-- Branding --}}
             <div class="space-y-3">
-                <p class="font-bold text-white text-base leading-snug">
-                    {{ app()->getLocale() === 'ms'
-                        ? 'Kementerian Digital Malaysia'
-                        : 'Ministry of Digital Malaysia' }}
+                <p class="font-heading font-semibold text-white text-heading-2xs leading-snug">
+                    {{ __('common.site_name') }}
                 </p>
-                <p class="text-sm text-gray-400 leading-relaxed">
-                    {{ app()->getLocale() === 'ms'
-                        ? 'Memimpin transformasi digital negara.'
-                        : 'Leading the nation\'s digital transformation.' }}
+                <p class="text-body-sm text-gray-500 leading-relaxed">
+                    {{ __('common.site_tagline') }}
                 </p>
 
-                {{-- Social links placeholder --}}
+                {{-- Social links --}}
                 <div class="flex items-center gap-3 pt-1">
                     @foreach (['facebook_url' => 'Facebook', 'twitter_url' => 'X', 'instagram_url' => 'Instagram', 'youtube_url' => 'YouTube'] as $key => $label)
                         @php $url = $footerData[$key] ?? '' @endphp
                         @if ($url)
                             <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
-                               class="text-gray-400 hover:text-white transition-colors text-xs">
+                               class="text-gray-500 hover:text-white transition-colors duration-short text-body-xs">
                                 {{ $label }}
                             </a>
                         @endif
@@ -38,8 +34,8 @@
 
             {{-- Quick links --}}
             <div>
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-                    {{ $locale === 'ms' ? 'Pautan Cepat' : 'Quick Links' }}
+                <h3 class="text-body-sm font-semibold text-white uppercase tracking-wider mb-4">
+                    {{ __('common.footer.quick_links') }}
                 </h3>
                 <ul class="space-y-2">
                     @foreach ([
@@ -50,7 +46,7 @@
                     ] as $link)
                         <li>
                             <a href="/{{ $locale }}/{{ $link['url'] }}"
-                               class="text-sm text-gray-400 hover:text-white transition-colors">
+                               class="text-body-sm text-gray-500 hover:text-white transition-colors duration-short">
                                 {{ $link[$labelKey] ?? $link['label_ms'] }}
                             </a>
                         </li>
@@ -60,8 +56,8 @@
 
             {{-- Legal links --}}
             <div>
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-                    {{ $locale === 'ms' ? 'Maklumat Lanjut' : 'More Info' }}
+                <h3 class="text-body-sm font-semibold text-white uppercase tracking-wider mb-4">
+                    {{ __('common.footer.more_info') }}
                 </h3>
                 <ul class="space-y-2">
                     @foreach ([
@@ -72,7 +68,7 @@
                     ] as $link)
                         <li>
                             <a href="/{{ $locale }}/{{ $link['url'] }}"
-                               class="text-sm text-gray-400 hover:text-white transition-colors">
+                               class="text-body-sm text-gray-500 hover:text-white transition-colors duration-short">
                                 {{ $link[$labelKey] ?? $link['label_ms'] }}
                             </a>
                         </li>
@@ -82,14 +78,14 @@
         </div>
 
         {{-- Bottom bar --}}
-        <div class="mt-10 pt-6 border-t border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-xs text-gray-500">
+        <div class="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-body-xs text-gray-600">
                 &copy; {{ $currentYear }}
-                {{ $locale === 'ms' ? 'Kementerian Digital Malaysia. Hak cipta terpelihara.' : 'Ministry of Digital Malaysia. All rights reserved.' }}
+                {{ __('common.site_name') }}. {{ __('common.footer.copyright') }}
             </p>
-            <p class="text-xs text-gray-600">
-                {{ $locale === 'ms' ? 'Dibangunkan oleh' : 'Built by' }}
-                <span class="text-gray-500">Kementerian Digital Malaysia</span>
+            <p class="text-body-xs text-gray-600">
+                {{ __('common.footer.built_by') }}
+                <span class="text-gray-500">{{ __('common.site_name') }}</span>
             </p>
         </div>
     </div>

@@ -46,7 +46,9 @@
       "mcp__laravel-boost__last-error",
       "Bash(find:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:design.digital.gov.my)"
+      "WebFetch(domain:design.digital.gov.my)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:www.npmjs.com)"
     ]
   }
 }

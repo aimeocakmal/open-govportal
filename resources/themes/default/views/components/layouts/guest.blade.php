@@ -14,7 +14,7 @@
     @vite([$themeViteEntries['css'], $themeViteEntries['js']])
     @livewireStyles
 </head>
-<body class="bg-surface text-text font-sans antialiased flex items-center justify-center min-h-full">
+<body class="bg-bg-washed text-text font-sans text-body-md antialiased flex items-center justify-center min-h-full">
 
     {{ $slot }}
 

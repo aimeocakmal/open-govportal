@@ -34,6 +34,20 @@ return [
         'choose' => 'Choose theme',
     ],
 
+    'masthead' => [
+        'official' => 'Official Malaysia Government Website',
+        'how_to_identify' => 'Here\'s how you know',
+        'govmy_title' => 'Official government websites end with .gov.my',
+        'govmy_desc_before' => 'If the link does not end with ',
+        'govmy_domain' => '.gov.my',
+        'govmy_desc_after' => ', exit the website immediately even if it looks similar.',
+        'secure_title' => 'Secure websites use HTTPS',
+        'secure_desc_before' => 'Look for a lock (',
+        'secure_desc_or' => ') or ',
+        'secure_https' => 'https://',
+        'secure_desc_after' => ' as an added precaution. If not present, do not share any sensitive information.',
+    ],
+
     'actions' => [
         'read_more' => 'Read More',
         'view_all' => 'View All',
