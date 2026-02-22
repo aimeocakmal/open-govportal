@@ -16,6 +16,8 @@
     <link rel="alternate" hreflang="ms" href="{{ preg_replace('#/(ms|en)(/)#', '/ms$2', url()->current()) }}">
     <link rel="alternate" hreflang="en" href="{{ preg_replace('#/(ms|en)(/)#', '/en$2', url()->current()) }}">
 
+    @stack('seo')
+
     @vite([$themeViteEntries['css'], $themeViteEntries['js']])
     @livewireStyles
 

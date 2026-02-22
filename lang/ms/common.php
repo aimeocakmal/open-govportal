@@ -48,6 +48,8 @@ return [
         'secure_desc_after' => ' di depan pautan. Sekiranya tiada, jangan kongsikan sebarang maklumat sensitif.',
     ],
 
+    'breadcrumb' => 'Senarai navigasi',
+
     'actions' => [
         'read_more' => 'Baca Selanjutnya',
         'view_all' => 'Lihat Semua',

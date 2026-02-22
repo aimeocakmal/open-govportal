@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\BroadcastController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PreviewController;
 use Illuminate\Support\Facades\Route;
@@ -47,12 +49,14 @@ Route::prefix('{locale}')
         Route::get('/', [HomeController::class, 'index'])->name('home');
 
         // --- Phase 3 routes (uncomment as each is implemented) ---
-        //
-        // Route::get('/siaran',             [BroadcastController::class, 'index'])->name('siaran.index');
-        // Route::get('/siaran/{slug}',       [BroadcastController::class, 'show'])->name('siaran.show');
-        //
-        // Route::get('/pencapaian',          [AchievementController::class, 'index'])->name('pencapaian.index');
-        // Route::get('/pencapaian/{slug}',   [AchievementController::class, 'show'])->name('pencapaian.show');
+
+        // Siaran (Broadcasts)
+        Route::get('/siaran', [BroadcastController::class, 'index'])->name('siaran.index');
+        Route::get('/siaran/{slug}', [BroadcastController::class, 'show'])->name('siaran.show');
+
+        // Pencapaian (Achievements)
+        Route::get('/pencapaian', [AchievementController::class, 'index'])->name('pencapaian.index');
+        Route::get('/pencapaian/{slug}', [AchievementController::class, 'show'])->name('pencapaian.show');
         //
         // Route::get('/statistik',           [StatistikController::class, 'index'])->name('statistik.index');
         //

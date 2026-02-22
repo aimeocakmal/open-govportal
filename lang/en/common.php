@@ -48,6 +48,8 @@ return [
         'secure_desc_after' => ' as an added precaution. If not present, do not share any sensitive information.',
     ],
 
+    'breadcrumb' => 'Breadcrumb navigation',
+
     'actions' => [
         'read_more' => 'Read More',
         'view_all' => 'View All',
