@@ -4,12 +4,19 @@ namespace App\Providers;
 
 use App\Listeners\LogSuccessfulLogin;
 use App\Models\Achievement;
+use App\Models\Address;
 use App\Models\Broadcast;
 use App\Models\Celebration;
+use App\Models\FooterSetting;
+use App\Models\HeroBanner;
+use App\Models\MinisterProfile;
+use App\Models\PageCategory;
 use App\Models\Policy;
+use App\Models\QuickLink;
 use App\Models\StaffDirectory;
 use App\Models\StaticPage;
 use App\Observers\ContentRevisionObserver;
+use App\Observers\PageCacheObserver;
 use App\Observers\SearchContentObserver;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\RolePolicy;
@@ -48,6 +55,17 @@ class AppServiceProvider extends ServiceProvider
         $revisionableModels = [Broadcast::class, Achievement::class, Celebration::class, Policy::class, StaticPage::class];
         foreach ($revisionableModels as $model) {
             $model::observe(ContentRevisionObserver::class);
+        }
+
+        // Register page cache observer for cache invalidation on content changes
+        $cacheableModels = [
+            HeroBanner::class, QuickLink::class, Broadcast::class,
+            Achievement::class, Policy::class, MinisterProfile::class,
+            Address::class, StaticPage::class, PageCategory::class,
+            FooterSetting::class,
+        ];
+        foreach ($cacheableModels as $model) {
+            $model::observe(PageCacheObserver::class);
         }
 
         RichEditor::configureUsing(function (RichEditor $editor): void {
