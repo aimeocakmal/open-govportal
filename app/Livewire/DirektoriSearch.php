@@ -42,7 +42,8 @@ class DirektoriSearch extends Component
             ->when($this->jabatan, fn ($q) => $q->where($departmentField, $this->jabatan))
             ->paginate(12);
 
-        $departments = StaffDirectory::active()
+        $departments = StaffDirectory::query()
+            ->where('is_active', true)
             ->whereNotNull($departmentField)
             ->select($departmentField)
             ->distinct()
