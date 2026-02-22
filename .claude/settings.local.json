@@ -44,7 +44,8 @@
       "mcp__laravel-boost__tinker",
       "mcp__laravel-boost__get-absolute-url",
       "mcp__laravel-boost__last-error",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }
