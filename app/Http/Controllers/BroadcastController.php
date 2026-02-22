@@ -18,25 +18,24 @@ class BroadcastController extends Controller
     {
         $cacheKey = "page:/{$locale}/siaran/{$slug}";
 
-        return Cache::tags(["broadcast:{$slug}"])
-            ->remember($cacheKey, 7200, function () use ($slug) {
-                $broadcast = Broadcast::published()
-                    ->where('slug', $slug)
-                    ->firstOrFail();
+        return Cache::remember($cacheKey, 7200, function () use ($slug) {
+            $broadcast = Broadcast::published()
+                ->where('slug', $slug)
+                ->firstOrFail();
 
-                $related = Broadcast::published()
-                    ->where('type', $broadcast->type)
-                    ->where('id', '!=', $broadcast->id)
-                    ->latest('published_at')
-                    ->limit(3)
-                    ->get();
+            $related = Broadcast::published()
+                ->where('type', $broadcast->type)
+                ->where('id', '!=', $broadcast->id)
+                ->latest('published_at')
+                ->limit(3)
+                ->get();
 
-                return response(
-                    view('siaran.show', [
-                        'broadcast' => $broadcast,
-                        'related' => $related,
-                    ])->render()
-                );
-            });
+            return response(
+                view('siaran.show', [
+                    'broadcast' => $broadcast,
+                    'related' => $related,
+                ])->render()
+            );
+        });
     }
 }

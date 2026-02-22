@@ -114,7 +114,8 @@ class ManageStatistik extends Page
         }
 
         Setting::set('statistik_charts', json_encode($decoded), 'json');
-        Cache::tags(['statistik'])->flush();
+        Cache::forget('statistik:charts:ms');
+        Cache::forget('statistik:charts:en');
 
         Notification::make()
             ->success()

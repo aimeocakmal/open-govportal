@@ -18,17 +18,16 @@ class AchievementController extends Controller
     {
         $cacheKey = "page:/{$locale}/pencapaian/{$slug}";
 
-        return Cache::tags(["achievement:{$slug}"])
-            ->remember($cacheKey, 7200, function () use ($slug) {
-                $achievement = Achievement::published()
-                    ->where('slug', $slug)
-                    ->firstOrFail();
+        return Cache::remember($cacheKey, 7200, function () use ($slug) {
+            $achievement = Achievement::published()
+                ->where('slug', $slug)
+                ->firstOrFail();
 
-                return response(
-                    view('pencapaian.show', [
-                        'achievement' => $achievement,
-                    ])->render()
-                );
-            });
+            return response(
+                view('pencapaian.show', [
+                    'achievement' => $achievement,
+                ])->render()
+            );
+        });
     }
 }

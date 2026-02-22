@@ -10,12 +10,11 @@ class StatistikController extends Controller
 {
     public function index(string $locale): View
     {
-        $charts = Cache::tags(['statistik'])
-            ->remember("statistik:charts:{$locale}", 21600, function () {
-                $chartsJson = Setting::get('statistik_charts', '[]');
+        $charts = Cache::remember("statistik:charts:{$locale}", 21600, function () {
+            $chartsJson = Setting::get('statistik_charts', '[]');
 
-                return json_decode($chartsJson, true) ?: [];
-            });
+            return json_decode($chartsJson, true) ?: [];
+        });
 
         return view('statistik.index', [
             'charts' => $charts,
