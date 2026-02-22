@@ -75,7 +75,10 @@ Route::prefix('{locale}')
         // Carian (Search)
         Route::get('/carian', [SearchController::class, 'index'])->name('carian.index');
 
-        // Static pages — catch-all (must be last in the group)
+        // Static pages — named routes for known pages
         Route::get('/penafian', [StaticPageController::class, 'show'])->name('penafian.index')->defaults('slug', 'penafian');
         Route::get('/dasar-privasi', [StaticPageController::class, 'show'])->name('dasar-privasi.index')->defaults('slug', 'dasar-privasi');
+
+        // Static pages — catch-all for any CMS-managed page (must be LAST in the group)
+        Route::get('/{slug}', [StaticPageController::class, 'show'])->name('static-page.show');
     });

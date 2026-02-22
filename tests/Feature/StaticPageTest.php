@@ -136,4 +136,25 @@ class StaticPageTest extends TestCase
             ->assertSee('Penafian KKD')
             ->assertSee('Halaman penafian rasmi.');
     }
+
+    public function test_generic_static_page_slug_route_returns_200_and_renders_content(): void
+    {
+        StaticPage::factory()->published()->create([
+            'slug' => 'faq-digital',
+            'title_ms' => 'Soalan Lazim Digital',
+            'content_ms' => '<p>Jawapan soalan lazim dalam Bahasa Malaysia.</p>',
+            'title_en' => 'Digital FAQ',
+            'content_en' => '<p>Frequently asked questions in English.</p>',
+        ]);
+
+        $this->get('/ms/faq-digital')
+            ->assertOk()
+            ->assertSee('Soalan Lazim Digital')
+            ->assertSee('Jawapan soalan lazim dalam Bahasa Malaysia.');
+
+        $this->get('/en/faq-digital')
+            ->assertOk()
+            ->assertSee('Digital FAQ')
+            ->assertSee('Frequently asked questions in English.');
+    }
 }
