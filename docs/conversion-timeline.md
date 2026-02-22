@@ -383,11 +383,11 @@ Split into must-have (5a) and nice-to-have (5b) to avoid overloading.
   - Change preferred language (ms/en), stored as user preference
   - Delete own account (with confirmation modal + password re-entry; blocked for `super_admin` role to prevent accidental lockout)
 
-**Week 5b — Nice-to-Have (can overlap with Week 6):**
-- [ ] Search indexing via PostgreSQL FTS — `searchable_content` migration + custom Scout driver; note: uses `TSVECTOR GENERATED ALWAYS AS (...)` which is PostgreSQL-only, tests need special handling
-- [ ] Image optimization on upload — WebP conversion, resize on S3 upload
-- [ ] Content preview from admin — generate preview URL showing draft content
-- [ ] Content versioning / revision history — **no schema defined in `database-schema.md`**; evaluate `spatie/laravel-activitylog` or add a `content_revisions` table before implementing
+**Week 5b — Nice-to-Have (can overlap with Week 6): ✅ COMPLETED 2026-02-22**
+- [x] Search indexing via PostgreSQL FTS — `searchable_content` migration with generated TSVECTOR columns + GIN indexes (PostgreSQL-only, SQLite LIKE fallback for tests); `SearchableContent` model, `HasSearchableContent` trait on 4 models, `SearchContentObserver`, `SearchService` with override priority
+- [x] Image optimization on upload — `ImageOptimizationService` (WebP conversion + resize > 2048px) + `OptimizeImageJob` (queued); uses `intervention/image` v3 with GD driver
+- [x] Content preview from admin — `PreviewController` with signed URLs (`/preview/{model}/{id}`), `HasPreviewUrl` trait on Edit pages, `AllowPreview` middleware, preview Blade view with banner
+- [x] Content versioning / revision history — `spatie/laravel-activitylog` for audit logging (6 models), `content_revisions` table + `ContentRevision` model + `HasContentRevisions` trait (5 publishable models) + `ContentRevisionObserver` for auto-snapshot on update
 
 **Deliverables:**
 - Full CMS parity with Payload (all 12 collections + all globals)

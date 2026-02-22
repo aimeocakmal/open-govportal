@@ -2,15 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasContentRevisions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Celebration extends Model
 {
+    use HasContentRevisions;
+
     /** @use HasFactory<\Database\Factories\CelebrationFactory> */
     use HasFactory;
+
+    use LogsActivity;
 
     protected $fillable = [
         'title_ms',
@@ -45,5 +52,13 @@ class Celebration extends Model
                 $q->whereNull('published_at')
                     ->orWhere('published_at', '<=', now());
             });
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['title_ms', 'title_en', 'status'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

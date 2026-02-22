@@ -2,6 +2,16 @@
 
 return [
 
+    // ── Versi kandungan ─────────────────────────────────────────────
+    'revisions' => 'Sejarah Semakan',
+    'revision_date' => 'Tarikh',
+    'revision_user' => 'Diubah Oleh',
+    'revision_reason' => 'Sebab',
+    'revision_restore' => 'Pulihkan',
+    'revision_restore_confirm' => 'Adakah anda pasti mahu memulihkan semakan ini? Kandungan semasa akan ditimpa.',
+    'revision_restored' => 'Semakan berjaya dipulihkan.',
+    'revision_no_revisions' => 'Tiada sejarah semakan.',
+
     // ── Kumpulan navigasi ────────────────────────────────────────────
     'nav' => [
         'settings' => 'Tetapan',
@@ -95,6 +105,7 @@ return [
         'deactivate' => 'Nyahaktif',
         'reactivate' => 'Aktifkan Semula',
         'password_reset_successfully' => 'Kata laluan berjaya ditetapkan semula',
+        'preview' => 'Pratonton',
     ],
 
     // ── Halaman profil ───────────────────────────────────────────────

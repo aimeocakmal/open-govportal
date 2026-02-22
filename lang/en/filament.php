@@ -2,6 +2,16 @@
 
 return [
 
+    // ── Content versioning ──────────────────────────────────────────
+    'revisions' => 'Revision History',
+    'revision_date' => 'Date',
+    'revision_user' => 'Modified By',
+    'revision_reason' => 'Reason',
+    'revision_restore' => 'Restore',
+    'revision_restore_confirm' => 'Are you sure you want to restore this revision? Current content will be overwritten.',
+    'revision_restored' => 'Revision restored successfully.',
+    'revision_no_revisions' => 'No revision history available.',
+
     // ── Navigation groups ────────────────────────────────────────────
     'nav' => [
         'settings' => 'Settings',
@@ -95,6 +105,7 @@ return [
         'deactivate' => 'Deactivate',
         'reactivate' => 'Reactivate',
         'password_reset_successfully' => 'Password reset successfully',
+        'preview' => 'Preview',
     ],
 
     // ── Profile page ─────────────────────────────────────────────────

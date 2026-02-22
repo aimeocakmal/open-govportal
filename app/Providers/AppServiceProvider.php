@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Achievement;
+use App\Models\Broadcast;
+use App\Models\Celebration;
+use App\Models\Policy;
+use App\Models\StaffDirectory;
+use App\Models\StaticPage;
+use App\Observers\ContentRevisionObserver;
+use App\Observers\SearchContentObserver;
 use App\Policies\RolePolicy;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
@@ -20,6 +28,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Role::class, RolePolicy::class);
+
+        // Register search content observer for FTS indexing
+        $searchableModels = [Broadcast::class, Achievement::class, StaffDirectory::class, Policy::class];
+        foreach ($searchableModels as $model) {
+            $model::observe(SearchContentObserver::class);
+        }
+
+        // Register content revision observer for versioning
+        $revisionableModels = [Broadcast::class, Achievement::class, Celebration::class, Policy::class, StaticPage::class];
+        foreach ($revisionableModels as $model) {
+            $model::observe(ContentRevisionObserver::class);
+        }
 
         RichEditor::configureUsing(function (RichEditor $editor): void {
             $editor->fileAttachmentsDirectory('rich-editor-attachments');

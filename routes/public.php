@@ -1,7 +1,17 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PreviewController;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Content preview with signed URL (not locale-prefixed)
+|--------------------------------------------------------------------------
+*/
+Route::get('/preview/{model}/{id}', [PreviewController::class, 'show'])
+    ->name('preview.show')
+    ->middleware('signed');
 
 /*
 |--------------------------------------------------------------------------

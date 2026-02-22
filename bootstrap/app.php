@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AllowPreview;
 use App\Http\Middleware\ApplyTheme;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -23,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Appended to the `web` middleware group (runs on all web + admin routes)
         $middleware->web(append: [
             ApplyTheme::class,
+            AllowPreview::class,
         ]);
 
         // Route-level middleware aliases

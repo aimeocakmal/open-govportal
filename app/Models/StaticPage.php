@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasContentRevisions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class StaticPage extends Model
 {
+    use HasContentRevisions;
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'category_id',
@@ -45,5 +50,13 @@ class StaticPage extends Model
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', 'published');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['title_ms', 'title_en', 'status'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }
