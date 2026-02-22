@@ -232,10 +232,7 @@ return [
 
         'footer' => [
             'title' => 'Footer',
-            'footer_links' => 'Footer Links',
-            'section_links' => 'Links',
-            'section_social' => 'Social',
-            'section_legal' => 'Legal',
+            'social_links' => 'Social Links',
             'saved' => 'Footer settings saved',
         ],
 

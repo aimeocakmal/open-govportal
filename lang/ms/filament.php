@@ -232,10 +232,7 @@ return [
 
         'footer' => [
             'title' => 'Kaki Halaman',
-            'footer_links' => 'Pautan Kaki Halaman',
-            'section_links' => 'Pautan',
-            'section_social' => 'Sosial',
-            'section_legal' => 'Perundangan',
+            'social_links' => 'Pautan Sosial',
             'saved' => 'Tetapan kaki halaman disimpan',
         ],
 

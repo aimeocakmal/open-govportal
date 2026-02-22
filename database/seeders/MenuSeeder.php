@@ -42,10 +42,74 @@ class MenuSeeder extends Seeder
 
     private function seedPublicFooter(): void
     {
-        Menu::firstOrCreate(
+        $footer = Menu::firstOrCreate(
             ['name' => 'public_footer'],
             ['label_ms' => 'Menu Footer', 'label_en' => 'Footer Menu', 'is_active' => true],
         );
+
+        // ── About Us column ────────────────────────────────────────────
+        $aboutUs = MenuItem::firstOrCreate(
+            ['menu_id' => $footer->id, 'label_ms' => 'Mengenai Kami', 'parent_id' => null],
+            ['menu_id' => $footer->id, 'label_ms' => 'Mengenai Kami', 'label_en' => 'About Us', 'sort_order' => 1, 'is_active' => true, 'is_system' => true],
+        );
+
+        $aboutItems = [
+            ['label_ms' => 'Kementerian Digital', 'label_en' => 'Ministry of Digital', 'url' => '/profil-kementerian', 'sort_order' => 1],
+            ['label_ms' => 'Direktori', 'label_en' => 'Directory', 'url' => '/direktori', 'sort_order' => 2],
+            ['label_ms' => 'Pencapaian', 'label_en' => 'Achievements', 'url' => '/pencapaian', 'sort_order' => 3],
+            ['label_ms' => 'Dasar', 'label_en' => 'Policy', 'url' => '/dasar', 'sort_order' => 4],
+            ['label_ms' => 'Media', 'label_en' => 'Media', 'url' => '/siaran', 'sort_order' => 5],
+        ];
+
+        foreach ($aboutItems as $item) {
+            MenuItem::firstOrCreate(
+                ['menu_id' => $footer->id, 'label_ms' => $item['label_ms'], 'parent_id' => $aboutUs->id],
+                array_merge($item, ['menu_id' => $footer->id, 'parent_id' => $aboutUs->id, 'is_active' => true]),
+            );
+        }
+
+        // ── Quick Links column ─────────────────────────────────────────
+        $quickLinks = MenuItem::firstOrCreate(
+            ['menu_id' => $footer->id, 'label_ms' => 'Pautan Pantas', 'parent_id' => null],
+            ['menu_id' => $footer->id, 'label_ms' => 'Pautan Pantas', 'label_en' => 'Quick Links', 'sort_order' => 2, 'is_active' => true, 'is_system' => true],
+        );
+
+        $linkItems = [
+            ['label_ms' => 'SpotMe', 'label_en' => 'SpotMe', 'url' => 'https://spotme.gov.my', 'target' => '_blank', 'sort_order' => 1],
+            ['label_ms' => 'MyGovUC', 'label_en' => 'MyGovUC', 'url' => 'https://mygovuc.gov.my', 'target' => '_blank', 'sort_order' => 2],
+            ['label_ms' => 'DDMS', 'label_en' => 'DDMS', 'url' => 'https://ddms.gov.my', 'target' => '_blank', 'sort_order' => 3],
+            ['label_ms' => 'MyMesyuarat', 'label_en' => 'MyMesyuarat', 'url' => 'https://mymesyuarat.gov.my', 'target' => '_blank', 'sort_order' => 4],
+            ['label_ms' => 'ePenyata Gaji', 'label_en' => 'ePenyata Gaji', 'url' => 'https://epenyatagaji.gov.my', 'target' => '_blank', 'sort_order' => 5],
+            ['label_ms' => 'HRMIS', 'label_en' => 'HRMIS', 'url' => 'https://hrmis2.eghrmis.gov.my', 'target' => '_blank', 'sort_order' => 6],
+            ['label_ms' => 'ePerolehan', 'label_en' => 'ePerolehan', 'url' => 'https://eperolehan.gov.my', 'target' => '_blank', 'sort_order' => 7],
+            ['label_ms' => 'MyGovernment', 'label_en' => 'MyGovernment', 'url' => 'https://mygovernment.gov.my', 'target' => '_blank', 'sort_order' => 8],
+            ['label_ms' => 'GAMMA', 'label_en' => 'GAMMA', 'url' => 'https://gamma.gov.my', 'target' => '_blank', 'sort_order' => 9],
+        ];
+
+        foreach ($linkItems as $item) {
+            MenuItem::firstOrCreate(
+                ['menu_id' => $footer->id, 'label_ms' => $item['label_ms'], 'parent_id' => $quickLinks->id],
+                array_merge($item, ['menu_id' => $footer->id, 'parent_id' => $quickLinks->id, 'is_active' => true]),
+            );
+        }
+
+        // ── Open Source column ─────────────────────────────────────────
+        $openSource = MenuItem::firstOrCreate(
+            ['menu_id' => $footer->id, 'label_ms' => 'Sumber Terbuka', 'parent_id' => null],
+            ['menu_id' => $footer->id, 'label_ms' => 'Sumber Terbuka', 'label_en' => 'Open Source', 'sort_order' => 3, 'is_active' => true, 'is_system' => true],
+        );
+
+        $openSourceItems = [
+            ['label_ms' => 'Repo GitHub', 'label_en' => 'GitHub Repo', 'url' => 'https://github.com/govtechmy', 'target' => '_blank', 'sort_order' => 1],
+            ['label_ms' => 'Figma', 'label_en' => 'Figma', 'url' => 'https://www.figma.com/community/file/1427452789680077498', 'target' => '_blank', 'sort_order' => 2],
+        ];
+
+        foreach ($openSourceItems as $item) {
+            MenuItem::firstOrCreate(
+                ['menu_id' => $footer->id, 'label_ms' => $item['label_ms'], 'parent_id' => $openSource->id],
+                array_merge($item, ['menu_id' => $footer->id, 'parent_id' => $openSource->id, 'is_active' => true]),
+            );
+        }
     }
 
     private function seedAdminSidebar(): void

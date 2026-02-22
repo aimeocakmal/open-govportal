@@ -4,10 +4,10 @@ namespace App\Filament\Pages;
 
 use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\FooterSetting;
+use App\Services\PublicNavigationService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -19,6 +19,11 @@ use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 
 /**
+ * Manages footer social links.
+ *
+ * Footer columns (About Us, Quick Links, Open Source) are managed via
+ * the public_footer Menu in the Menu resource.
+ *
  * @property-read Schema $form
  */
 class ManageFooter extends Page
@@ -63,6 +68,7 @@ class ManageFooter extends Page
     public function mount(): void
     {
         $items = FooterSetting::query()
+            ->where('section', 'social')
             ->orderBy('sort_order')
             ->get()
             ->map(fn (FooterSetting $item): array => $item->toArray())
@@ -80,15 +86,8 @@ class ManageFooter extends Page
             ->components([
                 Form::make([
                     Repeater::make('items')
-                        ->label(__('filament.settings.footer.footer_links'))
+                        ->label(__('filament.settings.footer.social_links'))
                         ->schema([
-                            Select::make('section')
-                                ->options([
-                                    'links' => __('filament.settings.footer.section_links'),
-                                    'social' => __('filament.settings.footer.section_social'),
-                                    'legal' => __('filament.settings.footer.section_legal'),
-                                ])
-                                ->required(),
                             TextInput::make('label_ms')
                                 ->label(__('filament.common.label_bm'))
                                 ->required()
@@ -100,6 +99,7 @@ class ManageFooter extends Page
                             TextInput::make('url')
                                 ->label(__('filament.common.url'))
                                 ->url()
+                                ->required()
                                 ->maxLength(2048),
                             TextInput::make('sort_order')
                                 ->label(__('filament.common.sort_order'))
@@ -136,11 +136,11 @@ class ManageFooter extends Page
         $data = $this->form->getState();
         $items = $data['items'] ?? [];
 
-        FooterSetting::query()->delete();
+        FooterSetting::query()->where('section', 'social')->delete();
 
         foreach ($items as $index => $item) {
             FooterSetting::create([
-                'section' => $item['section'],
+                'section' => 'social',
                 'label_ms' => $item['label_ms'],
                 'label_en' => $item['label_en'],
                 'url' => $item['url'] ?? null,
@@ -148,6 +148,8 @@ class ManageFooter extends Page
                 'is_active' => $item['is_active'] ?? true,
             ]);
         }
+
+        PublicNavigationService::clearCache();
 
         Notification::make()
             ->success()

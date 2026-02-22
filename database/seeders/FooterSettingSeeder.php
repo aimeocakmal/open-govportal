@@ -9,44 +9,21 @@ class FooterSettingSeeder extends Seeder
 {
     public function run(): void
     {
-        FooterSetting::create([
-            'section' => 'links',
-            'label_ms' => 'Laman Utama',
-            'label_en' => 'Home',
-            'url' => '/',
-            'sort_order' => 1,
-        ]);
+        FooterSetting::query()->delete();
 
-        FooterSetting::create([
-            'section' => 'links',
-            'label_ms' => 'Siaran',
-            'label_en' => 'Broadcasts',
-            'url' => '/siaran',
-            'sort_order' => 2,
-        ]);
+        // Footer columns (About Us, Quick Links, Open Source) are managed
+        // via the public_footer Menu — see MenuSeeder.
+        // FooterSetting is used only for social links in the branding column.
 
-        FooterSetting::create([
-            'section' => 'social',
-            'label_ms' => 'Facebook',
-            'label_en' => 'Facebook',
-            'url' => 'https://facebook.com/KementerianDigitalMalaysia',
-            'sort_order' => 1,
-        ]);
+        $social = [
+            ['label_ms' => 'Facebook', 'label_en' => 'Facebook', 'url' => 'https://facebook.com/KementerianDigitalMalaysia'],
+            ['label_ms' => 'X', 'label_en' => 'X', 'url' => 'https://x.com/KKDmalaysia'],
+            ['label_ms' => 'Instagram', 'label_en' => 'Instagram', 'url' => 'https://instagram.com/kemabordigital'],
+            ['label_ms' => 'TikTok', 'label_en' => 'TikTok', 'url' => 'https://tiktok.com/@kementeriandigital'],
+        ];
 
-        FooterSetting::create([
-            'section' => 'legal',
-            'label_ms' => 'Penafian',
-            'label_en' => 'Disclaimer',
-            'url' => '/penafian',
-            'sort_order' => 1,
-        ]);
-
-        FooterSetting::create([
-            'section' => 'legal',
-            'label_ms' => 'Dasar Privasi',
-            'label_en' => 'Privacy Policy',
-            'url' => '/dasar-privasi',
-            'sort_order' => 2,
-        ]);
+        foreach ($social as $i => $item) {
+            FooterSetting::create(array_merge($item, ['section' => 'social', 'sort_order' => $i + 1]));
+        }
     }
 }

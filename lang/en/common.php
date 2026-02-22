@@ -18,7 +18,9 @@ return [
 
     'footer' => [
         'copyright' => 'All rights reserved.',
+        'about_us' => 'About Us',
         'quick_links' => 'Quick Links',
+        'open_source' => 'Open Source',
         'more_info' => 'More Info',
         'built_by' => 'Built by',
         'penafian' => 'Disclaimer',

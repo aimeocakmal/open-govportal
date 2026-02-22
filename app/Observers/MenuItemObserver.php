@@ -4,24 +4,30 @@ namespace App\Observers;
 
 use App\Models\MenuItem;
 use App\Services\AdminNavigationService;
+use App\Services\PublicNavigationService;
 
 class MenuItemObserver
 {
     public function saved(MenuItem $menuItem): void
     {
-        $this->clearAdminSidebarCache($menuItem);
+        $this->clearCaches($menuItem);
     }
 
     public function deleted(MenuItem $menuItem): void
     {
-        $this->clearAdminSidebarCache($menuItem);
+        $this->clearCaches($menuItem);
     }
 
-    private function clearAdminSidebarCache(MenuItem $menuItem): void
+    private function clearCaches(MenuItem $menuItem): void
     {
-        // Only flush when the item belongs to the admin_sidebar menu
-        if ($menuItem->menu && $menuItem->menu->name === 'admin_sidebar') {
+        $menuName = $menuItem->menu?->name;
+
+        if ($menuName === 'admin_sidebar') {
             AdminNavigationService::clearCache();
+        }
+
+        if ($menuName === 'public_header' || $menuName === 'public_footer') {
+            PublicNavigationService::clearCache();
         }
     }
 }

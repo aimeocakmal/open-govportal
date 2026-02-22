@@ -18,7 +18,9 @@ return [
 
     'footer' => [
         'copyright' => 'Hak cipta terpelihara.',
-        'quick_links' => 'Pautan Cepat',
+        'about_us' => 'Mengenai Kami',
+        'quick_links' => 'Pautan Pantas',
+        'open_source' => 'Sumber Terbuka',
         'more_info' => 'Maklumat Lanjut',
         'built_by' => 'Dibangunkan oleh',
         'penafian' => 'Penafian',
