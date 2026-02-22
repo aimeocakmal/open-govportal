@@ -559,7 +559,7 @@ Replaces Payload CMS admin at `/admin`.
 | `ManageEmailSettings` | — (CMS extension) | Mail driver (ses/smtp/mailgun/log), SMTP host/port/username/password (encrypted)/encryption, from address, from name (ms/en) | Planned |
 | ~~`ManageHeader`~~ | ~~Header (navigation items)~~ | — | **Replaced** by `MenuResource` |
 | `ManageFooter` | Footer | Footer link sections (label ms/en + URL, grouped by `section`), social media links | Planned |
-| `ManageHomepage` | Homepage | Homepage layout flags and section ordering | Planned |
+| `ManageHomepage` | Homepage | Homepage layout flags and section ordering | Implemented |
 | `ManageMinisterProfile` | MinisterProfile | Minister photo (S3), name, title (ms/en), bio (ms/en), appointment date | Planned |
 | `ManageAddresses` | Addresses | Ministry office addresses with phone/fax/email/Google Maps URL | Planned |
 | `ManageFeedbackSettings` | FeedbackSettings | Enable/disable feedback widget, recipient email, success message (ms/en) | Planned |

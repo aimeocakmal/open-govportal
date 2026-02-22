@@ -93,6 +93,7 @@ class MenuSeeder extends Seeder
         $homepageItems = [
             ['route_name' => 'hero-banners', 'label_ms' => 'Sepanduk Utama', 'label_en' => 'Hero Banners', 'icon' => 'heroicon-o-photo', 'sort_order' => 0],
             ['route_name' => 'quick-links', 'label_ms' => 'Pautan Pantas', 'label_en' => 'Quick Links', 'icon' => 'heroicon-o-link', 'sort_order' => 1],
+            ['route_name' => 'manage-homepage', 'label_ms' => 'Tetapan Laman Utama', 'label_en' => 'Homepage Settings', 'icon' => 'heroicon-o-cog-6-tooth', 'sort_order' => 2],
         ];
 
         $this->seedGroupItems($sidebar->id, $groupIds['homepage'], $homepageItems);

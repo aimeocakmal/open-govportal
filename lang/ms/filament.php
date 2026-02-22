@@ -225,6 +225,25 @@ return [
             'saved' => 'Alamat disimpan',
         ],
 
+        'homepage' => [
+            'title' => 'Tetapan Laman Utama',
+            'section_visibility' => 'Keterlihatan Bahagian',
+            'section_visibility_desc' => 'Togol bahagian yang dipaparkan di laman utama.',
+            'show_hero_banner' => 'Papar Sepanduk Utama',
+            'show_quick_links' => 'Papar Pautan Pantas',
+            'show_broadcasts' => 'Papar Siaran Terkini',
+            'show_achievements' => 'Papar Pencapaian',
+            'show_feedback' => 'Papar Widget Maklum Balas',
+            'content_limits' => 'Had Kandungan',
+            'content_limits_desc' => 'Kawal bilangan item yang dipaparkan setiap bahagian.',
+            'broadcasts_count' => 'Bilangan Siaran',
+            'achievements_count' => 'Bilangan Pencapaian',
+            'section_order' => 'Susunan Bahagian',
+            'section_order_desc' => 'Tentukan susunan paparan bahagian laman utama.',
+            'section_order_help' => 'Array JSON kunci bahagian: hero_banner, quick_links, broadcasts, achievements, feedback',
+            'saved' => 'Tetapan laman utama disimpan.',
+        ],
+
         'minister' => [
             'title' => 'Profil Menteri',
             'full_name' => 'Nama Penuh',

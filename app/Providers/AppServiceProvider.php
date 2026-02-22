@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Policies\RolePolicy;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -18,6 +20,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Role::class, RolePolicy::class);
+
+        RichEditor::configureUsing(function (RichEditor $editor): void {
+            $editor->fileAttachmentsDirectory('rich-editor-attachments');
+        });
+
+        FileUpload::configureUsing(function (FileUpload $upload): void {
+            $upload->visibility('public');
+        });
 
         /*
          * Share navigation items with all views that include the nav component.

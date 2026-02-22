@@ -60,6 +60,41 @@ return [
             'report' => false,
         ],
 
+        'r2' => [
+            'driver' => 's3',
+            'key' => '',
+            'secret' => '',
+            'region' => 'auto',
+            'bucket' => '',
+            'url' => '',
+            'endpoint' => '',
+            'use_path_style_endpoint' => false,
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'gcs' => [
+            'driver' => 'gcs',
+            'project_id' => '',
+            'key_file' => [],
+            'bucket' => '',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'azure' => [
+            'driver' => 'azure',
+            'account' => '',
+            'key' => '',
+            'container' => '',
+            'url' => '',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

@@ -225,6 +225,25 @@ return [
             'saved' => 'Addresses saved',
         ],
 
+        'homepage' => [
+            'title' => 'Homepage Settings',
+            'section_visibility' => 'Section Visibility',
+            'section_visibility_desc' => 'Toggle which sections appear on the homepage.',
+            'show_hero_banner' => 'Show Hero Banner',
+            'show_quick_links' => 'Show Quick Links',
+            'show_broadcasts' => 'Show Latest Broadcasts',
+            'show_achievements' => 'Show Achievements',
+            'show_feedback' => 'Show Feedback Widget',
+            'content_limits' => 'Content Limits',
+            'content_limits_desc' => 'Control how many items are displayed per section.',
+            'broadcasts_count' => 'Number of Broadcasts',
+            'achievements_count' => 'Number of Achievements',
+            'section_order' => 'Section Order',
+            'section_order_desc' => 'Define the display order of homepage sections.',
+            'section_order_help' => 'JSON array of section keys: hero_banner, quick_links, broadcasts, achievements, feedback',
+            'saved' => 'Homepage settings saved.',
+        ],
+
         'minister' => [
             'title' => 'Minister Profile',
             'full_name' => 'Full Name',
