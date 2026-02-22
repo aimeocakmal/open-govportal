@@ -38,6 +38,7 @@ return [
         'static_page' => 'Static Page|Static Pages',
         'user' => 'User|Users',
         'role' => 'Role|Roles',
+        'activity_log' => 'Activity Log|Activity Logs',
     ],
 
     // ── Shared labels (used across many files) ───────────────────────
@@ -267,6 +268,18 @@ return [
             'bio_en' => 'Biography (EN)',
             'saved' => 'Minister profile saved',
         ],
+
+        'platform_version' => [
+            'title' => 'Platform Version',
+            'current_version' => 'Current Version',
+            'current_version_desc' => 'The platform version is managed by developers via the version.json file.',
+            'released' => 'Released',
+            'changelog' => 'Changelog',
+            'type_added' => 'Added',
+            'type_changed' => 'Changed',
+            'type_fixed' => 'Fixed',
+            'type_removed' => 'Removed',
+        ],
     ],
 
     // ── Resource-specific strings ────────────────────────────────────
@@ -418,6 +431,26 @@ return [
             'active_status' => 'Active Status',
             'reset_password' => 'Reset Password',
             'new_password' => 'New Password',
+        ],
+
+        'activity_logs' => [
+            'timestamp' => 'Timestamp',
+            'user' => 'User',
+            'system' => 'System',
+            'module' => 'Module',
+            'event' => 'Event',
+            'record_id' => 'Record ID',
+            'event_created' => 'Created',
+            'event_updated' => 'Updated',
+            'event_deleted' => 'Deleted',
+            'unknown_module' => 'Unknown',
+            'changes' => 'Changes',
+            'old_values' => 'Old Values',
+            'new_values' => 'New Values',
+            'no_changes' => 'No changes recorded.',
+            'activity_details' => 'Activity Details',
+            'date_from' => 'From',
+            'date_until' => 'Until',
         ],
     ],
 ];

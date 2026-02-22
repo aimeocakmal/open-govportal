@@ -10,12 +10,14 @@ use App\Models\StaffDirectory;
 use App\Models\StaticPage;
 use App\Observers\ContentRevisionObserver;
 use App\Observers\SearchContentObserver;
+use App\Policies\ActivityLogPolicy;
 use App\Policies\RolePolicy;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(Activity::class, ActivityLogPolicy::class);
 
         // Register search content observer for FTS indexing
         $searchableModels = [Broadcast::class, Achievement::class, StaffDirectory::class, Policy::class];

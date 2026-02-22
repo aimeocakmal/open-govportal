@@ -116,6 +116,8 @@ class MenuSeeder extends Seeder
             ['route_name' => 'manage-minister-profile', 'label_ms' => 'Profil Menteri', 'label_en' => 'Minister Profile', 'icon' => 'heroicon-o-user', 'sort_order' => 5],
             ['route_name' => 'manage-addresses', 'label_ms' => 'Alamat', 'label_en' => 'Addresses', 'icon' => 'heroicon-o-map-pin', 'sort_order' => 6],
             ['route_name' => 'manage-feedback-settings', 'label_ms' => 'Tetapan Maklum Balas', 'label_en' => 'Feedback Settings', 'icon' => 'heroicon-o-cog-6-tooth', 'sort_order' => 7],
+            ['route_name' => 'manage-platform-version', 'label_ms' => 'Versi Platform', 'label_en' => 'Platform Version', 'icon' => 'heroicon-o-tag', 'sort_order' => 8],
+            ['route_name' => 'activity-logs', 'label_ms' => 'Log Aktiviti', 'label_en' => 'Activity Logs', 'icon' => 'heroicon-o-clipboard-document-list', 'sort_order' => 9],
         ];
 
         $this->seedGroupItems($sidebar->id, $groupIds['settings'], $settingsItems);

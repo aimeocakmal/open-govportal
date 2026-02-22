@@ -1,0 +1,28 @@
+{
+    "version": "0.5.0",
+    "released_at": "2026-02-22",
+    "changelog": [
+        {
+            "type": "added",
+            "items": [
+                "Platform version tracking with changelog display",
+                "User activity log viewer for monitoring and auditing",
+                "Activity logging on all 16 models (LogsActivity trait)",
+                "Content preview with signed URLs",
+                "Content revision history and restore"
+            ]
+        },
+        {
+            "type": "changed",
+            "items": [
+                "Menu system upgraded to 4-level nested items with role visibility"
+            ]
+        },
+        {
+            "type": "fixed",
+            "items": [
+                "Admin menu display in English locale"
+            ]
+        }
+    ]
+}

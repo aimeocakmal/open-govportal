@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Feedback extends Model
 {
     /** @use HasFactory<\Database\Factories\FeedbackFactory> */
     use HasFactory;
+
+    use LogsActivity;
 
     protected $table = 'feedbacks';
 
@@ -49,5 +53,13 @@ class Feedback extends Model
     public function scopeUnread(Builder $query): Builder
     {
         return $query->where('status', 'new');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status', 'reply', 'replied_by'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

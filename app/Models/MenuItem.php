@@ -9,11 +9,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(MenuItemObserver::class)]
 class MenuItem extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'menu_id',
@@ -62,5 +65,13 @@ class MenuItem extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['label_ms', 'label_en', 'url', 'is_active', 'sort_order'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

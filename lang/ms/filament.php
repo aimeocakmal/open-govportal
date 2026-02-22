@@ -38,6 +38,7 @@ return [
         'static_page' => 'Halaman Statik|Halaman Statik',
         'user' => 'Pengguna|Pengguna',
         'role' => 'Peranan|Peranan',
+        'activity_log' => 'Log Aktiviti|Log Aktiviti',
     ],
 
     // ── Label dikongsi (digunakan di banyak fail) ────────────────────
@@ -267,6 +268,18 @@ return [
             'bio_en' => 'Biografi (EN)',
             'saved' => 'Profil menteri disimpan',
         ],
+
+        'platform_version' => [
+            'title' => 'Versi Platform',
+            'current_version' => 'Versi Semasa',
+            'current_version_desc' => 'Versi platform diuruskan oleh pembangun melalui fail version.json.',
+            'released' => 'Dikeluarkan',
+            'changelog' => 'Log Perubahan',
+            'type_added' => 'Ditambah',
+            'type_changed' => 'Diubah',
+            'type_fixed' => 'Diperbaiki',
+            'type_removed' => 'Dibuang',
+        ],
     ],
 
     // ── Rentetan khusus sumber ────────────────────────────────────────
@@ -418,6 +431,26 @@ return [
             'active_status' => 'Status Aktif',
             'reset_password' => 'Tetap Semula Kata Laluan',
             'new_password' => 'Kata Laluan Baharu',
+        ],
+
+        'activity_logs' => [
+            'timestamp' => 'Cap Masa',
+            'user' => 'Pengguna',
+            'system' => 'Sistem',
+            'module' => 'Modul',
+            'event' => 'Peristiwa',
+            'record_id' => 'ID Rekod',
+            'event_created' => 'Dicipta',
+            'event_updated' => 'Dikemas kini',
+            'event_deleted' => 'Dipadam',
+            'unknown_module' => 'Tidak Diketahui',
+            'changes' => 'Perubahan',
+            'old_values' => 'Nilai Lama',
+            'new_values' => 'Nilai Baharu',
+            'no_changes' => 'Tiada perubahan direkodkan.',
+            'activity_details' => 'Butiran Aktiviti',
+            'date_from' => 'Dari',
+            'date_until' => 'Hingga',
         ],
     ],
 ];

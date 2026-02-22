@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class PageCategory extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'parent_id',
@@ -54,5 +57,13 @@ class PageCategory extends Model
     public function scopeRoot(Builder $query): Builder
     {
         return $query->whereNull('parent_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name_ms', 'name_en', 'slug', 'is_active'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

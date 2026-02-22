@@ -49,6 +49,7 @@ class RoleSeeder extends Seeder
             'manage_settings',
             'manage_email_settings',
             'manage_ai_settings',
+            'view_activity_logs',
         ];
 
         foreach ($systemPermissions as $perm) {

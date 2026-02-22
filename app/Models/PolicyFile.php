@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class PolicyFile extends Model
 {
     /** @use HasFactory<\Database\Factories\PolicyFileFactory> */
     use HasFactory;
+
+    use LogsActivity;
 
     protected $table = 'files';
 
@@ -46,5 +50,13 @@ class PolicyFile extends Model
     public function scopePublic(Builder $query): Builder
     {
         return $query->where('is_public', true);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['title_ms', 'title_en', 'filename', 'is_public'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }
