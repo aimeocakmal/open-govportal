@@ -105,7 +105,7 @@ Locale detection order:
 
 ---
 
-### 2. Siaran (`/siaran`) — **Status: Planned**
+### 2. Siaran (`/siaran`) — **Status: Implemented** (SiaranPageTest — 25 tests)
 
 **Laravel routes:**
 - `GET /{locale}/siaran` → `BroadcastController@index`
@@ -146,7 +146,7 @@ Locale detection order:
 
 ---
 
-### 3. Pencapaian (`/pencapaian`) — **Status: Planned**
+### 3. Pencapaian (`/pencapaian`) — **Status: Implemented** (PencapaianPageTest — 25 tests)
 
 **Laravel routes:**
 - `GET /{locale}/pencapaian` → `AchievementController@index`
@@ -181,7 +181,7 @@ Locale detection order:
 
 ---
 
-### 4. Statistik (`/statistik`) — **Status: Planned**
+### 4. Statistik (`/statistik`) — **Status: Implemented** (StatistikPageTest — 16 tests)
 
 **Laravel route:** `GET /{locale}/statistik` → `StatistikController@index`
 **Source component directory:** `src/components/statistik/`
@@ -206,7 +206,7 @@ Locale detection order:
 
 ---
 
-### 5. Direktori (`/direktori`) — **Status: Planned**
+### 5. Direktori (`/direktori`) — **Status: Implemented** (DirektoriPageTest — 22 tests)
 
 **Laravel route:** `GET /{locale}/direktori` → `DirectoriController@index`
 **Source component directory:** `src/components/direktori/`

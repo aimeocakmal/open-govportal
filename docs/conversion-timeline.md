@@ -422,16 +422,16 @@ Recreate homepage sections from kd-portal's `home/` components:
 
 **Effort:** 40 hours
 
-#### Week 7: Siaran & Pencapaian Pages
+#### Week 7: Siaran & Pencapaian Pages ✅ COMPLETED 2026-02-22
 
 **Tasks:**
-- [ ] `/siaran` — `SiaranList` Livewire component (type filter + pagination)
-- [ ] `/siaran/{slug}` — Broadcast detail page (pure Blade, no Livewire)
-- [ ] `/pencapaian` — `PencapaianList` Livewire component (year filter)
-- [ ] `/pencapaian/{slug}` — Achievement detail (pure Blade)
-- [ ] Breadcrumb navigation component
-- [ ] Related content section (pure Blade, server-side query)
-- [ ] SEO meta tags per page (`<x-seo>` Blade component)
+- [x] `/siaran` — `SiaranList` Livewire component (type filter + pagination)
+- [x] `/siaran/{slug}` — Broadcast detail page (pure Blade, no Livewire)
+- [x] `/pencapaian` — `PencapaianList` Livewire component (year filter)
+- [x] `/pencapaian/{slug}` — Achievement detail (pure Blade)
+- [x] Breadcrumb navigation component
+- [x] Related content section (pure Blade, server-side query)
+- [x] SEO meta tags per page (`@push('seo')` in detail views + `@stack('seo')` in layout)
 
 **Deliverables:**
 - Siaran and Pencapaian pages in ms/en
@@ -440,14 +440,14 @@ Recreate homepage sections from kd-portal's `home/` components:
 
 **Effort:** 40 hours
 
-#### Week 8: Direktori & Statistik Pages
+#### Week 8: Direktori & Statistik Pages ✅ COMPLETED 2026-02-22
 
 **Tasks:**
-- [ ] `/direktori` — `DirectoriSearch` Livewire component (name + department filter, `wire:model.live.debounce.400ms`)
-- [ ] Staff card Blade component with photo, name, position, email, phone
-- [ ] `/statistik` — Statistics page with Chart.js (pure Blade + Alpine.js `x-init`)
-- [ ] Statistics data management in Filament (JSON field or dedicated settings)
-- [ ] Responsive grid layout for staff cards
+- [x] `/direktori` — `DirektoriSearch` Livewire component (name + department filter, `wire:model.live.debounce.400ms`)
+- [x] Staff card Blade component with photo, name, position, email, phone
+- [x] `/statistik` — Statistics page with Chart.js (pure Blade + Alpine.js `x-init`)
+- [x] Statistics data management in Filament (`ManageStatistik` page, JSON in `settings` table)
+- [x] Responsive grid layout for staff cards
 
 **Deliverables:**
 - Direktori page with live Livewire search (tested under Octane)

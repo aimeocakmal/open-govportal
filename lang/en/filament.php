@@ -278,6 +278,16 @@ return [
             'saved' => 'Minister profile saved',
         ],
 
+        'statistik' => [
+            'title' => 'Statistics Settings',
+            'charts_section' => 'Chart Configuration',
+            'charts_section_desc' => 'Define the charts displayed on the public statistics page. Use JSON format.',
+            'charts_json' => 'Chart Data (JSON)',
+            'charts_json_help' => 'JSON array of chart objects. Each chart requires: title_ms, title_en, type (bar/line/pie/doughnut), and data (labels + datasets).',
+            'saved' => 'Statistics settings saved.',
+            'invalid_json' => 'Invalid JSON. Please check the format.',
+        ],
+
         'platform_version' => [
             'title' => 'Platform Version',
             'current_version' => 'Current Version',

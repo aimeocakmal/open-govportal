@@ -278,6 +278,16 @@ return [
             'saved' => 'Profil menteri disimpan',
         ],
 
+        'statistik' => [
+            'title' => 'Tetapan Statistik',
+            'charts_section' => 'Konfigurasi Carta',
+            'charts_section_desc' => 'Tentukan carta yang dipaparkan di halaman statistik awam. Gunakan format JSON.',
+            'charts_json' => 'Data Carta (JSON)',
+            'charts_json_help' => 'Array JSON objek carta. Setiap carta memerlukan: title_ms, title_en, type (bar/line/pie/doughnut), dan data (labels + datasets).',
+            'saved' => 'Tetapan statistik disimpan.',
+            'invalid_json' => 'JSON tidak sah. Sila semak format.',
+        ],
+
         'platform_version' => [
             'title' => 'Versi Platform',
             'current_version' => 'Versi Semasa',
