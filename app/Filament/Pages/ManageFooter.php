@@ -8,18 +8,20 @@ use App\Services\PublicNavigationService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Form;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Manages footer social links.
+ * Manages footer branding block and social links.
  *
  * Footer columns (About Us, Quick Links, Open Source) are managed via
  * the public_footer Menu in the Menu resource.
@@ -67,7 +69,15 @@ class ManageFooter extends Page
 
     public function mount(): void
     {
-        $items = FooterSetting::query()
+        $branding = FooterSetting::query()
+            ->where('section', 'branding')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (FooterSetting $item): array => $item->toArray())
+            ->values()
+            ->all();
+
+        $social = FooterSetting::query()
             ->where('section', 'social')
             ->orderBy('sort_order')
             ->get()
@@ -76,7 +86,8 @@ class ManageFooter extends Page
             ->all();
 
         $this->form->fill([
-            'items' => $items,
+            'branding' => $branding,
+            'social' => $social,
         ]);
     }
 
@@ -85,34 +96,90 @@ class ManageFooter extends Page
         return $schema
             ->components([
                 Form::make([
-                    Repeater::make('items')
-                        ->label(__('filament.settings.footer.social_links'))
+                    Section::make(__('filament.settings.footer.branding'))
+                        ->description(__('filament.settings.footer.branding_desc'))
                         ->schema([
-                            TextInput::make('label_ms')
-                                ->label(__('filament.common.label_bm'))
-                                ->required()
-                                ->maxLength(200),
-                            TextInput::make('label_en')
-                                ->label(__('filament.common.label_en'))
-                                ->required()
-                                ->maxLength(200),
-                            TextInput::make('url')
-                                ->label(__('filament.common.url'))
-                                ->url()
-                                ->required()
-                                ->maxLength(2048),
-                            TextInput::make('sort_order')
-                                ->label(__('filament.common.sort_order'))
-                                ->numeric()
-                                ->default(0),
-                            Toggle::make('is_active')
-                                ->label(__('filament.common.active'))
-                                ->default(true),
-                        ])
-                        ->columns(3)
-                        ->defaultItems(0)
-                        ->reorderable()
-                        ->collapsible(),
+                            Repeater::make('branding')
+                                ->label('')
+                                ->schema([
+                                    Select::make('type')
+                                        ->label(__('filament.settings.footer.type'))
+                                        ->options([
+                                            'logo' => __('filament.settings.footer.type_logo'),
+                                            'heading' => __('filament.settings.footer.type_heading'),
+                                            'text' => __('filament.settings.footer.type_text'),
+                                            'subheading' => __('filament.settings.footer.type_subheading'),
+                                        ])
+                                        ->required(),
+                                    TextInput::make('label_ms')
+                                        ->label(__('filament.common.label_bm'))
+                                        ->required()
+                                        ->maxLength(500),
+                                    TextInput::make('label_en')
+                                        ->label(__('filament.common.label_en'))
+                                        ->required()
+                                        ->maxLength(500),
+                                    TextInput::make('url')
+                                        ->label(__('filament.common.url'))
+                                        ->maxLength(2048),
+                                    TextInput::make('sort_order')
+                                        ->label(__('filament.common.sort_order'))
+                                        ->numeric()
+                                        ->default(0),
+                                    Toggle::make('is_active')
+                                        ->label(__('filament.common.active'))
+                                        ->default(true),
+                                ])
+                                ->columns(3)
+                                ->defaultItems(0)
+                                ->reorderable()
+                                ->collapsible(),
+                        ]),
+
+                    Section::make(__('filament.settings.footer.social_links'))
+                        ->description(__('filament.settings.footer.social_links_desc'))
+                        ->schema([
+                            Repeater::make('social')
+                                ->label('')
+                                ->schema([
+                                    TextInput::make('label_ms')
+                                        ->label(__('filament.common.label_bm'))
+                                        ->required()
+                                        ->maxLength(200),
+                                    TextInput::make('label_en')
+                                        ->label(__('filament.common.label_en'))
+                                        ->required()
+                                        ->maxLength(200),
+                                    TextInput::make('url')
+                                        ->label(__('filament.common.url'))
+                                        ->url()
+                                        ->required()
+                                        ->maxLength(2048),
+                                    Select::make('icon')
+                                        ->label(__('filament.common.icon'))
+                                        ->options([
+                                            'facebook' => 'Facebook',
+                                            'instagram' => 'Instagram',
+                                            'x-twitter' => 'X (Twitter)',
+                                            'tiktok' => 'TikTok',
+                                            'youtube' => 'YouTube',
+                                            'linkedin' => 'LinkedIn',
+                                            'github' => 'GitHub',
+                                        ])
+                                        ->required(),
+                                    TextInput::make('sort_order')
+                                        ->label(__('filament.common.sort_order'))
+                                        ->numeric()
+                                        ->default(0),
+                                    Toggle::make('is_active')
+                                        ->label(__('filament.common.active'))
+                                        ->default(true),
+                                ])
+                                ->columns(3)
+                                ->defaultItems(0)
+                                ->reorderable()
+                                ->collapsible(),
+                        ]),
                 ])
                     ->livewireSubmitHandler('save')
                     ->footer([
@@ -134,16 +201,35 @@ class ManageFooter extends Page
     public function save(): void
     {
         $data = $this->form->getState();
-        $items = $data['items'] ?? [];
 
-        FooterSetting::query()->where('section', 'social')->delete();
+        // Save branding items
+        $brandingItems = $data['branding'] ?? [];
+        FooterSetting::query()->where('section', 'branding')->delete();
 
-        foreach ($items as $index => $item) {
+        foreach ($brandingItems as $index => $item) {
             FooterSetting::create([
-                'section' => 'social',
+                'section' => 'branding',
+                'type' => $item['type'],
                 'label_ms' => $item['label_ms'],
                 'label_en' => $item['label_en'],
                 'url' => $item['url'] ?? null,
+                'sort_order' => $item['sort_order'] ?? $index,
+                'is_active' => $item['is_active'] ?? true,
+            ]);
+        }
+
+        // Save social items
+        $socialItems = $data['social'] ?? [];
+        FooterSetting::query()->where('section', 'social')->delete();
+
+        foreach ($socialItems as $index => $item) {
+            FooterSetting::create([
+                'section' => 'social',
+                'type' => 'link',
+                'label_ms' => $item['label_ms'],
+                'label_en' => $item['label_en'],
+                'url' => $item['url'] ?? null,
+                'icon' => $item['icon'] ?? null,
                 'sort_order' => $item['sort_order'] ?? $index,
                 'is_active' => $item['is_active'] ?? true,
             ]);

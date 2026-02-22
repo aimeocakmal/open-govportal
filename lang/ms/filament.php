@@ -232,7 +232,15 @@ return [
 
         'footer' => [
             'title' => 'Kaki Halaman',
+            'branding' => 'Blok Penjenamaan',
+            'branding_desc' => 'Logo, tajuk, penerangan dan sub-tajuk yang dipaparkan di lajur kiri kaki halaman.',
             'social_links' => 'Pautan Sosial',
+            'social_links_desc' => 'Pautan media sosial dengan ikon yang dipaparkan di bawah blok penjenamaan.',
+            'type' => 'Jenis',
+            'type_logo' => 'Logo',
+            'type_heading' => 'Tajuk',
+            'type_text' => 'Teks',
+            'type_subheading' => 'Sub-tajuk',
             'saved' => 'Tetapan kaki halaman disimpan',
         ],
 

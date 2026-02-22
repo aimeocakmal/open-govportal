@@ -76,6 +76,22 @@ class PublicNavigationService
     }
 
     /**
+     * Get footer branding block items (logo, heading, text, subheading).
+     *
+     * @return Collection<int, FooterSetting>
+     */
+    public function getFooterBranding(): Collection
+    {
+        return Cache::remember('public_nav:footer_branding', self::CACHE_TTL, function (): Collection {
+            try {
+                return FooterSetting::active()->where('section', 'branding')->orderBy('sort_order')->get();
+            } catch (\Throwable) {
+                return collect();
+            }
+        });
+    }
+
+    /**
      * Get social links from footer_settings table.
      *
      * @return Collection<int, FooterSetting>
@@ -113,6 +129,7 @@ class PublicNavigationService
     {
         Cache::forget('public_nav:header');
         Cache::forget('public_nav:footer_menu');
+        Cache::forget('public_nav:footer_branding');
         Cache::forget('public_nav:footer_social');
     }
 

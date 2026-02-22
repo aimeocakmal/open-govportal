@@ -63,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
             $service = app(PublicNavigationService::class);
             $view->with('navItems', $service->getHeaderItems());
             $view->with('footerMenuItems', $service->getFooterMenuItems());
+            $view->with('footerBranding', $service->getFooterBranding());
             $view->with('footerSocialLinks', $service->getFooterSocialLinks());
             $view->with('footerData', $service->getSocialUrls());
         });

@@ -232,7 +232,15 @@ return [
 
         'footer' => [
             'title' => 'Footer',
+            'branding' => 'Branding Block',
+            'branding_desc' => 'Logo, heading, description and sub-heading displayed in the footer left column.',
             'social_links' => 'Social Links',
+            'social_links_desc' => 'Social media links with icons displayed below the branding block.',
+            'type' => 'Type',
+            'type_logo' => 'Logo',
+            'type_heading' => 'Heading',
+            'type_text' => 'Text',
+            'type_subheading' => 'Sub-heading',
             'saved' => 'Footer settings saved',
         ],
 

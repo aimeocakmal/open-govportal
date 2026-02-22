@@ -11,9 +11,11 @@ class FooterSetting extends Model
 
     protected $fillable = [
         'section',
+        'type',
         'label_ms',
         'label_en',
         'url',
+        'icon',
         'sort_order',
         'is_active',
     ];

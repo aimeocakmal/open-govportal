@@ -2,8 +2,8 @@
     $locale           = app()->getLocale();
     $labelKey         = 'label_' . $locale;
     $footerMenuItems  = $footerMenuItems ?? collect();
+    $footerBranding   = $footerBranding ?? collect();
     $footerSocialLinks = $footerSocialLinks ?? collect();
-    $footerData       = $footerData ?? [];
     $currentYear      = date('Y');
 @endphp
 
@@ -11,36 +11,39 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {{-- Left: Branding + Social (from FooterSetting) --}}
+            {{-- Left: Dynamic branding block + Social icons --}}
             <div class="space-y-3">
-                <p class="font-heading font-semibold text-white text-heading-2xs leading-snug">
-                    {{ __('common.site_name') }}
-                </p>
-                <p class="text-body-sm text-gray-500 leading-relaxed">
-                    {{ __('common.site_tagline') }}
-                </p>
+                @foreach ($footerBranding as $item)
+                    @if ($item->type === 'logo' && $item->url)
+                        <img src="{{ $item->url }}" alt="{{ $item->$labelKey ?? $item->label_ms }}" class="h-10">
+                    @elseif ($item->type === 'heading')
+                        <p class="font-heading font-semibold text-white text-heading-2xs leading-snug">
+                            {{ $item->$labelKey ?? $item->label_ms }}
+                        </p>
+                    @elseif ($item->type === 'text')
+                        <p class="text-body-sm text-gray-500 leading-relaxed">
+                            {!! nl2br(e($item->$labelKey ?? $item->label_ms)) !!}
+                        </p>
+                    @elseif ($item->type === 'subheading')
+                        <p class="text-body-sm font-semibold text-white pt-2">
+                            {{ $item->$labelKey ?? $item->label_ms }}
+                        </p>
+                    @endif
+                @endforeach
 
-                {{-- Social links from footer_settings --}}
+                {{-- Social links with icons --}}
                 @if ($footerSocialLinks->isNotEmpty())
                     <div class="flex items-center gap-3 pt-1">
                         @foreach ($footerSocialLinks as $social)
                             @if ($social->url)
                                 <a href="{{ $social->url }}" target="_blank" rel="noopener noreferrer"
-                                   class="text-gray-500 hover:text-white transition-colors duration-short text-body-xs">
-                                    {{ $social->$labelKey ?? $social->label_ms }}
-                                </a>
-                            @endif
-                        @endforeach
-                    </div>
-                @else
-                    {{-- Fallback to settings table social URLs --}}
-                    <div class="flex items-center gap-3 pt-1">
-                        @foreach (['facebook_url' => 'Facebook', 'twitter_url' => 'X', 'instagram_url' => 'Instagram', 'youtube_url' => 'YouTube'] as $key => $label)
-                            @php $url = $footerData[$key] ?? '' @endphp
-                            @if ($url)
-                                <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
-                                   class="text-gray-500 hover:text-white transition-colors duration-short text-body-xs">
-                                    {{ $label }}
+                                   class="text-gray-500 hover:text-white transition-colors duration-short"
+                                   title="{{ $social->$labelKey ?? $social->label_ms }}">
+                                    @if ($social->icon)
+                                        <x-icons.social :name="$social->icon" class="size-5" />
+                                    @else
+                                        <span class="text-body-xs">{{ $social->$labelKey ?? $social->label_ms }}</span>
+                                    @endif
                                 </a>
                             @endif
                         @endforeach
