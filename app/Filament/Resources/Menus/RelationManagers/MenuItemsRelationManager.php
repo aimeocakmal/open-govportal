@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Menus\RelationManagers;
 
+use App\Models\MenuItem;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -19,12 +20,17 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as BaseCollection;
 use Spatie\Permission\Models\Role;
 
 class MenuItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';
+
+    /** @var array<int, string>|null */
+    protected ?array $treePrefixCache = null;
 
     public function form(Schema $schema): Schema
     {
@@ -103,19 +109,35 @@ class MenuItemsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query): void {
+                $orderedIds = $this->getTreeOrderedIds();
+
+                if (! empty($orderedIds)) {
+                    $cases = collect($orderedIds)
+                        ->map(fn (int $id, int $index) => "WHEN {$id} THEN {$index}")
+                        ->implode(' ');
+
+                    $query->orderByRaw("CASE menu_items.id {$cases} ELSE 999999 END");
+                }
+            })
             ->columns([
                 TextColumn::make('label_ms')
                     ->label(__('filament.common.label_bm'))
                     ->searchable()
-                    ->sortable(),
-                TextColumn::make('parent.label_ms')
-                    ->label(__('filament.common.parent'))
-                    ->placeholder(__('filament.common.root')),
+                    ->formatStateUsing(function (string $state, MenuItem $record): string {
+                        if ($record->parent_id === null) {
+                            return $state;
+                        }
+
+                        $prefixes = $this->buildTreePrefixes();
+
+                        return ($prefixes[$record->id] ?? '├── ').$state;
+                    })
+                    ->html(false),
                 TextColumn::make('url')
                     ->limit(30)
                     ->placeholder('—'),
-                TextColumn::make('sort_order')
-                    ->sortable(),
+                TextColumn::make('sort_order'),
                 IconColumn::make('is_active')
                     ->label(__('filament.common.active'))
                     ->boolean(),
@@ -123,7 +145,6 @@ class MenuItemsRelationManager extends RelationManager
                     ->label(__('filament.resource.menu_items.system_item'))
                     ->boolean(),
             ])
-            ->defaultSort('sort_order')
             ->headerActions([
                 CreateAction::make(),
             ])
@@ -140,5 +161,69 @@ class MenuItemsRelationManager extends RelationManager
                         }),
                 ]),
             ]);
+    }
+
+    /**
+     * Get item IDs in tree-walk order for SQL sorting.
+     *
+     * @return list<int>
+     */
+    protected function getTreeOrderedIds(): array
+    {
+        return array_keys($this->buildTreePrefixes());
+    }
+
+    /**
+     * Build a prefix string for every menu item so the label column
+     * renders with tree branch characters (├──, └──, │).
+     *
+     * @return array<int, string> Map of item ID → display prefix
+     */
+    protected function buildTreePrefixes(): array
+    {
+        if ($this->treePrefixCache !== null) {
+            return $this->treePrefixCache;
+        }
+
+        $items = $this->getOwnerRecord()
+            ->items()
+            ->orderBy('sort_order')
+            ->get();
+
+        $this->treePrefixCache = [];
+        $childrenByParent = $items->groupBy(
+            fn (MenuItem $item) => $item->parent_id ?? 'root'
+        );
+
+        $this->walkTree($childrenByParent, 'root', '');
+
+        return $this->treePrefixCache;
+    }
+
+    /**
+     * Recursively walk the tree and populate treePrefixCache with
+     * the correct branch characters for each item.
+     */
+    private function walkTree(BaseCollection $childrenByParent, string|int $parentKey, string $linePrefix): void
+    {
+        $siblings = $childrenByParent
+            ->get($parentKey, collect())
+            ->sortBy('sort_order')
+            ->values();
+
+        $lastIndex = $siblings->count() - 1;
+
+        foreach ($siblings as $index => $item) {
+            $isLast = $index === $lastIndex;
+
+            if ($parentKey === 'root') {
+                $this->treePrefixCache[$item->id] = '';
+                $this->walkTree($childrenByParent, $item->id, '');
+            } else {
+                $this->treePrefixCache[$item->id] = $linePrefix.($isLast ? '└── ' : '├── ');
+                $childLinePrefix = $linePrefix.($isLast ? '    ' : '│   ');
+                $this->walkTree($childrenByParent, $item->id, $childLinePrefix);
+            }
+        }
     }
 }
