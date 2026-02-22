@@ -52,4 +52,88 @@ class StaticPageTest extends TestCase
 
         $this->assertNull($page->fresh()->category_id);
     }
+
+    public function test_penafian_route_returns_200_ms(): void
+    {
+        StaticPage::factory()->published()->create(['slug' => 'penafian']);
+
+        $this->get('/ms/penafian')->assertOk();
+    }
+
+    public function test_penafian_route_returns_200_en(): void
+    {
+        StaticPage::factory()->published()->create(['slug' => 'penafian']);
+
+        $this->get('/en/penafian')->assertOk();
+    }
+
+    public function test_dasar_privasi_route_returns_200_ms(): void
+    {
+        StaticPage::factory()->published()->create(['slug' => 'dasar-privasi']);
+
+        $this->get('/ms/dasar-privasi')->assertOk();
+    }
+
+    public function test_dasar_privasi_route_returns_200_en(): void
+    {
+        StaticPage::factory()->published()->create(['slug' => 'dasar-privasi']);
+
+        $this->get('/en/dasar-privasi')->assertOk();
+    }
+
+    public function test_penafian_page_shows_content_ms(): void
+    {
+        StaticPage::factory()->published()->create([
+            'slug' => 'penafian',
+            'title_ms' => 'Penafian',
+            'content_ms' => '<p>Kandungan penafian di sini.</p>',
+        ]);
+
+        $this->get('/ms/penafian')
+            ->assertSee('Penafian')
+            ->assertSee('Kandungan penafian di sini.');
+    }
+
+    public function test_dasar_privasi_page_shows_content_en(): void
+    {
+        StaticPage::factory()->published()->create([
+            'slug' => 'dasar-privasi',
+            'title_en' => 'Privacy Policy',
+            'content_en' => '<p>Privacy policy content here.</p>',
+        ]);
+
+        $this->get('/en/dasar-privasi')
+            ->assertSee('Privacy Policy')
+            ->assertSee('Privacy policy content here.');
+    }
+
+    public function test_static_page_404_when_not_published(): void
+    {
+        StaticPage::factory()->create([
+            'slug' => 'penafian',
+            'status' => 'draft',
+        ]);
+
+        $this->get('/ms/penafian')->assertNotFound();
+    }
+
+    public function test_static_page_has_breadcrumb(): void
+    {
+        StaticPage::factory()->published()->create(['slug' => 'penafian', 'title_ms' => 'Penafian']);
+
+        $this->get('/ms/penafian')->assertSee('Laman Utama');
+    }
+
+    public function test_static_page_has_seo_meta(): void
+    {
+        StaticPage::factory()->published()->create([
+            'slug' => 'penafian',
+            'meta_title_ms' => 'Penafian KKD',
+            'meta_desc_ms' => 'Halaman penafian rasmi.',
+        ]);
+
+        $this->get('/ms/penafian')
+            ->assertSee('Penafian KKD')
+            ->assertSee('Halaman penafian rasmi.');
+    }
 }

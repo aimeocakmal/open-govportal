@@ -77,7 +77,7 @@ Locale detection order:
 
 ## Pages
 
-### 1. Homepage (`/`) — **Status: Planned**
+### 1. Homepage (`/`) — **Status: Implemented** (HomepageTest — 33 tests)
 
 **Laravel route:** `GET /{locale}` → `HomeController@index`
 **Source component directory:** `src/components/home/`
@@ -234,7 +234,7 @@ Locale detection order:
 
 ---
 
-### 6. Dasar (`/dasar`) — **Status: Planned**
+### 6. Dasar (`/dasar`) — **Status: Implemented** (DasarPageTest — 14 tests)
 
 **Laravel routes:**
 - `GET /{locale}/dasar` → `DasarController@index`
@@ -259,7 +259,7 @@ Locale detection order:
 
 ---
 
-### 7. Profil Kementerian (`/profil-kementerian`) — **Status: Planned**
+### 7. Profil Kementerian (`/profil-kementerian`) — **Status: Implemented** (ProfilKementerianPageTest — 11 tests)
 
 **Laravel route:** `GET /{locale}/profil-kementerian` → `ProfilKementerianController@index`
 **Payload global:** `MinisterProfile`
@@ -277,7 +277,7 @@ Locale detection order:
 
 ---
 
-### 8. Hubungi Kami (`/hubungi-kami`) — **Status: Planned**
+### 8. Hubungi Kami (`/hubungi-kami`) — **Status: Implemented** (HubungiKamiPageTest — 14 tests)
 
 **Laravel route:** `GET /{locale}/hubungi-kami` → `HubungiKamiController@index` (renders page shell + addresses)
 
@@ -311,7 +311,7 @@ protected $rules = [
 
 ---
 
-### 9. Penafian (`/penafian`) — **Status: Planned**
+### 9. Penafian (`/penafian`) — **Status: Implemented** (StaticPageTest — 14 tests)
 
 **Laravel route:** `GET /{locale}/penafian` → served by the generic static page catch-all route `GET /{locale}/{slug}` → `StaticPageController@show`
 **Source:** `static_pages` table, row with `slug = 'penafian'`. Managed via `StaticPageResource` in Filament.
@@ -322,7 +322,7 @@ protected $rules = [
 
 ---
 
-### 10. Dasar Privasi (`/dasar-privasi`) — **Status: Planned**
+### 10. Dasar Privasi (`/dasar-privasi`) — **Status: Implemented** (StaticPageTest — 14 tests)
 
 **Laravel route:** `GET /{locale}/dasar-privasi` → `StaticPageController@show` (catch-all)
 **Source:** `static_pages` table, row with `slug = 'dasar-privasi'`. Managed via `StaticPageResource` in Filament.
@@ -401,7 +401,7 @@ Level 1 (Main menu)       → top-level items (parent_id IS NULL) in public_head
 
 ---
 
-### Static Pages (`/{locale}/{slug}`) — **Status: Planned**
+### Static Pages (`/{locale}/{slug}`) — **Status: Implemented** (StaticPageTest — 14 tests)
 
 **Laravel route:** `GET /{locale}/{slug}` → `StaticPageController@show` (catch-all, must be the **last** route in the `/{locale}/` prefix group so named routes are matched first)
 **Model:** `StaticPage` — managed in Filament via `StaticPageResource`
@@ -467,7 +467,7 @@ Level 1 — Main menu       (parent_id IS NULL in menu_items)
 
 ---
 
-### Search (`/carian`) — **Status: Planned**
+### Search (`/carian`) — **Status: Implemented** (CarianPageTest — 11 tests)
 
 **Payload plugin:** `@payloadcms/plugin-search`
 **Laravel route:** `GET /{locale}/carian` → `SearchController@index` (renders page shell)

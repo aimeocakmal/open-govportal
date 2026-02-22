@@ -2,9 +2,15 @@
 
 use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\BroadcastController;
+use App\Http\Controllers\DasarController;
 use App\Http\Controllers\DirectoriController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\HubungiKamiController;
 use App\Http\Controllers\PreviewController;
+use App\Http\Controllers\ProfilKementerianController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\StaticPageController;
 use App\Http\Controllers\StatistikController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +25,13 @@ Route::get('/preview/{model}/{id}', [PreviewController::class, 'show'])
 
 /*
 |--------------------------------------------------------------------------
+| XML Sitemap (not locale-prefixed)
+|--------------------------------------------------------------------------
+*/
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+/*
+|--------------------------------------------------------------------------
 | Public routes — locale-prefixed
 |--------------------------------------------------------------------------
 | All public-facing pages live under /{locale}/...
@@ -26,21 +39,6 @@ Route::get('/preview/{model}/{id}', [PreviewController::class, 'show'])
 | Middleware stack (applied to the group):
 |   - setlocale  → reads {locale} segment, calls App::setLocale()
 |   - ApplyTheme → reads govportal_theme cookie, shares $currentTheme (via web group)
-|
-| Pages to add (Phase 3, Weeks 6–9):
-|   /siaran            BroadcastController@index   SiaranList (Livewire)
-|   /siaran/{slug}     BroadcastController@show    (pure Blade)
-|   /pencapaian        AchievementController@index PencapaianList (Livewire)
-|   /pencapaian/{slug} AchievementController@show  (pure Blade)
-|   /statistik         StatistikController@index   (pure Blade + Chart.js)
-|   /direktori         DirectoriController@index   DirectoriSearch (Livewire)
-|   /dasar             DasarController@index       (pure Blade)
-|   /dasar/{id}/muat-turun DasarController@download
-|   /profil-kementerian    ProfilKementerianController@index
-|   /hubungi-kami      HubungiKamiController@index ContactForm (Livewire)
-|   /penafian          StaticPageController@penafian
-|   /dasar-privasi     StaticPageController@dasarPrivasi
-|   /carian            SearchController@index      SearchResults (Livewire)
 */
 Route::prefix('{locale}')
     ->where(['locale' => 'ms|en'])
@@ -49,8 +47,6 @@ Route::prefix('{locale}')
 
         // Homepage
         Route::get('/', [HomeController::class, 'index'])->name('home');
-
-        // --- Phase 3 routes (uncomment as each is implemented) ---
 
         // Siaran (Broadcasts)
         Route::get('/siaran', [BroadcastController::class, 'index'])->name('siaran.index');
@@ -65,16 +61,21 @@ Route::prefix('{locale}')
 
         // Direktori (Staff Directory)
         Route::get('/direktori', [DirectoriController::class, 'index'])->name('direktori.index');
-        //
-        // Route::get('/dasar',               [DasarController::class, 'index'])->name('dasar.index');
-        // Route::get('/dasar/{id}/muat-turun', [DasarController::class, 'download'])->name('dasar.download');
-        //
-        // Route::get('/profil-kementerian',  [ProfilKementerianController::class, 'index'])->name('profil-kementerian.index');
-        //
-        // Route::get('/hubungi-kami',        [HubungiKamiController::class, 'index'])->name('hubungi-kami.index');
-        //
-        // Route::get('/penafian',            [StaticPageController::class, 'penafian'])->name('penafian.index');
-        // Route::get('/dasar-privasi',       [StaticPageController::class, 'dasarPrivasi'])->name('dasar-privasi.index');
-        //
-        // Route::get('/carian',              [SearchController::class, 'index'])->name('carian.index');
+
+        // Dasar (Policies)
+        Route::get('/dasar', [DasarController::class, 'index'])->name('dasar.index');
+        Route::get('/dasar/{id}/muat-turun', [DasarController::class, 'download'])->name('dasar.download');
+
+        // Profil Kementerian (Ministry Profile)
+        Route::get('/profil-kementerian', [ProfilKementerianController::class, 'index'])->name('profil-kementerian.index');
+
+        // Hubungi Kami (Contact Us)
+        Route::get('/hubungi-kami', [HubungiKamiController::class, 'index'])->name('hubungi-kami.index');
+
+        // Carian (Search)
+        Route::get('/carian', [SearchController::class, 'index'])->name('carian.index');
+
+        // Static pages — catch-all (must be last in the group)
+        Route::get('/penafian', [StaticPageController::class, 'show'])->name('penafian.index')->defaults('slug', 'penafian');
+        Route::get('/dasar-privasi', [StaticPageController::class, 'show'])->name('dasar-privasi.index')->defaults('slug', 'dasar-privasi');
     });
