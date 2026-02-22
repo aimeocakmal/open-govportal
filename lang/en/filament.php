@@ -88,6 +88,7 @@ return [
         'status' => 'Status',
         'name' => 'Name',
         'password' => 'Password',
+        'password_confirmation' => 'Confirm Password',
         'created_at' => 'Created At',
         'department' => 'Department',
         'file_upload_placeholder' => 'Drag & drop your file or <span class="filepond--label-action">Browse</span>',

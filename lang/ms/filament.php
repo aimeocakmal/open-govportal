@@ -88,6 +88,7 @@ return [
         'status' => 'Status',
         'name' => 'Nama',
         'password' => 'Kata Laluan',
+        'password_confirmation' => 'Sahkan Kata Laluan',
         'created_at' => 'Dicipta Pada',
         'department' => 'Jabatan',
         'file_upload_placeholder' => 'Seret & lepas fail anda atau <span class="filepond--label-action">Semak Imbas</span>',

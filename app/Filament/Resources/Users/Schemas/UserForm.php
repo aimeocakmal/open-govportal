@@ -34,6 +34,14 @@ class UserForm
                             ->revealable()
                             ->required(fn (string $operation): bool => $operation === 'create')
                             ->dehydrated(fn (?string $state): bool => filled($state))
+                            ->confirmed()
+                            ->maxLength(255),
+                        TextInput::make('password_confirmation')
+                            ->label(__('filament.common.password_confirmation'))
+                            ->password()
+                            ->revealable()
+                            ->requiredWith('password')
+                            ->dehydrated(false)
                             ->maxLength(255),
                     ])
                     ->columns(2),

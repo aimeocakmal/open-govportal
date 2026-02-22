@@ -35,7 +35,13 @@ class EditUser extends EditRecord
                         ->password()
                         ->revealable()
                         ->required()
+                        ->confirmed()
                         ->minLength(8),
+                    \Filament\Forms\Components\TextInput::make('new_password_confirmation')
+                        ->label(__('filament.common.password_confirmation'))
+                        ->password()
+                        ->revealable()
+                        ->required(),
                 ])
                 ->action(function (array $data) {
                     $this->record->update(['password' => Hash::make($data['new_password'])]);
