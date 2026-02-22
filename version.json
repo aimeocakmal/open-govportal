@@ -1,27 +1,75 @@
 {
-    "version": "0.5.0",
-    "released_at": "2026-02-22",
+    "version": "0.6.0",
+    "released_at": "2026-02-23",
     "changelog": [
         {
             "type": "added",
             "items": [
-                "Platform version tracking with changelog display",
-                "User activity log viewer for monitoring and auditing",
-                "Activity logging on all 16 models (LogsActivity trait)",
-                "Content preview with signed URLs",
-                "Content revision history and restore"
+                "All 10 public pages fully implemented (Phase 3 complete)",
+                "Homepage with hero banner carousel, quick links, broadcasts, achievements (Week 6)",
+                "Siaran (Broadcasts) listing and detail pages (Week 7)",
+                "Pencapaian (Achievements) listing and detail pages (Week 7)",
+                "Statistik (Statistics) page with Chart.js visualizations (Week 8)",
+                "Direktori (Staff Directory) with Livewire live search (Week 8)",
+                "Dasar (Policy) listing with file download counter (Week 9)",
+                "Profil Kementerian (Ministry Profile) page (Week 9)",
+                "Hubungi Kami (Contact Us) with Livewire contact form and rate limiting (Week 9)",
+                "Static pages (Penafian, Dasar Privasi) served via CMS (Week 9)",
+                "Search page with Livewire SearchResults component (Week 9)",
+                "XML Sitemap with dynamic broadcast and static page URLs (Week 9)",
+                "Custom error pages (404, 403, 500) with bilingual support (Week 9)",
+                "Accessibility menu (CTRL+U) with font size, font type, background color, and contrast settings",
+                "WordPress-like theme system with auto-discovery and fallback resolution",
+                "Google Analytics and custom analytics script support",
+                "Forgot password functionality",
+                "Password confirmation in user settings",
+                "Danger zone with account deletion"
             ]
         },
         {
             "type": "changed",
             "items": [
-                "Menu system upgraded to 4-level nested items with role visibility"
+                "Frontend updated to MyDS design system tokens (Poppins headings, Inter body, full color scales)",
+                "CSS architecture: two-layer --raw-* / --color-* variable system for runtime theme switching",
+                "Theme assets (CSS, JS, views) moved into resources/themes/default/"
             ]
         },
         {
             "type": "fixed",
             "items": [
-                "Admin menu display in English locale"
+                "Directory page display issues",
+                "Statistics page query errors",
+                "Tailwind v4 @theme inline not generating semantic utility classes (bg-bg, text-text, border-border, etc.)"
+            ]
+        }
+    ],
+    "history": [
+        {
+            "version": "0.5.0",
+            "released_at": "2026-02-22",
+            "changelog": [
+                {
+                    "type": "added",
+                    "items": [
+                        "Platform version tracking with changelog display",
+                        "User activity log viewer for monitoring and auditing",
+                        "Activity logging on all 16 models (LogsActivity trait)",
+                        "Content preview with signed URLs",
+                        "Content revision history and restore"
+                    ]
+                },
+                {
+                    "type": "changed",
+                    "items": [
+                        "Menu system upgraded to 4-level nested items with role visibility"
+                    ]
+                },
+                {
+                    "type": "fixed",
+                    "items": [
+                        "Admin menu display in English locale"
+                    ]
+                }
             ]
         }
     ]

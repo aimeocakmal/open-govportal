@@ -22,37 +22,50 @@
         </div>
     </x-filament::section>
 
-    {{-- Changelog --}}
+    {{-- Current Version Changelog --}}
     @if (count($changelog) > 0)
         <x-filament::section>
             <x-slot name="heading">
                 {{ __('filament.settings.platform_version.changelog') }}
             </x-slot>
 
-            <div class="space-y-4">
-                @foreach ($changelog as $section)
-                    @php
-                        $typeKey = 'filament.settings.platform_version.type_' . $section['type'];
-                        $color = match ($section['type']) {
-                            'added' => 'success',
-                            'changed' => 'info',
-                            'fixed' => 'warning',
-                            'removed' => 'danger',
-                            default => 'gray',
-                        };
-                    @endphp
+            @include('filament.pages.partials.changelog-sections', ['sections' => $changelog])
+        </x-filament::section>
+    @endif
 
+    {{-- Version History --}}
+    @if (count($history) > 0)
+        <x-filament::section>
+            <x-slot name="heading">
+                {{ __('filament.settings.platform_version.version_history') }}
+            </x-slot>
+
+            <div class="space-y-6">
+                @foreach ($history as $release)
                     <div>
-                        <x-filament::badge :color="$color">
-                            {{ __($typeKey) }}
-                        </x-filament::badge>
+                        <div class="flex items-center gap-3">
+                            <x-filament::badge size="lg" color="gray">
+                                v{{ $release['version'] }}
+                            </x-filament::badge>
 
-                        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700 dark:text-gray-300">
-                            @foreach ($section['items'] as $item)
-                                <li>{{ $item }}</li>
-                            @endforeach
-                        </ul>
+                            @if ($release['released_at'] ?? false)
+                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ __('filament.settings.platform_version.released') }}
+                                    {{ \Carbon\Carbon::parse($release['released_at'])->translatedFormat('d F Y') }}
+                                </span>
+                            @endif
+                        </div>
+
+                        @if (count($release['changelog'] ?? []) > 0)
+                            <div class="mt-3">
+                                @include('filament.pages.partials.changelog-sections', ['sections' => $release['changelog']])
+                            </div>
+                        @endif
                     </div>
+
+                    @if (! $loop->last)
+                        <hr class="border-gray-200 dark:border-gray-700">
+                    @endif
                 @endforeach
             </div>
         </x-filament::section>

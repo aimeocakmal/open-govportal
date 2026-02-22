@@ -298,6 +298,7 @@ return [
             'type_changed' => 'Changed',
             'type_fixed' => 'Fixed',
             'type_removed' => 'Removed',
+            'version_history' => 'Version History',
         ],
     ],
 

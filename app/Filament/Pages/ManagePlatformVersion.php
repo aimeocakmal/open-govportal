@@ -45,6 +45,9 @@ class ManagePlatformVersion extends Page
     /** @var array<int, array{type: string, items: list<string>}> */
     public array $changelog = [];
 
+    /** @var list<array{version: string, released_at: string, changelog: list<array{type: string, items: list<string>}>}> */
+    public array $history = [];
+
     public static function canAccess(): bool
     {
         return Auth::user()?->can('manage_settings') ?? false;
@@ -58,6 +61,7 @@ class ManagePlatformVersion extends Page
             $this->version = '0.0.0';
             $this->releasedAt = '';
             $this->changelog = [];
+            $this->history = [];
 
             return;
         }
@@ -67,19 +71,20 @@ class ManagePlatformVersion extends Page
         $this->version = $data['version'] ?? '0.0.0';
         $this->releasedAt = $data['released_at'] ?? '';
         $this->changelog = $data['changelog'] ?? [];
+        $this->history = $data['history'] ?? [];
     }
 
     /**
      * Read version data from the flat file.
      *
-     * @return array{version: string, released_at: string, changelog: list<array{type: string, items: list<string>}>}
+     * @return array{version: string, released_at: string, changelog: list<array{type: string, items: list<string>}>, history: list<array{version: string, released_at: string, changelog: list<array{type: string, items: list<string>}>}>}
      */
     public static function readVersionFile(): array
     {
         $path = base_path('version.json');
 
         if (! file_exists($path)) {
-            return ['version' => '0.0.0', 'released_at' => '', 'changelog' => []];
+            return ['version' => '0.0.0', 'released_at' => '', 'changelog' => [], 'history' => []];
         }
 
         $data = json_decode(file_get_contents($path), true);
@@ -88,6 +93,7 @@ class ManagePlatformVersion extends Page
             'version' => $data['version'] ?? '0.0.0',
             'released_at' => $data['released_at'] ?? '',
             'changelog' => $data['changelog'] ?? [],
+            'history' => $data['history'] ?? [],
         ];
     }
 }
