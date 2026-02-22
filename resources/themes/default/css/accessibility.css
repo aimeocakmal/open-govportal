@@ -1,0 +1,133 @@
+/* ================================================================
+ * Accessibility Menu — CSS Overrides
+ *
+ * Applied via data-a11y-* attributes on <html>.
+ * Alpine.js sets these attributes; localStorage persists them.
+ * Flash prevention inline script in <head> sets them before paint.
+ * ================================================================ */
+
+/* ----------------------------------------------------------------
+ * Font Size — scales root font-size (all rem units follow)
+ * ---------------------------------------------------------------- */
+html[data-a11y-fontsize="small"] {
+    font-size: 80%;
+}
+
+html[data-a11y-fontsize="large"] {
+    font-size: 120%;
+}
+
+html[data-a11y-fontsize="xlarge"] {
+    font-size: 140%;
+}
+
+/* ----------------------------------------------------------------
+ * Font Type — !important required because Tailwind v4 @theme
+ * compiles font-sans/font-heading as static values, not CSS vars
+ * ---------------------------------------------------------------- */
+html[data-a11y-fonttype="arial"],
+html[data-a11y-fonttype="arial"] h1,
+html[data-a11y-fonttype="arial"] h2,
+html[data-a11y-fonttype="arial"] h3,
+html[data-a11y-fonttype="arial"] h4,
+html[data-a11y-fonttype="arial"] h5,
+html[data-a11y-fonttype="arial"] h6,
+html[data-a11y-fonttype="arial"] p,
+html[data-a11y-fonttype="arial"] a,
+html[data-a11y-fonttype="arial"] span,
+html[data-a11y-fonttype="arial"] li,
+html[data-a11y-fonttype="arial"] td,
+html[data-a11y-fonttype="arial"] th,
+html[data-a11y-fonttype="arial"] label,
+html[data-a11y-fonttype="arial"] input,
+html[data-a11y-fonttype="arial"] textarea,
+html[data-a11y-fonttype="arial"] select,
+html[data-a11y-fonttype="arial"] button {
+    font-family: 'Arial', sans-serif !important;
+}
+
+html[data-a11y-fonttype="times"],
+html[data-a11y-fonttype="times"] h1,
+html[data-a11y-fonttype="times"] h2,
+html[data-a11y-fonttype="times"] h3,
+html[data-a11y-fonttype="times"] h4,
+html[data-a11y-fonttype="times"] h5,
+html[data-a11y-fonttype="times"] h6,
+html[data-a11y-fonttype="times"] p,
+html[data-a11y-fonttype="times"] a,
+html[data-a11y-fonttype="times"] span,
+html[data-a11y-fonttype="times"] li,
+html[data-a11y-fonttype="times"] td,
+html[data-a11y-fonttype="times"] th,
+html[data-a11y-fonttype="times"] label,
+html[data-a11y-fonttype="times"] input,
+html[data-a11y-fonttype="times"] textarea,
+html[data-a11y-fonttype="times"] select,
+html[data-a11y-fonttype="times"] button {
+    font-family: 'Times New Roman', serif !important;
+}
+
+html[data-a11y-fonttype="courier"],
+html[data-a11y-fonttype="courier"] h1,
+html[data-a11y-fonttype="courier"] h2,
+html[data-a11y-fonttype="courier"] h3,
+html[data-a11y-fonttype="courier"] h4,
+html[data-a11y-fonttype="courier"] h5,
+html[data-a11y-fonttype="courier"] h6,
+html[data-a11y-fonttype="courier"] p,
+html[data-a11y-fonttype="courier"] a,
+html[data-a11y-fonttype="courier"] span,
+html[data-a11y-fonttype="courier"] li,
+html[data-a11y-fonttype="courier"] td,
+html[data-a11y-fonttype="courier"] th,
+html[data-a11y-fonttype="courier"] label,
+html[data-a11y-fonttype="courier"] input,
+html[data-a11y-fonttype="courier"] textarea,
+html[data-a11y-fonttype="courier"] select,
+html[data-a11y-fonttype="courier"] button {
+    font-family: 'Courier New', monospace !important;
+}
+
+/* ----------------------------------------------------------------
+ * Background Color — overrides --raw-bg (cascades to --color-bg via var())
+ * ---------------------------------------------------------------- */
+html[data-a11y-bgcolor="white"] {
+    --raw-bg: #ffffff;
+}
+
+html[data-a11y-bgcolor="yellow"] {
+    --raw-bg: #ffffcc;
+}
+
+html[data-a11y-bgcolor="blue"] {
+    --raw-bg: #ccf2ff;
+}
+
+/* ----------------------------------------------------------------
+ * Contrast — AFTER bgcolor rules so it takes precedence for --raw-bg
+ * ---------------------------------------------------------------- */
+html[data-a11y-contrast="light"] {
+    --raw-bg: #FFFFFF;
+    --raw-bg-washed: #FAFAFA;
+    --raw-surface: #F4F4F5;
+    --raw-border: #D4D4D8;
+    --raw-border-light: #E4E4E7;
+    --raw-text: #18181B;
+    --raw-text-secondary: #52525B;
+    --raw-muted: #6B6B74;
+    --raw-placeholder: #A1A1AA;
+    --raw-white: #FFFFFF;
+}
+
+html[data-a11y-contrast="dark"] {
+    --raw-bg: #18181B;
+    --raw-bg-washed: #27272A;
+    --raw-surface: #3F3F46;
+    --raw-border: #52525B;
+    --raw-border-light: #3F3F46;
+    --raw-text: #FAFAFA;
+    --raw-text-secondary: #A1A1AA;
+    --raw-muted: #71717A;
+    --raw-placeholder: #52525B;
+    --raw-white: #FAFAFA;
+}

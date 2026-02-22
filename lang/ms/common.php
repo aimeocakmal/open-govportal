@@ -50,6 +50,8 @@ return [
 
     'breadcrumb' => 'Senarai navigasi',
 
+    'close' => 'Tutup',
+
     'actions' => [
         'read_more' => 'Baca Selanjutnya',
         'view_all' => 'Lihat Semua',

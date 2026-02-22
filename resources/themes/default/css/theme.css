@@ -91,19 +91,35 @@
     --color-gray-950: #09090B;
 
     /* ----------------------------------------------------------------
-     * Semantic Surface Tokens
+     * Raw Semantic Tokens — override these for runtime changes
+     * (accessibility menu, dark mode, theme switching)
      * ---------------------------------------------------------------- */
-    --color-bg: #FFFFFF;
-    --color-bg-washed: var(--color-gray-50);
-    --color-surface: var(--color-gray-100);
-    --color-border: var(--color-gray-300);
-    --color-border-light: var(--color-gray-200);
-    --color-text: var(--color-gray-900);
-    --color-text-secondary: var(--color-gray-600);
-    --color-muted: var(--color-gray-500);
-    --color-placeholder: var(--color-gray-400);
-    --color-white: #FFFFFF;
-    --color-black: var(--color-gray-950);
+    --raw-bg: #FFFFFF;
+    --raw-bg-washed: var(--color-gray-50);
+    --raw-surface: var(--color-gray-100);
+    --raw-border: var(--color-gray-300);
+    --raw-border-light: var(--color-gray-200);
+    --raw-text: var(--color-gray-900);
+    --raw-text-secondary: var(--color-gray-600);
+    --raw-muted: var(--color-gray-500);
+    --raw-placeholder: var(--color-gray-400);
+    --raw-white: #FFFFFF;
+    --raw-black: var(--color-gray-950);
+
+    /* ----------------------------------------------------------------
+     * Semantic Surface Tokens — reference --raw-* for var() resolution
+     * ---------------------------------------------------------------- */
+    --color-bg: var(--raw-bg);
+    --color-bg-washed: var(--raw-bg-washed);
+    --color-surface: var(--raw-surface);
+    --color-border: var(--raw-border);
+    --color-border-light: var(--raw-border-light);
+    --color-text: var(--raw-text);
+    --color-text-secondary: var(--raw-text-secondary);
+    --color-muted: var(--raw-muted);
+    --color-placeholder: var(--raw-placeholder);
+    --color-white: var(--raw-white);
+    --color-black: var(--raw-black);
 
     /* ----------------------------------------------------------------
      * Shadows (MyDS spec)

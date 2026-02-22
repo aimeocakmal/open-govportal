@@ -50,6 +50,8 @@ return [
 
     'breadcrumb' => 'Breadcrumb navigation',
 
+    'close' => 'Close',
+
     'actions' => [
         'read_more' => 'Read More',
         'view_all' => 'View All',

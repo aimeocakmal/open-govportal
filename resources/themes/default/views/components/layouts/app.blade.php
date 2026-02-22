@@ -18,6 +18,17 @@
 
     @stack('seo')
 
+    {{-- Accessibility: apply saved settings before first paint to prevent flash --}}
+    <script>
+    (function(){
+        var s=localStorage,d=document.documentElement.dataset;
+        d.a11yFontsize=s.getItem('a11y-fontsize')||'default';
+        d.a11yFonttype=s.getItem('a11y-fonttype')||'default';
+        d.a11yBgcolor=s.getItem('a11y-bgcolor')||'default';
+        d.a11yContrast=s.getItem('a11y-contrast')||'default';
+    })();
+    </script>
+
     @vite([$themeViteEntries['css'], $themeViteEntries['js']])
     @livewireStyles
 
@@ -42,6 +53,8 @@
     </main>
 
     <x-layout.footer />
+
+    <x-layout.accessibility-menu />
 
     @livewireScripts
 </body>

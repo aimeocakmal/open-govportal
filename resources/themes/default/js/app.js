@@ -63,4 +63,66 @@ document.addEventListener('alpine:init', () => {
             this.embla?.destroy();
         },
     }));
+
+    window.Alpine.data('accessibilityMenu', () => ({
+        open: false,
+        fontSize: 'default',
+        fontType: 'default',
+        bgColor: 'default',
+        contrast: 'default',
+
+        init() {
+            this.fontSize = localStorage.getItem('a11y-fontsize') || 'default';
+            this.fontType = localStorage.getItem('a11y-fonttype') || 'default';
+            this.bgColor = localStorage.getItem('a11y-bgcolor') || 'default';
+            this.contrast = localStorage.getItem('a11y-contrast') || 'default';
+            this.apply();
+        },
+
+        setFontSize(val) {
+            this.fontSize = val;
+            localStorage.setItem('a11y-fontsize', val);
+            this.apply();
+        },
+
+        setFontType(val) {
+            this.fontType = val;
+            localStorage.setItem('a11y-fonttype', val);
+            this.apply();
+        },
+
+        setBgColor(val) {
+            this.bgColor = val;
+            localStorage.setItem('a11y-bgcolor', val);
+            this.apply();
+        },
+
+        setContrast(val) {
+            this.contrast = val;
+            localStorage.setItem('a11y-contrast', val);
+            this.apply();
+        },
+
+        reset() {
+            this.fontSize = 'default';
+            this.fontType = 'default';
+            this.bgColor = 'default';
+            this.contrast = 'default';
+            ['a11y-fontsize', 'a11y-fonttype', 'a11y-bgcolor', 'a11y-contrast']
+                .forEach(k => localStorage.removeItem(k));
+            this.apply();
+        },
+
+        apply() {
+            const d = document.documentElement.dataset;
+            d.a11yFontsize = this.fontSize;
+            d.a11yFonttype = this.fontType;
+            d.a11yBgcolor = this.bgColor;
+            d.a11yContrast = this.contrast;
+        },
+
+        toggle() {
+            this.open = !this.open;
+        },
+    }));
 });
