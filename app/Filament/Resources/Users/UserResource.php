@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class UserResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'users';
+
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;

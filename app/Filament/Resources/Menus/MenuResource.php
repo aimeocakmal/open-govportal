@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Menus;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\Menus\Pages\EditMenu;
 use App\Filament\Resources\Menus\Pages\ListMenus;
 use App\Filament\Resources\Menus\RelationManagers\MenuItemsRelationManager;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class MenuResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'menus';
+
     protected static ?string $model = Menu::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBars3;

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\Setting;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -25,6 +26,10 @@ use Illuminate\Support\Facades\Crypt;
  */
 class ManageEmailSettings extends Page
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'manage-email-settings';
+
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
     protected static ?int $navigationSort = 2;

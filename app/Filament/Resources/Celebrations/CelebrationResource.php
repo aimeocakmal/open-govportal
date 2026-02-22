@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Celebrations;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\Celebrations\Pages\CreateCelebration;
 use App\Filament\Resources\Celebrations\Pages\EditCelebration;
 use App\Filament\Resources\Celebrations\Pages\ListCelebrations;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class CelebrationResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'celebrations';
+
     protected static ?string $model = Celebration::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSparkles;

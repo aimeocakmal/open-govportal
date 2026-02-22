@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\QuickLinks;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\QuickLinks\Pages\CreateQuickLink;
 use App\Filament\Resources\QuickLinks\Pages\EditQuickLink;
 use App\Filament\Resources\QuickLinks\Pages\ListQuickLinks;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class QuickLinkResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'quick-links';
+
     protected static ?string $model = QuickLink::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedLink;

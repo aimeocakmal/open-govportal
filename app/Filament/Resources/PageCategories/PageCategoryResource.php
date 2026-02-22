@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PageCategories;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\PageCategories\Pages\CreatePageCategory;
 use App\Filament\Resources\PageCategories\Pages\EditPageCategory;
 use App\Filament\Resources\PageCategories\Pages\ListPageCategories;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class PageCategoryResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'page-categories';
+
     protected static ?string $model = PageCategory::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;

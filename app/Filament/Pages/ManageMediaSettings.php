@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\Setting;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -24,6 +25,10 @@ use Illuminate\Support\Facades\Crypt;
  */
 class ManageMediaSettings extends Page
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'manage-media-settings';
+
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCloud;
 
     protected static ?int $navigationSort = 3;

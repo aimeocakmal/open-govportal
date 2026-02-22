@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\FeedbackSetting;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -21,6 +22,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class ManageFeedbackSettings extends Page
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'manage-feedback-settings';
+
     protected string $view = 'filament.pages.manage-feedback-settings';
 
     protected static \UnitEnum|string|null $navigationGroup = null;

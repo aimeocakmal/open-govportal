@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SearchOverrides;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\SearchOverrides\Pages\CreateSearchOverride;
 use App\Filament\Resources\SearchOverrides\Pages\EditSearchOverride;
 use App\Filament\Resources\SearchOverrides\Pages\ListSearchOverrides;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class SearchOverrideResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'search-overrides';
+
     protected static ?string $model = SearchOverride::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMagnifyingGlass;

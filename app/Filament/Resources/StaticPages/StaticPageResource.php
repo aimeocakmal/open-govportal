@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StaticPages;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\StaticPages\Pages\CreateStaticPage;
 use App\Filament\Resources\StaticPages\Pages\EditStaticPage;
 use App\Filament\Resources\StaticPages\Pages\ListStaticPages;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class StaticPageResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'static-pages';
+
     protected static ?string $model = StaticPage::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;

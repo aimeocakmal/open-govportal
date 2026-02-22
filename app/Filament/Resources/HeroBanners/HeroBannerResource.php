@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\HeroBanners;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\HeroBanners\Pages\CreateHeroBanner;
 use App\Filament\Resources\HeroBanners\Pages\EditHeroBanner;
 use App\Filament\Resources\HeroBanners\Pages\ListHeroBanners;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class HeroBannerResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'hero-banners';
+
     protected static ?string $model = HeroBanner::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;

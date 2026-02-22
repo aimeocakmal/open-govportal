@@ -314,6 +314,8 @@ return [
             'mega_columns' => 'Mega Menu Columns',
             'access_control' => 'Access Control',
             'visible_to_roles' => 'Visible to Roles (leave empty for all)',
+            'system_item' => 'System',
+            'cannot_delete_system' => 'System items cannot be deleted. Use the active toggle to hide them instead.',
         ],
 
         'page_categories' => [

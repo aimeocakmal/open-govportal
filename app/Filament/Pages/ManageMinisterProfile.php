@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\MinisterProfile;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -24,6 +25,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class ManageMinisterProfile extends Page
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'manage-minister-profile';
+
     protected string $view = 'filament.pages.manage-minister-profile';
 
     protected static \UnitEnum|string|null $navigationGroup = null;

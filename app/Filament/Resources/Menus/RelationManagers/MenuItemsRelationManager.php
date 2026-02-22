@@ -19,6 +19,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Models\Role;
 
 class MenuItemsRelationManager extends RelationManager
@@ -118,6 +119,9 @@ class MenuItemsRelationManager extends RelationManager
                 IconColumn::make('is_active')
                     ->label(__('filament.common.active'))
                     ->boolean(),
+                IconColumn::make('is_system')
+                    ->label(__('filament.resource.menu_items.system_item'))
+                    ->boolean(),
             ])
             ->defaultSort('sort_order')
             ->headerActions([
@@ -125,11 +129,15 @@ class MenuItemsRelationManager extends RelationManager
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->hidden(fn ($record) => $record->is_system),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->action(function (Collection $records): void {
+                            $records->reject(fn ($record) => $record->is_system)->each->delete();
+                        }),
                 ]),
             ]);
     }

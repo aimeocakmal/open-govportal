@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Observers\MenuItemObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[ObservedBy(MenuItemObserver::class)]
 class MenuItem extends Model
 {
     use HasFactory;
@@ -24,6 +27,7 @@ class MenuItem extends Model
         'sort_order',
         'target',
         'is_active',
+        'is_system',
         'required_roles',
         'mega_columns',
     ];
@@ -34,6 +38,7 @@ class MenuItem extends Model
             'route_params' => 'json',
             'required_roles' => 'json',
             'is_active' => 'boolean',
+            'is_system' => 'boolean',
             'sort_order' => 'integer',
             'mega_columns' => 'integer',
         ];

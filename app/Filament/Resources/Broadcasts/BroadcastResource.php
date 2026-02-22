@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Broadcasts;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\Broadcasts\Pages\CreateBroadcast;
 use App\Filament\Resources\Broadcasts\Pages\EditBroadcast;
 use App\Filament\Resources\Broadcasts\Pages\ListBroadcasts;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class BroadcastResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'broadcasts';
+
     protected static ?string $model = Broadcast::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMegaphone;

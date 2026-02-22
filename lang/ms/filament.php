@@ -314,6 +314,8 @@ return [
             'mega_columns' => 'Lajur Menu Mega',
             'access_control' => 'Kawalan Akses',
             'visible_to_roles' => 'Kelihatan kepada Peranan (biarkan kosong untuk semua)',
+            'system_item' => 'Sistem',
+            'cannot_delete_system' => 'Item sistem tidak boleh dipadam. Gunakan togol aktif untuk menyembunyikannya.',
         ],
 
         'page_categories' => [

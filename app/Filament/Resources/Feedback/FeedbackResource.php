@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Feedback;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\Feedback\Pages\EditFeedback;
 use App\Filament\Resources\Feedback\Pages\ListFeedback;
 use App\Filament\Resources\Feedback\Schemas\FeedbackForm;
@@ -15,6 +16,10 @@ use Filament\Tables\Table;
 
 class FeedbackResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'feedback';
+
     protected static ?string $model = Feedback::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;

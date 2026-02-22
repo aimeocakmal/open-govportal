@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\Setting;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
@@ -24,6 +25,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class ManageSiteInfo extends Page
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'manage-site-info';
+
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
     protected static ?int $navigationSort = 1;

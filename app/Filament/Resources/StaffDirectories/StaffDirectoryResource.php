@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StaffDirectories;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\StaffDirectories\Pages\CreateStaffDirectory;
 use App\Filament\Resources\StaffDirectories\Pages\EditStaffDirectory;
 use App\Filament\Resources\StaffDirectories\Pages\ListStaffDirectories;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class StaffDirectoryResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'staff-directories';
+
     protected static ?string $model = StaffDirectory::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;

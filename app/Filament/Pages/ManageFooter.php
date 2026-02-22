@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\FooterSetting;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -22,6 +23,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class ManageFooter extends Page
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'manage-footer';
+
     protected string $view = 'filament.pages.manage-footer';
 
     protected static \UnitEnum|string|null $navigationGroup = null;

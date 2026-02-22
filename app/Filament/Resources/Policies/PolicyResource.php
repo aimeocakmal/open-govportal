@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Policies;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\Policies\Pages\CreatePolicy;
 use App\Filament\Resources\Policies\Pages\EditPolicy;
 use App\Filament\Resources\Policies\Pages\ListPolicies;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class PolicyResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'policies';
+
     protected static ?string $model = Policy::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;

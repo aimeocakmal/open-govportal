@@ -24,7 +24,15 @@ class MenuItemFactory extends Factory
             'sort_order' => fake()->numberBetween(0, 100),
             'target' => '_self',
             'is_active' => true,
+            'is_system' => false,
         ];
+    }
+
+    public function system(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_system' => true,
+        ]);
     }
 
     public function inactive(): static

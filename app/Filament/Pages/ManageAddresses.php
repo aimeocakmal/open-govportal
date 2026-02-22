@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Models\Address;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -22,6 +23,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class ManageAddresses extends Page
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'manage-addresses';
+
     protected string $view = 'filament.pages.manage-addresses';
 
     protected static \UnitEnum|string|null $navigationGroup = null;

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Media;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\Media\Pages\CreateMedia;
 use App\Filament\Resources\Media\Pages\EditMedia;
 use App\Filament\Resources\Media\Pages\ListMedia;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class MediaResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'media';
+
     protected static ?string $model = Media::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;

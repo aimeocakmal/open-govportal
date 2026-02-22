@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PolicyFiles;
 
+use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Resources\PolicyFiles\Pages\CreatePolicyFile;
 use App\Filament\Resources\PolicyFiles\Pages\EditPolicyFile;
 use App\Filament\Resources\PolicyFiles\Pages\ListPolicyFiles;
@@ -16,6 +17,10 @@ use Filament\Tables\Table;
 
 class PolicyFileResource extends Resource
 {
+    use HasConfigurableNavigation;
+
+    protected static string $sidebarKey = 'policy-files';
+
     protected static ?string $model = PolicyFile::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperClip;
