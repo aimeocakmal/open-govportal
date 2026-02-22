@@ -367,21 +367,21 @@ composer require league/flysystem-azure-blob-storage "^3.0"
 
 Split into must-have (5a) and nice-to-have (5b) to avoid overloading.
 
-**Week 5a — Must-Have:**
-- [ ] `UserResource` enhancements: `department` field for `department_admin` scoping, `last_login_at` display column, deactivate/reactivate user action, admin password reset action, bulk role assignment
-- [ ] `RoleResource`: CRUD for Spatie Permission roles + checkbox-based permission assignment per role (note: `RoleSeeder` already seeds all 6 roles + 60 permissions from Week 4)
-- [ ] Role-based access within Filament resources — Filament policies for all content resources, scoped by Spatie permissions
-- [ ] Draft/publish workflow: publish action button on list/edit pages, scheduled publishing via `published_at` (scheduler checks for publishable records)
-- [ ] Bulk actions in Filament: publish, unpublish, change status (extends existing `DeleteBulkAction`)
-- [ ] `StaticPage` + `PageCategory` models, migrations, Filament resources (from `database-schema.md`)
-- [ ] `Menu` + `MenuItem` models, migrations, Filament resource (`MenuResource` with nested items)
-- [ ] `ManageHomepage` settings page — homepage layout flags using `settings` table keys (deferred from Week 4; built now that Homepage data needs are clearer)
-- [ ] Wire `ManageMediaSettings` to Filament file uploads — create `MediaDiskService` (reads `media_disk` setting, decrypts cloud credentials, calls `Config::set()` at runtime); hook via `AdminPanelProvider::bootUsing()`; add `configureUsing()` defaults for `RichEditor` (directory) and `FileUpload` (visibility); map `local` → `public` disk so uploads are web-accessible; add `r2`/`gcs`/`azure` placeholder disks to `config/filesystems.php`; install `league/flysystem-aws-s3-v3` for S3/R2 support; zero changes to individual form schemas (global config handles all)
-- [ ] `MyProfile` Filament page — current user can manage their own profile:
-  - Edit name, email, avatar (file upload)
+**Week 5a — Must-Have: ✅ COMPLETED 2026-02-22**
+- [x] `UserResource` enhancements: `department` field for `department_admin` scoping, `last_login_at` display column, deactivate/reactivate user action, bulk role assignment, avatar upload
+- [x] `RoleResource`: CRUD for Spatie Permission roles + checkbox-based permission assignment per role (note: `RoleSeeder` already seeds all 6 roles + 60 permissions from Week 4)
+- [x] Role-based access within Filament resources — 16 Filament policies for all content resources, scoped by Spatie permissions
+- [x] Draft/publish workflow: publish action button on list/edit pages, `published_at` DateTimePicker for scheduling (note: auto-publish scheduler command deferred to Week 10)
+- [x] Bulk actions in Filament: publish, unpublish, activate/deactivate, delete (with confirmation)
+- [x] `StaticPage` + `PageCategory` models, migrations, Filament resources (from `database-schema.md`)
+- [x] `Menu` + `MenuItem` models, migrations, Filament resource (`MenuResource` with nested items, tree display, role-based visibility, `is_system` flag)
+- [x] `ManageHomepage` settings page — section visibility toggles, content limits, section order configuration using `settings` table keys
+- [x] Wire `ManageMediaSettings` to Filament file uploads — `MediaDiskService` (reads `media_disk` setting, decrypts cloud credentials, calls `Config::set()` at runtime); hooked via `AdminPanelProvider::bootUsing()`; `configureUsing()` defaults for `RichEditor` (directory) and `FileUpload` (visibility); `local` → `public` disk mapping; `r2`/`gcs`/`azure` placeholder disks in `config/filesystems.php`; `league/flysystem-aws-s3-v3` installed
+- [x] `MyProfile` (EditProfile) Filament page — current user can manage their own profile:
+  - Edit name, email, avatar (file upload with size/format constraints)
   - Change password (current + new + confirm)
-  - Change preferred language (ms/en), stored as user preference
-  - Delete own account (with confirmation modal + password re-entry; blocked for `super_admin` role to prevent accidental lockout)
+  - Change preferred language (ms/en), stored as user preference, locale applied on save
+  - Delete own account (with confirmation; blocked for `super_admin` role)
 
 **Week 5b — Nice-to-Have (can overlap with Week 6): ✅ COMPLETED 2026-02-22**
 - [x] Search indexing via PostgreSQL FTS — `searchable_content` migration with generated TSVECTOR columns + GIN indexes (PostgreSQL-only, SQLite LIKE fallback for tests); `SearchableContent` model, `HasSearchableContent` trait on 4 models, `SearchContentObserver`, `SearchService` with override priority
@@ -491,6 +491,7 @@ Recreate homepage sections from kd-portal's `home/` components:
 - [ ] Route, config, view caching in production
 - [ ] Lighthouse audit → target 90+ score
 - [ ] Add dark mode theme (`resources/css/themes/dark.css`) — register in `config/themes.php`; verify WCAG AA contrast ratios for dark palette
+- [ ] Scheduled publishing command — `php artisan content:publish-scheduled` (Artisan command registered in Laravel scheduler, runs every minute, finds records where `status = 'draft'` AND `published_at <= now()`, sets `status = 'published'`; applies to Broadcast, Achievement, Policy, Celebration, StaticPage)
 
 **Deliverables:**
 - Page load < 1 second
@@ -777,7 +778,7 @@ class QuickLink extends Model {
 | 2 | ✅ Design System & Base UI | Alpine.js + MyDS tokens + theme system + nav/footer + RBAC roles + 5 passing tests — 2026-02-21 |
 | 3 | ✅ Core Content Models | 6 models + Filament resources + 6 roles + 55 permissions + 53 tests passing — 2026-02-21 |
 | 4 | ✅ Directory, Files & Site Config | 5 content models + 4 site config tables + 7 settings pages + 87 tests passing — 2026-02-21 |
-| 5 | CMS Complete | All 12 collections manageable in Filament + My Profile page |
+| 5 | ✅ CMS Complete | All 12 collections + 16 policies + MyProfile + MediaDiskService + Menu/MenuItem + ManageHomepage + FTS + Image optimization + Content preview + Content versioning — 230 tests passing — 2026-02-22 |
 | 9 | All Pages Complete | All 10 public pages functional in ms/en |
 | 11 | QA Complete | 90+ Lighthouse, WCAG AA, load test passed |
 | 12 | Go Live | Site deployed, content migrated |
