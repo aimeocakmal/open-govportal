@@ -9,6 +9,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -34,10 +35,12 @@ class AdminPanelProvider extends PanelProvider
 
     /**
      * Build navigation groups ordered from the admin_sidebar menu.
-     * Returns translated group labels in the same order as the DB sort_order,
-     * matching what each resource's getNavigationGroup() returns.
      *
-     * @return array<int, string>
+     * Uses NavigationGroup objects with closure-based labels so that
+     * translation is deferred to render time (after SetAdminLocale middleware).
+     * This ensures the group order is consistent across all locales.
+     *
+     * @return array<int, NavigationGroup>
      */
     private function buildNavigationGroups(): array
     {
@@ -45,13 +48,22 @@ class AdminPanelProvider extends PanelProvider
         $groups = $service->getGroups();
 
         if ($groups->isEmpty()) {
-            return array_map(fn (string $key) => __($key), array_values(self::GROUP_I18N_MAP));
+            return array_map(
+                fn (string $key) => NavigationGroup::make()
+                    ->label(fn (): string => __($key)),
+                array_values(self::GROUP_I18N_MAP),
+            );
         }
 
         return $groups
             ->filter(fn (array $group) => $group['is_active'])
             ->keys()
-            ->map(fn (string $routeName) => __(self::GROUP_I18N_MAP[$routeName] ?? $routeName))
+            ->map(function (string $routeName) {
+                $i18nKey = self::GROUP_I18N_MAP[$routeName] ?? $routeName;
+
+                return NavigationGroup::make()
+                    ->label(fn (): string => __($i18nKey));
+            })
             ->values()
             ->all();
     }
