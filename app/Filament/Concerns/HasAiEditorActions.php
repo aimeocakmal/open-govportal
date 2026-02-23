@@ -28,9 +28,9 @@ trait HasAiEditorActions
                 AiGrammarAction::make("grammar_{$locale}")->locale($locale),
                 AiExpandAction::make("expand_{$locale}")->locale($locale),
                 AiSummariseAction::make("summarise_{$locale}")->locale($locale),
-                AiTranslateAction::make("translate_{$locale}_to_{$otherLocale}")
-                    ->sourceField($contentField)->targetField($otherContentField)
-                    ->from($locale)->to($otherLocale),
+                AiTranslateAction::make("translate_{$locale}")
+                    ->currentLocale($locale)
+                    ->localeFields([$locale => $contentField, $otherLocale => $otherContentField]),
                 AiTldrAction::make("tldr_{$locale}")
                     ->sourceField($contentField)
                     ->locale($locale),
@@ -62,9 +62,9 @@ trait HasAiEditorActions
                 AiGrammarAction::make("grammar_{$locale}")->locale($locale),
                 AiExpandAction::make("expand_{$locale}")->locale($locale),
                 AiSummariseAction::make("summarise_{$locale}")->locale($locale),
-                AiTranslateAction::make("translate_{$locale}_to_{$otherLocale}")
-                    ->sourceField($field)->targetField($otherField)
-                    ->from($locale)->to($otherLocale),
+                AiTranslateAction::make("translate_{$locale}")
+                    ->currentLocale($locale)
+                    ->localeFields([$locale => $field, $otherLocale => $otherField]),
             ])
                 ->label(__('ai_admin.generate_ai'))
                 ->icon('heroicon-o-sparkles')
@@ -90,9 +90,9 @@ trait HasAiEditorActions
         return [
             ActionGroup::make([
                 AiGrammarAction::make("grammar_excerpt_{$locale}")->locale($locale),
-                AiTranslateAction::make("translate_excerpt_{$locale}_to_{$otherLocale}")
-                    ->sourceField($field)->targetField($otherField)
-                    ->from($locale)->to($otherLocale),
+                AiTranslateAction::make("translate_excerpt_{$locale}")
+                    ->currentLocale($locale)
+                    ->localeFields([$locale => $field, $otherLocale => $otherField]),
             ])
                 ->label(__('ai_admin.generate_ai'))
                 ->icon('heroicon-o-sparkles')

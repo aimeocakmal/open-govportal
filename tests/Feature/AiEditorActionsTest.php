@@ -101,7 +101,7 @@ class AiEditorActionsTest extends TestCase
         Livewire::actingAs($this->getAdmin())
             ->test(EditBroadcast::class, ['record' => $broadcast->id])
             ->assertActionExists(
-                TestAction::make('translate_ms_to_en')->schemaComponent('content_ms')
+                TestAction::make('translate_ms')->schemaComponent('content_ms')
             );
     }
 
@@ -164,7 +164,7 @@ class AiEditorActionsTest extends TestCase
                 TestAction::make('grammar_excerpt_ms')->schemaComponent('excerpt_ms')
             )
             ->assertActionExists(
-                TestAction::make('translate_excerpt_ms_to_en')->schemaComponent('excerpt_ms')
+                TestAction::make('translate_excerpt_ms')->schemaComponent('excerpt_ms')
             );
     }
 
@@ -179,7 +179,7 @@ class AiEditorActionsTest extends TestCase
                 TestAction::make('grammar_en')->schemaComponent('content_en')
             )
             ->assertActionExists(
-                TestAction::make('translate_en_to_ms')->schemaComponent('content_en')
+                TestAction::make('translate_en')->schemaComponent('content_en')
             );
     }
 
@@ -212,7 +212,7 @@ class AiEditorActionsTest extends TestCase
             ->assertNotified();
     }
 
-    public function test_translate_action_requires_confirmation(): void
+    public function test_translate_action_shows_language_modal(): void
     {
         $this->enableAiEditor();
         $broadcast = Broadcast::factory()->create(['content_ms' => 'Kandungan BM.']);
@@ -220,10 +220,10 @@ class AiEditorActionsTest extends TestCase
         Livewire::actingAs($this->getAdmin())
             ->test(EditBroadcast::class, ['record' => $broadcast->id])
             ->mountAction(
-                TestAction::make('translate_ms_to_en')->schemaComponent('content_ms')
+                TestAction::make('translate_ms')->schemaComponent('content_ms')
             )
             ->assertActionMounted(
-                TestAction::make('translate_ms_to_en')->schemaComponent('content_ms')
+                TestAction::make('translate_ms')->schemaComponent('content_ms')
             );
     }
 }

@@ -5,6 +5,7 @@ return [
     'grammar_check' => 'Grammar Check',
     'grammar_applied' => 'Grammar corrections applied.',
     'translate' => 'Translate',
+    'translate_to' => 'Translate to',
     'translate_to_en' => 'Translate → EN',
     'translate_to_ms' => 'Translate → BM',
     'translated' => 'Translation complete.',

@@ -5,6 +5,7 @@ return [
     'grammar_check' => 'Semak Tatabahasa',
     'grammar_applied' => 'Tatabahasa telah diperbaiki.',
     'translate' => 'Terjemah',
+    'translate_to' => 'Terjemah ke',
     'translate_to_en' => 'Terjemah → EN',
     'translate_to_ms' => 'Terjemah → BM',
     'translated' => 'Terjemahan selesai.',

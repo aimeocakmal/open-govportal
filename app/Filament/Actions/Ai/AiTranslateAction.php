@@ -4,49 +4,38 @@ namespace App\Filament\Actions\Ai;
 
 use App\Services\AiService;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 
 class AiTranslateAction extends Action
 {
-    protected string $fromLocale = 'ms';
+    protected string $currentLocale = 'ms';
 
-    protected string $toLocale = 'en';
-
-    protected string $sourceFieldName = '';
-
-    protected string $targetFieldName = '';
+    /** @var array<string, string> locale => field name */
+    protected array $localeFieldMap = [];
 
     public static function make(?string $id = null): static
     {
         return parent::make($id ?? 'ai_translate');
     }
 
-    public function from(string $locale): static
+    public function currentLocale(string $locale): static
     {
-        $this->fromLocale = $locale;
+        $this->currentLocale = $locale;
 
         return $this;
     }
 
-    public function to(string $locale): static
+    /**
+     * Map of locale code to form field name (e.g. ['ms' => 'content_ms', 'en' => 'content_en']).
+     *
+     * @param  array<string, string>  $fields
+     */
+    public function localeFields(array $fields): static
     {
-        $this->toLocale = $locale;
-
-        return $this;
-    }
-
-    public function sourceField(string $field): static
-    {
-        $this->sourceFieldName = $field;
-
-        return $this;
-    }
-
-    public function targetField(string $field): static
-    {
-        $this->targetFieldName = $field;
+        $this->localeFieldMap = $fields;
 
         return $this;
     }
@@ -55,22 +44,28 @@ class AiTranslateAction extends Action
     {
         parent::setUp();
 
-        $from = $this->fromLocale;
-        $to = $this->toLocale;
-        $source = $this->sourceFieldName;
-        $target = $this->targetFieldName;
-
-        $label = $to === 'en' ? __('ai_admin.translate_to_en') : __('ai_admin.translate_to_ms');
+        $currentLocale = $this->currentLocale;
+        $localeFields = $this->localeFieldMap;
 
         $this
-            ->label($label)
+            ->label(__('ai_admin.translate'))
             ->icon('heroicon-o-language')
             ->color('gray')
             ->size('sm')
             ->visible(fn (): bool => AiGrammarAction::isAiEditorEnabled())
-            ->requiresConfirmation()
-            ->action(function (Get $schemaGet, Set $schemaSet) use ($from, $to, $source, $target): void {
-                $sourceField = $source !== '' ? $source : $this->getSchemaComponent()?->getName();
+            ->schema([
+                Select::make('target_locale')
+                    ->label(__('ai_admin.translate_to'))
+                    ->options([
+                        'ms' => 'Bahasa Malaysia (BM)',
+                        'en' => 'English (EN)',
+                    ])
+                    ->required(),
+            ])
+            ->action(function (array $data, Get $schemaGet, Set $schemaSet) use ($currentLocale, $localeFields): void {
+                $targetLocale = $data['target_locale'];
+                $sourceField = $localeFields[$currentLocale] ?? $this->getSchemaComponent()?->getName();
+                $targetField = $localeFields[$targetLocale] ?? $sourceField;
 
                 if ($sourceField === null) {
                     return;
@@ -85,7 +80,7 @@ class AiTranslateAction extends Action
                     return;
                 }
 
-                $result = app(AiService::class)->translate($text, $from, $to);
+                $result = app(AiService::class)->translate($text, $currentLocale, $targetLocale);
 
                 if ($result === '') {
                     Notification::make()->danger()
@@ -94,7 +89,6 @@ class AiTranslateAction extends Action
                     return;
                 }
 
-                $targetField = $target !== '' ? $target : $sourceField;
                 $schemaSet($targetField, $result);
                 Notification::make()->success()
                     ->title(__('ai_admin.translated'))->send();
