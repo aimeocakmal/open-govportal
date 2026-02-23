@@ -72,7 +72,7 @@ class StaticPageForm
                                     ->label(__('filament.common.excerpt_bm'))
                                     ->maxLength(1000)
                                     ->rows(3)
-                                    ->afterLabel(self::excerptAiActions('ms', 'en', 'excerpt_ms', 'excerpt_en')),
+                                    ->afterLabel(self::excerptAiActions('ms', 'en', 'excerpt_ms', 'excerpt_en', 'content_ms')),
                             ]),
                         Tab::make(__('filament.common.english'))
                             ->schema([
@@ -87,7 +87,7 @@ class StaticPageForm
                                     ->label(__('filament.common.excerpt_en'))
                                     ->maxLength(1000)
                                     ->rows(3)
-                                    ->afterLabel(self::excerptAiActions('en', 'ms', 'excerpt_en', 'excerpt_ms')),
+                                    ->afterLabel(self::excerptAiActions('en', 'ms', 'excerpt_en', 'excerpt_ms', 'content_en')),
                             ]),
                     ])
                     ->columnSpanFull(),

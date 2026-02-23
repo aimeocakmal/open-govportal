@@ -8,6 +8,7 @@ use App\Filament\Actions\Ai\AiGrammarAction;
 use App\Filament\Actions\Ai\AiSummariseAction;
 use App\Filament\Actions\Ai\AiTldrAction;
 use App\Filament\Actions\Ai\AiTranslateAction;
+use App\Filament\Actions\Ai\AiWriteExcerptAction;
 use Filament\Actions\ActionGroup;
 
 trait HasAiEditorActions
@@ -77,7 +78,7 @@ trait HasAiEditorActions
     }
 
     /**
-     * AI actions dropdown for excerpt/short text fields (grammar, translate).
+     * AI actions dropdown for excerpt/short text fields (write excerpt, grammar, translate).
      *
      * @return array<int, ActionGroup>
      */
@@ -86,14 +87,18 @@ trait HasAiEditorActions
         string $otherLocale,
         string $field,
         string $otherField,
+        string $contentField = '',
     ): array {
         return [
-            ActionGroup::make([
+            ActionGroup::make(array_filter([
+                $contentField !== '' ? AiWriteExcerptAction::make("write_excerpt_{$locale}")
+                    ->contentField($contentField)
+                    ->locale($locale) : null,
                 AiGrammarAction::make("grammar_excerpt_{$locale}")->locale($locale),
                 AiTranslateAction::make("translate_excerpt_{$locale}")
                     ->currentLocale($locale)
                     ->localeFields([$locale => $field, $otherLocale => $otherField]),
-            ])
+            ]))
                 ->label(__('ai_admin.generate_ai'))
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')

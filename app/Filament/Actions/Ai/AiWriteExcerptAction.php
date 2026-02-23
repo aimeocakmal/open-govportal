@@ -8,15 +8,15 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 
-class AiTldrAction extends Action
+class AiWriteExcerptAction extends Action
 {
     protected string $aiLocale = 'ms';
 
-    protected string $sourceFieldName = '';
+    protected string $contentFieldName = '';
 
     public static function make(?string $id = null): static
     {
-        return parent::make($id ?? 'ai_tldr');
+        return parent::make($id ?? 'ai_write_excerpt');
     }
 
     public function locale(string $locale): static
@@ -26,9 +26,12 @@ class AiTldrAction extends Action
         return $this;
     }
 
-    public function sourceField(string $field): static
+    /**
+     * The content/article field to read from for generating the excerpt.
+     */
+    public function contentField(string $field): static
     {
-        $this->sourceFieldName = $field;
+        $this->contentFieldName = $field;
 
         return $this;
     }
@@ -38,31 +41,32 @@ class AiTldrAction extends Action
         parent::setUp();
 
         $locale = $this->aiLocale;
-        $source = $this->sourceFieldName;
+        $contentField = $this->contentFieldName;
 
         $this
-            ->label(__('ai_admin.tldr'))
-            ->icon('heroicon-o-bolt')
+            ->label(__('ai_admin.write_excerpt'))
+            ->icon('heroicon-o-pencil-square')
             ->color('gray')
             ->size('sm')
             ->visible(fn (): bool => AiGrammarAction::isAiEditorEnabled())
-            ->action(function (Get $schemaGet, Set $schemaSet) use ($locale, $source): void {
-                $fieldName = $source !== '' ? $source : $this->getSchemaComponent()?->getName();
+            ->action(function (Get $schemaGet, Set $schemaSet) use ($locale, $contentField): void {
+                $excerptField = $this->getSchemaComponent()?->getName();
 
-                if ($fieldName === null) {
+                if ($excerptField === null) {
                     return;
                 }
 
-                $text = $schemaGet($fieldName);
+                $sourceField = $contentField !== '' ? $contentField : $excerptField;
+                $text = $schemaGet($sourceField);
 
                 if (blank($text)) {
                     Notification::make()->warning()
-                        ->title(__('ai_admin.field_empty'))->send();
+                        ->title(__('ai_admin.content_empty_for_excerpt'))->send();
 
                     return;
                 }
 
-                $result = app(AiService::class)->tldr(strip_tags($text), $locale);
+                $result = app(AiService::class)->writeExcerpt(strip_tags($text), $locale);
 
                 if ($result === '') {
                     Notification::make()->danger()
@@ -71,15 +75,9 @@ class AiTldrAction extends Action
                     return;
                 }
 
-                $cleanResult = strip_tags($result, '<ul><li>');
-
-                $tldrBlock = '<p><strong>TL;DR</strong></p>'
-                    .$cleanResult
-                    .'<hr>';
-
-                $schemaSet($fieldName, $tldrBlock.$text);
+                $schemaSet($excerptField, $result);
                 Notification::make()->success()
-                    ->title(__('ai_admin.tldr_generated'))->send();
+                    ->title(__('ai_admin.excerpt_written'))->send();
             });
     }
 }

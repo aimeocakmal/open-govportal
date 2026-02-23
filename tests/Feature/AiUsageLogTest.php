@@ -104,7 +104,7 @@ class AiUsageLogTest extends TestCase
 
     public function test_operation_values_are_stored_correctly(): void
     {
-        $operations = ['grammar_check', 'translate', 'expand', 'summarise', 'tldr', 'generate', 'chat', 'embed'];
+        $operations = ['grammar_check', 'translate', 'expand', 'summarise', 'tldr', 'write_excerpt', 'generate', 'chat', 'embed'];
 
         foreach ($operations as $op) {
             AiUsageLog::create(['operation' => $op]);

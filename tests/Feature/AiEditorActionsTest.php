@@ -168,6 +168,34 @@ class AiEditorActionsTest extends TestCase
             );
     }
 
+    public function test_write_excerpt_action_exists_on_excerpt_field(): void
+    {
+        $this->enableAiEditor();
+        $broadcast = Broadcast::factory()->create();
+
+        Livewire::actingAs($this->getAdmin())
+            ->test(EditBroadcast::class, ['record' => $broadcast->id])
+            ->assertActionExists(
+                TestAction::make('write_excerpt_ms')->schemaComponent('excerpt_ms')
+            );
+    }
+
+    public function test_write_excerpt_action_calls_ai_service(): void
+    {
+        $this->enableAiEditor();
+        Prism::fake([
+            TextResponseFake::make()->withText('A short excerpt.')->withUsage(new Usage(20, 10)),
+        ]);
+        $broadcast = Broadcast::factory()->create(['content_ms' => '<p>Long article content here.</p>']);
+
+        Livewire::actingAs($this->getAdmin())
+            ->test(EditBroadcast::class, ['record' => $broadcast->id])
+            ->callAction(
+                TestAction::make('write_excerpt_ms')->schemaComponent('excerpt_ms')
+            )
+            ->assertNotified();
+    }
+
     public function test_english_tab_has_ai_actions(): void
     {
         $this->enableAiEditor();

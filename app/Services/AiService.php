@@ -184,17 +184,33 @@ class AiService
     }
 
     /**
-     * Generate a 2-3 sentence TLDR summary.
+     * Generate a TLDR summary as a bulleted list with a hook.
      */
     public function tldr(string $text, string $locale): string
     {
         $langName = $locale === 'ms' ? 'Bahasa Malaysia' : 'English';
         $systemPrompt = "You are a TLDR generator for {$langName}. "
-            .'Write a concise 2-3 sentence summary of the provided content. '
-            .'Return ONLY plain text (no HTML). '
-            .'Focus on the most important takeaways.';
+            .'Create a TL;DR using 2 to 4 bullet points. '
+            .'Do NOT just list the topics — summarise the conclusions and key takeaways. '
+            .'End with a final bullet that gives the reader a reason to keep reading the full article. '
+            .'Return ONLY an HTML unordered list (<ul><li>…</li></ul>) with no other markup or text.';
 
         return $this->generate($systemPrompt, $text, 'tldr', $locale);
+    }
+
+    /**
+     * Write a 30-50 word excerpt based on article content.
+     */
+    public function writeExcerpt(string $text, string $locale): string
+    {
+        $langName = $locale === 'ms' ? 'Bahasa Malaysia' : 'English';
+        $systemPrompt = 'You are a professional editor for a government website. '
+            ."Write a concise excerpt of 30 to 50 words in {$langName} that summarises the provided article. "
+            .'The excerpt must be written in the SAME language as the article. '
+            .'Return ONLY plain text (no HTML, no quotes). '
+            .'Do not start with phrases like "This article" or "In this article".';
+
+        return $this->generate($systemPrompt, $text, 'write_excerpt', $locale);
     }
 
     /**

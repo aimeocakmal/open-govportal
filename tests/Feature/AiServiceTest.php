@@ -254,6 +254,43 @@ class AiServiceTest extends TestCase
         ]);
     }
 
+    public function test_write_excerpt_returns_empty_without_api_key(): void
+    {
+        $result = $this->app->make(AiService::class)->writeExcerpt('article text', 'ms');
+
+        $this->assertEquals('', $result);
+    }
+
+    public function test_write_excerpt_returns_short_excerpt(): void
+    {
+        $this->setUpApiKey();
+        $fake = Prism::fake([
+            TextResponseFake::make()->withText('Kementerian Digital melancarkan inisiatif baharu.')->withUsage(new Usage(30, 12)),
+        ]);
+
+        $result = $this->app->make(AiService::class)->writeExcerpt('Long article about the ministry...', 'ms');
+
+        $this->assertEquals('Kementerian Digital melancarkan inisiatif baharu.', $result);
+        $fake->assertCallCount(1);
+    }
+
+    public function test_write_excerpt_logs_usage(): void
+    {
+        $this->setUpApiKey();
+        Prism::fake([
+            TextResponseFake::make()->withText('An excerpt.')->withUsage(new Usage(25, 10)),
+        ]);
+
+        $this->app->make(AiService::class)->writeExcerpt('article content', 'en');
+
+        $this->assertDatabaseHas('ai_usage_logs', [
+            'operation' => 'write_excerpt',
+            'locale' => 'en',
+            'prompt_tokens' => 25,
+            'completion_tokens' => 10,
+        ]);
+    }
+
     public function test_generate_from_image_stub_throws_bad_method_call(): void
     {
         $this->expectException(\BadMethodCallException::class);
