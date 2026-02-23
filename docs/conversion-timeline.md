@@ -492,94 +492,35 @@ Recreate homepage sections from kd-portal's `home/` components:
 
 ---
 
-### Phase 4: Performance & Quality (Weeks 10–11)
+### Phase 4: AI Features, Code Quality & Performance (Weeks 10–14) — Local Development
 
-#### Week 10: Performance Optimisation
+> All tasks in this phase run on the developer machine. No server or cloud infrastructure required.
+>
+> **Strategy:** Build AI features first (Weeks 10–12), then run a comprehensive quality and performance pass (Weeks 13–14) that covers the **entire application including AI**. This ensures caching, security, accessibility, and test coverage all account for the AI chatbot, embedding pipeline, and admin editor.
+>
+> AI features are an **approved extension beyond kd-portal parity**. See [docs/ai.md](ai.md) and [docs/architecture.md → AI Services Layer](architecture.md) for full specification.
 
-**Tasks:**
-- [ ] Full-page cache for all public routes (Redis, TTL 1 hour)
-- [ ] Cache tag invalidation on content save (Filament observer hooks)
-- [ ] Database query optimisation (eager loading, indexes)
-- [ ] Image lazy loading + WebP conversion on upload
-- [ ] Cloudflare CDN integration
-- [ ] Octane tuning (workers, max_requests)
-- [ ] Route, config, view caching in production
-- [ ] Lighthouse audit → target 90+ score
-- [ ] Add dark mode theme (`resources/css/themes/dark.css`) — register in `config/themes.php`; verify WCAG AA contrast ratios for dark palette
-- [ ] Scheduled publishing command — `php artisan content:publish-scheduled` (Artisan command registered in Laravel scheduler, runs every minute, finds records where `status = 'draft'` AND `published_at <= now()`, sets `status = 'published'`; applies to Broadcast, Achievement, Policy, Celebration, StaticPage)
-
-**Deliverables:**
-- Page load < 1 second
-- 90+ Lighthouse performance score
-- Cache invalidation working
-
-**Effort:** 40 hours
-
-#### Week 11: Testing, Accessibility & Security
-
-**Tasks:**
-- [ ] PHPUnit feature tests for all routes (ms + en locale)
-- [ ] Browser testing (Chrome, Firefox, Safari, mobile)
-- [ ] WCAG 2.1 AA accessibility audit + fixes
-- [ ] Security audit (CSRF, XSS, SQL injection, rate limiting)
-- [ ] Load testing (target: 10,000 concurrent users)
-- [ ] Cross-browser responsive testing
-
-**Deliverables:**
-- Test suite with >80% coverage
-- WCAG compliance report
-- Security audit passed
-
-**Effort:** 40 hours
-
----
-
-### Phase 5: Migration & Launch (Week 12)
-
-**Tasks:**
-- [ ] Export content from kd-portal MongoDB via Payload API
-- [ ] Write migration scripts to import into PostgreSQL
-- [ ] Verify content integrity (counts, images, slugs)
-- [ ] Set up URL redirects (preserve old URL structure)
-- [ ] Production environment configuration
-- [ ] SSL certificates + DNS
-- [ ] Final smoke tests
-- [ ] Soft launch (staging → production)
-- [ ] Post-launch monitoring setup (Sentry, Grafana)
-
-**Deliverables:**
-- All content migrated
-- Live at digital.gov.my equivalent
-- Monitoring active
-
-**Effort:** 40 hours
-
----
-
-### Phase 6: AI Features (Weeks 13–16)
-
-> **Approved extension beyond kd-portal parity.** See [docs/ai.md](ai.md) and [docs/architecture.md → AI Services Layer](architecture.md) for full specification.
-
-#### Week 13: RAG Foundation
+#### Week 10: RAG Foundation
 
 Set up the embedding pipeline so all content is vector-indexed before building the chatbot.
 
 **Tasks:**
-- [ ] Install `pgvector` PostgreSQL extension; enable in migration
+- [ ] Install `pgvector` PostgreSQL extension on local PostgreSQL; enable in migration
 - [ ] Create `content_embeddings` migration + `ContentEmbedding` model (morphic, chunk_index, locale, embedding `vector(1536)`, metadata JSON)
-- [ ] Install Prism PHP (`echolabsdev/prism`); configure Anthropic + OpenAI providers in `config/prism.php`
-- [ ] Create `AiService` (`app/Services/AiService.php`) — single entry point for all Claude + OpenAI calls
-- [ ] Create `RagService` (`app/Services/RagService.php`) — embed query → pgvector similarity search → context assembly
+- [ ] Install Prism PHP (`echolabsdev/prism`); configure providers in `config/prism.php`
+- [ ] Create `AiService` (`app/Services/AiService.php`) — single entry point for all LLM + embedding calls; reads active provider from `settings` table
+- [ ] Create `RagService` (`app/Services/RagService.php`) — embed query → pgvector cosine similarity search → context assembly
 - [ ] Create `EmbeddingObserver` (`app/Observers/EmbeddingObserver.php`) — fires `GenerateEmbeddingJob` on model `saved`/`deleted`
-- [ ] Create `GenerateEmbeddingJob` (`app/Jobs/GenerateEmbeddingJob.php`) — queued; chunks content, calls OpenAI `text-embedding-3-small`, upserts `content_embeddings`
-- [ ] Register `EmbeddingObserver` on all embeddable models in `AppServiceProvider`: `Broadcast`, `Achievement`, `Policy`, `StaffDirectory`
-- [ ] Add `AI_CHATBOT_ENABLED`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` to `.env.example`
+- [ ] Create `GenerateEmbeddingJob` (`app/Jobs/GenerateEmbeddingJob.php`) — queued; chunks content, calls admin-configured embedding provider, upserts `content_embeddings`
+- [ ] Register `EmbeddingObserver` on embeddable models in `AppServiceProvider`: `Broadcast`, `Achievement`, `Policy`, `StaffDirectory`
+- [ ] Create `ManageAiSettings` Filament settings page — LLM provider/model/key, embedding provider/model/key/dimension, feature flags (chatbot enabled, admin editor enabled, rate limit)
+- [ ] Add AI env vars to `.env.example` (`AI_LLM_PROVIDER`, `AI_LLM_MODEL`, `AI_LLM_API_KEY`, `AI_EMBEDDING_PROVIDER`, etc.)
 - [ ] Write `GenerateEmbeddingJobTest` + `RagServiceTest`
 
 **Installation Commands:**
 
 ```bash
-# pgvector extension (run in PostgreSQL)
+# pgvector extension (run in local PostgreSQL)
 psql -U postgres -d govportal -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 # Prism PHP
@@ -591,23 +532,23 @@ php artisan queue:work --queue=embeddings
 
 **Deliverables:**
 - `content_embeddings` table with pgvector column
-- `php artisan db:seed --class=BroadcastSeeder` → rows appear in `content_embeddings`
-- `RagServiceTest` passes (top-5 chunks returned for a test query)
-- `GenerateEmbeddingJobTest` passes
+- Embedding pipeline working locally (seed → observe → queue → embed → store)
+- `ManageAiSettings` Filament page functional (provider config + feature flags)
+- `RagServiceTest` + `GenerateEmbeddingJobTest` pass
 
 **Effort:** 32 hours
 
 ---
 
-#### Week 14: Public AI Chatbot
+#### Week 11: Public AI Chatbot
 
 Build the `AiChat` Livewire component and integrate it into the public layout.
 
 **Tasks:**
 - [ ] Create `AiChat` Livewire component (`app/Livewire/AiChat.php` + `resources/views/livewire/ai-chat.blade.php`)
   - Properties: `$messages = []` (session conversation history), `$input = ''`, `$isThinking = false`
-  - Method `send()`: validates input, embeds query via `RagService`, builds prompt, calls Claude via `AiService`, appends response to `$messages`
-  - Rate limiting: 10 messages/hour per IP via `RateLimiter::attempt('ai-chat:' . $ip, 10, ...)`
+  - Method `send()`: validates input, embeds query via `RagService`, builds prompt, calls LLM via `AiService`, appends response to `$messages`
+  - Rate limiting: configurable per IP via `RateLimiter::attempt()` (default 10/hour, setting `ai_chatbot_rate_limit`)
   - Session-only history: store in PHP session, not DB; never log PII
 - [ ] Create privacy disclaimer modal (Alpine.js) — shown on first open; acceptance stored in session
 - [ ] Add `<livewire:ai-chat />` to `resources/views/components/layouts/app.blade.php`
@@ -618,9 +559,9 @@ Build the `AiChat` Livewire component and integrate it into the public layout.
 - [ ] Add rate limit test: 11th message in same hour returns error response
 
 **Deliverables:**
-- Chat widget visible on `/ms` and `/en` pages
-- Sends question → receives contextually accurate response (sourced from DB content)
-- Rate limiting enforced (10/hour/IP)
+- Chat widget visible on `/ms` and `/en` pages (hidden if not configured)
+- Sends question → receives contextually accurate RAG response
+- Rate limiting enforced (configurable)
 - Privacy disclaimer shown on first open
 - `AiChatTest` passes (all happy paths + rate limit)
 
@@ -628,12 +569,12 @@ Build the `AiChat` Livewire component and integrate it into the public layout.
 
 ---
 
-#### Week 15: Admin AI Content Editor
+#### Week 12: Admin AI Content Editor + AI QA
 
-Inject AI actions into existing Filament content resources.
+Inject AI actions into existing Filament resources, then validate AI-specific quality.
 
-**Tasks:**
-- [ ] Create base Filament action classes in `app/Filament/Actions/Ai/`:
+**Tasks — Admin AI Editor:**
+- [ ] Create Filament action classes in `app/Filament/Actions/Ai/`:
   - `AiGrammarAction` — grammar check BM or EN
   - `AiTranslateAction` — BM ↔ EN translation (from/to locale as constructor params)
   - `AiExpandAction` — expand selected text
@@ -641,39 +582,115 @@ Inject AI actions into existing Filament content resources.
   - `AiTldrAction` — generate 2-3 sentence TLDR → fills `excerpt_{locale}` field
   - `AiGenerateAction` — generate from text prompt (modal)
   - `AiGenerateFromImageAction` — generate from image URL + prompt (modal)
-- [ ] Inject relevant actions into these Filament resources: `BroadcastResource`, `AchievementResource`, `PolicyResource`
+- [ ] Inject relevant actions into: `BroadcastResource`, `AchievementResource`, `PolicyResource`
 - [ ] Add `lang/ms/ai_admin.php` + `lang/en/ai_admin.php` for action labels and confirmations
-- [ ] Write tests for each action class: `AiGrammarActionTest`, `AiTranslateActionTest`, etc. (mock `AiService`)
-- [ ] Manual QA: each action button opens modal or replaces content inline
+- [ ] Write tests for each action class (mock `AiService`)
+
+**Tasks — AI QA & Compliance:**
+- [ ] Load test embedding job queue locally (target: 100 concurrent saves without queue overflow)
+- [ ] Benchmark chatbot response time (target: first token < 2s, full response < 10s)
+- [ ] Add `ai_usage_logs` table (anonymised): `operation`, `locale`, `duration_ms`, `tokens_used`, `created_at` — no user PII
+- [ ] Monitor pgvector index size; add `ivfflat` index on `content_embeddings.embedding` if > 10,000 rows
+- [ ] PDPA compliance audit: no PII in embeddings (audit sample of 20 rows), no user data persisted in chat logs
+- [ ] `AI_CHATBOT_ENABLED` feature flag — disabled → hide widget gracefully
+- [ ] Update `docs/ai.md` with final architecture, API key rotation guide, cost estimation
 
 **Deliverables:**
-- AI action buttons visible on `content_ms` / `content_en` fields in Broadcast, Achievement, Policy editors
-- Each action calls Claude and returns a result within 10 seconds
-- All action tests pass (mocked)
+- AI editor actions working in all target resources
+- All AI tests passing (mocked)
+- PDPA compliance audit passed
+- `docs/ai.md` finalised
 
-**Effort:** 32 hours
+**Effort:** 40 hours
 
 ---
 
-#### Week 16: AI QA, Performance & Monitoring
+#### Week 13: Performance Optimisation & Features
+
+Optimise the entire application — including AI features built in Weeks 10–12.
 
 **Tasks:**
-- [ ] Load test embedding job queue (target: 100 concurrent saves without job queue overflow)
-- [ ] Benchmark chatbot response time (target: first token < 2 seconds, full response < 10 seconds)
-- [ ] Add `ai_usage_logs` table (optional, anonymised): `operation`, `locale`, `duration_ms`, `tokens_used`, `created_at` — no user PII
-- [ ] Monitor pgvector index size; add `ivfflat` index on `content_embeddings.embedding` if > 10,000 rows
-- [ ] Verify PDPA compliance: no PII in embeddings (audit sample of 20 rows), no user data persisted in chat logs
-- [ ] Update Cloudflare WAF rules to allow AI chat Livewire requests (bypass full-page cache)
-- [ ] Add `AI_CHATBOT_ENABLED` feature flag check in `AiChat` component — disabled → hide widget gracefully
-- [ ] Documentation: update `docs/ai.md` with final architecture, API key rotation guide, cost estimation
+- [ ] Full-page cache for all public routes (cache driver per environment, TTL 1 hour) — use `CacheResponse` middleware with plain `Cache::remember()` (no `Cache::tags()` — database driver doesn't support it); AI chat Livewire requests bypass page cache
+- [ ] Cache invalidation on content save — `CacheObserver` registered on all content models (see [pages-features.md → Cache Tag → Route / Model Mapping](pages-features.md) for invalidation rules); uses explicit `Cache::forget()` with key patterns
+- [ ] Database query optimisation — eager loading audit across all controllers/Livewire components (including `AiChat`), N+1 detection, verify all GIN FTS indexes exist
+- [ ] Image lazy loading — add `loading="lazy"` to all `<img>` tags on public pages (WebP conversion already implemented in Week 5b via `ImageOptimizationService`)
+- [ ] Route, config, view caching — verify `php artisan route:cache`, `config:cache`, `view:cache` work correctly with all routes
+- [ ] Add dark mode theme (`resources/css/themes/dark.css`) — register in `config/themes.php`; verify WCAG AA contrast ratios for dark palette; test theme switcher toggles correctly; verify AI chat widget renders correctly in dark mode
+- [ ] Scheduled publishing command — `php artisan content:publish-scheduled` (Artisan command registered in Laravel scheduler, runs every minute, finds records where `status = 'draft'` AND `published_at <= now()`, sets `status = 'published'`; applies to Broadcast, Achievement, Policy, Celebration, StaticPage)
+- [ ] Lighthouse audit → target 90+ score (run locally via Chrome DevTools; includes pages with AI chat widget loaded)
 
 **Deliverables:**
-- AI chatbot handles 50 concurrent users without degrading page performance
-- pgvector index optimised
-- PDPA audit passed
-- `docs/ai.md` finalised
+- Cache invalidation working on all content models (AI chat bypasses page cache correctly)
+- Dark mode theme complete with accessible contrast ratios (including chat widget)
+- Scheduled publishing tested locally with all 5 publishable models
+- Lighthouse performance score ≥ 90 (local)
 
-**Effort:** 32 hours
+**Effort:** 40 hours
+
+---
+
+#### Week 14: Testing, Accessibility & Security
+
+Comprehensive quality pass over the **entire application** — all 10 pages, admin panel, AI chatbot, and AI editor.
+
+**Tasks:**
+- [ ] PHPUnit feature tests for all routes (ms + en locale) — target >80% coverage; includes AI component tests (`AiChatTest`, action tests, embedding tests)
+- [ ] WCAG 2.1 AA accessibility audit + fixes (all 10 public pages, both themes, AI chat widget focus management + keyboard nav + screen reader)
+- [ ] Security audit (CSRF token on all forms, XSS in user-generated content, SQL injection review, rate limiting on all form endpoints + AI chat, AI input sanitisation)
+- [ ] Cross-browser responsive testing (Chrome, Firefox, Safari, mobile viewports; verify AI chat widget positioning and interaction on all breakpoints)
+
+**Deliverables:**
+- Test suite with >80% coverage (including AI features)
+- WCAG compliance fixes applied (all critical/high resolved, including chat widget)
+- Security audit passed (no critical/high findings; AI rate limiting verified)
+- Cross-browser issues fixed
+
+**Effort:** 40 hours
+
+---
+
+### Phase 5: Content Migration & Server Deployment (Weeks 15–16)
+
+> All local development (Phases 1–4) is complete. This phase handles production environment setup, content migration from the live kd-portal, and launch. All tasks require server or cloud infrastructure access.
+
+#### Week 15: Content Migration & Deployment Prep
+
+**Tasks:**
+- [ ] Export content from kd-portal MongoDB via Payload API (all 12 collections)
+- [ ] Write migration scripts to import into PostgreSQL (map Payload fields → Laravel columns)
+- [ ] Verify content integrity (record counts, image references, slug uniqueness, bilingual completeness)
+- [ ] Set up URL redirects (preserve old kd-portal URL structure → new Laravel routes)
+- [ ] Production environment configuration (`.env.production`, database credentials, Redis, queue driver, AI provider keys)
+- [ ] SSL certificates + DNS configuration
+
+**Deliverables:**
+- All content migrated to PostgreSQL with verified integrity
+- URL redirects tested (old → new)
+- Production environment configured and validated
+
+**Effort:** 40 hours
+
+---
+
+#### Week 16: Launch & Operations
+
+**Tasks:**
+- [ ] Cloudflare CDN integration (page rules, static asset caching, edge TTLs)
+- [ ] Cloudflare WAF rules (allow Livewire POST requests, bypass full-page cache for AI chat)
+- [ ] Octane tuning (worker count, `max_requests`, memory limits for FrankenPHP)
+- [ ] Load testing on production-like environment (target: 10,000 concurrent users; AI chatbot handles 50 concurrent sessions)
+- [ ] Post-launch monitoring setup (Sentry error tracking, Grafana dashboards, health checks)
+- [ ] Final smoke tests on staging environment (all 10 pages, both locales, AI chatbot, admin panel)
+- [ ] Soft launch (staging → production cutover)
+- [ ] Post-launch monitoring active (24-hour watch period)
+
+**Deliverables:**
+- Live at production URL
+- Monitoring active (Sentry + Grafana)
+- Load test passed (10K concurrent users)
+- 99.9% uptime target active
+
+**Effort:** 40 hours
 
 ---
 
@@ -787,16 +804,21 @@ class QuickLink extends Model {
 
 ## Milestones
 
-| Week | Milestone | Success Criteria |
-|------|-----------|-----------------|
-| 1 | ✅ Tooling Bootstrap | Laravel 12 + Octane + Filament + Boost + Blueprint all installed and verified — 2026-02-21 |
-| 2 | ✅ Design System & Base UI | Alpine.js + MyDS tokens + theme system + nav/footer + RBAC roles + 5 passing tests — 2026-02-21 |
-| 3 | ✅ Core Content Models | 6 models + Filament resources + 6 roles + 55 permissions + 53 tests passing — 2026-02-21 |
-| 4 | ✅ Directory, Files & Site Config | 5 content models + 4 site config tables + 7 settings pages + 87 tests passing — 2026-02-21 |
-| 5 | ✅ CMS Complete | All 12 collections + 16 policies + MyProfile + MediaDiskService + Menu/MenuItem + ManageHomepage + FTS + Image optimization + Content preview + Content versioning — 230 tests passing — 2026-02-22 |
-| 9 | All Pages Complete | All 10 public pages functional in ms/en |
-| 11 | QA Complete | 90+ Lighthouse, WCAG AA, load test passed |
-| 12 | Go Live | Site deployed, content migrated |
+| Week | Phase | Milestone | Success Criteria |
+|------|-------|-----------|-----------------|
+| 1 | 1 | ✅ Tooling Bootstrap | Laravel 12 + Octane + Filament + Boost + Blueprint all installed and verified — 2026-02-21 |
+| 2 | 1 | ✅ Design System & Base UI | Alpine.js + MyDS tokens + theme system + nav/footer + RBAC roles + 5 passing tests — 2026-02-21 |
+| 3 | 2 | ✅ Core Content Models | 6 models + Filament resources + 6 roles + 55 permissions + 53 tests passing — 2026-02-21 |
+| 4 | 2 | ✅ Directory, Files & Site Config | 5 content models + 4 site config tables + 7 settings pages + 87 tests passing — 2026-02-21 |
+| 5 | 2 | ✅ CMS Complete | All 12 collections + 16 policies + MyProfile + MediaDiskService + Menu/MenuItem + ManageHomepage + FTS + Image optimization + Content preview + Content versioning — 230 tests passing — 2026-02-22 |
+| 9 | 3 | ✅ All Pages Complete | All 10 public pages functional in ms/en — 456 tests, 840 assertions |
+| 10 | 4 | RAG Foundation | pgvector + embeddings + AiService + RagService + ManageAiSettings |
+| 11 | 4 | AI Chatbot | AiChat Livewire component working with RAG, rate-limited |
+| 12 | 4 | AI Editor + AI QA | Admin AI actions, PDPA compliance, all AI tests passing |
+| 13 | 4 | Performance & Dark Mode | Cache invalidation (incl. AI bypass), dark mode, scheduled publishing, Lighthouse ≥ 90 |
+| 14 | 4 | QA Complete (LOCAL) | >80% test coverage (incl. AI), WCAG AA (incl. chat widget), security audit passed |
+| 15 | 5 | Content Migrated | All kd-portal content in PostgreSQL, URL redirects, production env configured |
+| 16 | 5 | Go Live | CDN + WAF + Octane tuned + monitoring + load test passed + launched |
 
 ---
 
