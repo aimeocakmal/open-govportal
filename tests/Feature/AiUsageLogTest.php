@@ -102,6 +102,55 @@ class AiUsageLogTest extends TestCase
         $this->assertEquals(2, AiUsageLog::where('locale', 'ms')->count());
     }
 
+    public function test_source_column_defaults_to_admin_editor(): void
+    {
+        $log = AiUsageLog::create([
+            'operation' => 'grammar_check',
+        ]);
+
+        $this->assertEquals('admin_editor', $log->fresh()->source);
+    }
+
+    public function test_source_column_stores_valid_values(): void
+    {
+        foreach (['admin_editor', 'public_chat', 'admin_embedding'] as $source) {
+            AiUsageLog::create([
+                'operation' => 'test',
+                'source' => $source,
+            ]);
+        }
+
+        $this->assertDatabaseHas('ai_usage_logs', ['source' => 'admin_editor']);
+        $this->assertDatabaseHas('ai_usage_logs', ['source' => 'public_chat']);
+        $this->assertDatabaseHas('ai_usage_logs', ['source' => 'admin_embedding']);
+    }
+
+    public function test_factory_creates_with_source(): void
+    {
+        $log = AiUsageLog::factory()->create();
+        $this->assertNotNull($log->source);
+    }
+
+    public function test_factory_admin_editor_state(): void
+    {
+        $log = AiUsageLog::factory()->adminEditor()->create();
+        $this->assertEquals('admin_editor', $log->source);
+    }
+
+    public function test_factory_public_chat_state(): void
+    {
+        $log = AiUsageLog::factory()->publicChat()->create();
+        $this->assertEquals('public_chat', $log->source);
+        $this->assertEquals('chat', $log->operation);
+    }
+
+    public function test_factory_embedding_state(): void
+    {
+        $log = AiUsageLog::factory()->embedding()->create();
+        $this->assertEquals('admin_embedding', $log->source);
+        $this->assertEquals('embed', $log->operation);
+    }
+
     public function test_operation_values_are_stored_correctly(): void
     {
         $operations = ['grammar_check', 'translate', 'expand', 'summarise', 'tldr', 'write_excerpt', 'generate', 'chat', 'embed'];

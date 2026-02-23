@@ -125,6 +125,7 @@ class MenuSeeder extends Seeder
             ['route_name' => 'homepage', 'label_ms' => 'Laman Utama', 'label_en' => 'Homepage', 'icon' => 'heroicon-o-home', 'sort_order' => 1],
             ['route_name' => 'user_management', 'label_ms' => 'Pengurusan Pengguna', 'label_en' => 'User Management', 'icon' => 'heroicon-o-user-group', 'sort_order' => 2],
             ['route_name' => 'settings', 'label_ms' => 'Tetapan', 'label_en' => 'Settings', 'icon' => 'heroicon-o-cog-6-tooth', 'sort_order' => 3],
+            ['route_name' => 'logs', 'label_ms' => 'Log', 'label_en' => 'Logs', 'icon' => 'heroicon-o-clipboard-document-list', 'sort_order' => 4],
         ];
 
         $groupIds = [];
@@ -175,16 +176,25 @@ class MenuSeeder extends Seeder
             ['route_name' => 'manage-site-info', 'label_ms' => 'Maklumat Laman', 'label_en' => 'Site Info', 'icon' => 'heroicon-o-cog-6-tooth', 'sort_order' => 0],
             ['route_name' => 'manage-email-settings', 'label_ms' => 'Tetapan Emel', 'label_en' => 'Email Settings', 'icon' => 'heroicon-o-envelope', 'sort_order' => 1],
             ['route_name' => 'manage-media-settings', 'label_ms' => 'Tetapan Media', 'label_en' => 'Media Settings', 'icon' => 'heroicon-o-cloud', 'sort_order' => 2],
-            ['route_name' => 'menus', 'label_ms' => 'Menu', 'label_en' => 'Menus', 'icon' => 'heroicon-o-bars-3', 'sort_order' => 3],
-            ['route_name' => 'manage-footer', 'label_ms' => 'Kaki Halaman', 'label_en' => 'Footer', 'icon' => 'heroicon-o-bars-3-bottom-left', 'sort_order' => 4],
-            ['route_name' => 'manage-minister-profile', 'label_ms' => 'Profil Menteri', 'label_en' => 'Minister Profile', 'icon' => 'heroicon-o-user', 'sort_order' => 5],
-            ['route_name' => 'manage-addresses', 'label_ms' => 'Alamat', 'label_en' => 'Addresses', 'icon' => 'heroicon-o-map-pin', 'sort_order' => 6],
-            ['route_name' => 'manage-feedback-settings', 'label_ms' => 'Tetapan Maklum Balas', 'label_en' => 'Feedback Settings', 'icon' => 'heroicon-o-cog-6-tooth', 'sort_order' => 7],
-            ['route_name' => 'manage-platform-version', 'label_ms' => 'Versi Platform', 'label_en' => 'Platform Version', 'icon' => 'heroicon-o-tag', 'sort_order' => 8],
-            ['route_name' => 'activity-logs', 'label_ms' => 'Log Aktiviti', 'label_en' => 'Activity Logs', 'icon' => 'heroicon-o-clipboard-document-list', 'sort_order' => 9],
+            ['route_name' => 'manage-ai-settings', 'label_ms' => 'Tetapan AI', 'label_en' => 'AI Settings', 'icon' => 'heroicon-o-cpu-chip', 'sort_order' => 3],
+            ['route_name' => 'menus', 'label_ms' => 'Menu', 'label_en' => 'Menus', 'icon' => 'heroicon-o-bars-3', 'sort_order' => 4],
+            ['route_name' => 'manage-footer', 'label_ms' => 'Kaki Halaman', 'label_en' => 'Footer', 'icon' => 'heroicon-o-bars-3-bottom-left', 'sort_order' => 5],
+            ['route_name' => 'manage-minister-profile', 'label_ms' => 'Profil Menteri', 'label_en' => 'Minister Profile', 'icon' => 'heroicon-o-user', 'sort_order' => 6],
+            ['route_name' => 'manage-addresses', 'label_ms' => 'Alamat', 'label_en' => 'Addresses', 'icon' => 'heroicon-o-map-pin', 'sort_order' => 7],
+            ['route_name' => 'manage-feedback-settings', 'label_ms' => 'Tetapan Maklum Balas', 'label_en' => 'Feedback Settings', 'icon' => 'heroicon-o-cog-6-tooth', 'sort_order' => 8],
+            ['route_name' => 'manage-platform-version', 'label_ms' => 'Versi Platform', 'label_en' => 'Platform Version', 'icon' => 'heroicon-o-tag', 'sort_order' => 9],
         ];
 
         $this->seedGroupItems($sidebar->id, $groupIds['settings'], $settingsItems);
+
+        // ── Logs group items ──────────────────────────────────────────
+        $logsItems = [
+            ['route_name' => 'activity-logs', 'label_ms' => 'Log Aktiviti', 'label_en' => 'Activity Logs', 'icon' => 'heroicon-o-clipboard-document-list', 'sort_order' => 0],
+            ['route_name' => 'ai-usage-dashboard', 'label_ms' => 'Log Penggunaan AI', 'label_en' => 'AI Usage Logs', 'icon' => 'heroicon-o-chart-bar-square', 'sort_order' => 1],
+            ['route_name' => 'ai-chat-conversations', 'label_ms' => 'Log Chat AI', 'label_en' => 'AI Chat Logs', 'icon' => 'heroicon-o-chat-bubble-left-right', 'sort_order' => 2],
+        ];
+
+        $this->seedGroupItems($sidebar->id, $groupIds['logs'], $logsItems);
     }
 
     /**

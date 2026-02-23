@@ -14,7 +14,19 @@ use Prism\Prism\ValueObjects\Messages\UserMessage;
 
 class AiService
 {
+    private ?object $lastUsage = null;
+
     public function __construct(private Prism $prism) {}
+
+    /**
+     * Get usage data from the last chat() or generate() call.
+     *
+     * @return object{promptTokens: ?int, completionTokens: ?int, durationMs: int}|null
+     */
+    public function getLastUsage(): ?object
+    {
+        return $this->lastUsage;
+    }
 
     /**
      * Send a chat message with optional conversation history and RAG context.
@@ -57,8 +69,27 @@ class AiService
             $pendingRequest->withPrompt($prompt);
         }
 
+        $startTime = microtime(true);
+
         try {
             $response = $pendingRequest->asText();
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+
+            $this->lastUsage = (object) [
+                'promptTokens' => $response->usage->promptTokens ?? null,
+                'completionTokens' => $response->usage->completionTokens ?? null,
+                'durationMs' => $durationMs,
+            ];
+
+            $this->logUsage(
+                operation: 'chat',
+                locale: $locale,
+                startTime: $startTime,
+                provider: $provider,
+                model: $model,
+                response: $response,
+                source: 'public_chat',
+            );
 
             return $response->text;
         } catch (\Throwable $e) {
@@ -89,11 +120,23 @@ class AiService
             return [];
         }
 
+        $startTime = microtime(true);
+
         try {
             $response = $this->prism->embeddings()
                 ->using($provider, $model, $this->buildProviderConfig($apiKey, forEmbedding: true))
                 ->fromInput($text)
                 ->asEmbeddings();
+
+            $this->logUsage(
+                operation: 'embed',
+                locale: '',
+                startTime: $startTime,
+                provider: $provider,
+                model: $model,
+                response: $response,
+                source: 'admin_embedding',
+            );
 
             return $response->embeddings[0] ?? [];
         } catch (\Throwable $e) {
@@ -266,6 +309,7 @@ class AiService
                 provider: $provider,
                 model: $model,
                 response: $response,
+                source: 'admin_editor',
             );
 
             return $response->text;
@@ -280,13 +324,14 @@ class AiService
         }
     }
 
-    private function logUsage(string $operation, string $locale, float $startTime, Provider $provider, string $model, mixed $response): void
+    private function logUsage(string $operation, string $locale, float $startTime, Provider $provider, string $model, mixed $response, string $source = 'admin_editor'): void
     {
         try {
             $durationMs = (int) round((microtime(true) - $startTime) * 1000);
 
             AiUsageLog::create([
                 'operation' => $operation,
+                'source' => $source,
                 'locale' => $locale,
                 'duration_ms' => $durationMs,
                 'prompt_tokens' => $response->usage->promptTokens ?? null,

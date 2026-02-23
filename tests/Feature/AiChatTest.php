@@ -110,6 +110,8 @@ class AiChatTest extends TestCase
             $mock->shouldReceive('chat')
                 ->once()
                 ->andReturn('Ini adalah jawapan AI.');
+            $mock->shouldReceive('getLastUsage')
+                ->andReturn(null);
         });
 
         $this->mock(RagService::class, function ($mock) {
@@ -168,6 +170,7 @@ class AiChatTest extends TestCase
 
         $this->mock(AiService::class, function ($mock) {
             $mock->shouldReceive('chat')->andReturn('response');
+            $mock->shouldReceive('getLastUsage')->andReturn(null);
         });
 
         $this->mock(RagService::class, function ($mock) {
@@ -219,6 +222,7 @@ class AiChatTest extends TestCase
 
         $this->mock(AiService::class, function ($mock) {
             $mock->shouldReceive('chat')->andReturn('response text');
+            $mock->shouldReceive('getLastUsage')->andReturn(null);
         });
 
         $this->mock(RagService::class, function ($mock) {
@@ -322,6 +326,7 @@ class AiChatTest extends TestCase
 
         $this->mock(AiService::class, function ($mock) {
             $mock->shouldReceive('chat')->andReturn('Jawapan ujian');
+            $mock->shouldReceive('getLastUsage')->andReturn(null);
         });
 
         $this->mock(RagService::class, function ($mock) {

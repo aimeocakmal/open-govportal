@@ -2,9 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Jobs\GenerateConversationTitleJob;
+use App\Models\AiChatConversation;
+use App\Models\AiChatMessage;
 use App\Models\Setting;
 use App\Services\AiService;
 use App\Services\RagService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
@@ -27,11 +31,14 @@ class AiChat extends Component
 
     public string $preferredLanguage = '';
 
+    public ?int $conversationId = null;
+
     public function mount(): void
     {
         $this->messages = session('ai_chat_messages', []);
         $this->disclaimerAccepted = (bool) session('ai_chat_disclaimer_accepted', false);
         $this->preferredLanguage = session('ai_chat_preferred_language', '');
+        $this->conversationId = session('ai_chat_conversation_id');
     }
 
     public function send(): void
@@ -85,6 +92,18 @@ class AiChat extends Component
         $history = array_slice($this->messages, 0, -1);
         $history = array_slice($history, -10);
 
+        // Create conversation on first message
+        if ($this->conversationId === null) {
+            $conversation = AiChatConversation::create([
+                'session_id' => session()->getId(),
+                'ip_address' => request()->ip(),
+                'locale' => $locale,
+                'started_at' => now(),
+            ]);
+            $this->conversationId = $conversation->id;
+            session()->put('ai_chat_conversation_id', $this->conversationId);
+        }
+
         // Call LLM
         $response = $aiService->chat($userMessage, $history, $systemPrompt, $locale);
 
@@ -95,6 +114,39 @@ class AiChat extends Component
             array_pop($this->messages);
 
             return;
+        }
+
+        $usage = $aiService->getLastUsage();
+
+        // Store messages to DB
+        AiChatMessage::create([
+            'conversation_id' => $this->conversationId,
+            'role' => 'user',
+            'content' => $userMessage,
+            'created_at' => now(),
+        ]);
+        AiChatMessage::create([
+            'conversation_id' => $this->conversationId,
+            'role' => 'assistant',
+            'content' => $response,
+            'prompt_tokens' => $usage?->promptTokens,
+            'completion_tokens' => $usage?->completionTokens,
+            'duration_ms' => $usage?->durationMs,
+            'created_at' => now(),
+        ]);
+
+        // Update conversation counters
+        AiChatConversation::where('id', $this->conversationId)->update([
+            'message_count' => DB::raw('message_count + 2'),
+            'total_prompt_tokens' => DB::raw('total_prompt_tokens + '.((int) ($usage?->promptTokens ?? 0))),
+            'total_completion_tokens' => DB::raw('total_completion_tokens + '.((int) ($usage?->completionTokens ?? 0))),
+            'last_message_at' => now(),
+        ]);
+
+        // Dispatch title generation after 3rd exchange (6 messages)
+        $conversation = AiChatConversation::find($this->conversationId);
+        if ($conversation && $conversation->message_count >= 6 && $conversation->title === null) {
+            GenerateConversationTitleJob::dispatch($this->conversationId);
         }
 
         // Append assistant response
@@ -117,10 +169,15 @@ class AiChat extends Component
 
     public function clearChat(): void
     {
+        if ($this->conversationId !== null) {
+            AiChatConversation::where('id', $this->conversationId)->update(['ended_at' => now()]);
+        }
+
         $this->messages = [];
         $this->hasError = false;
         $this->rateLimited = false;
-        session()->forget('ai_chat_messages');
+        $this->conversationId = null;
+        session()->forget(['ai_chat_messages', 'ai_chat_conversation_id']);
     }
 
     public function setLanguage(string $lang): void

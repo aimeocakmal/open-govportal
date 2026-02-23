@@ -85,6 +85,7 @@ A dedicated Filament settings page at `/admin/ai-settings` allows admins to conf
 | Chatbot Enabled | `ai_chatbot_enabled` | boolean | `false` |
 | Admin Editor Enabled | `ai_admin_editor_enabled` | boolean | `false` |
 | Chatbot Rate Limit | `ai_chatbot_rate_limit` | integer (msg/hour/IP) | `10` |
+| Chat Retention Days | `ai_chat_retention_days` | integer (min 7) | `90` |
 
 **Chatbot Settings (identity, behavior, display):**
 
@@ -171,7 +172,7 @@ Single entry point for all LLM and embedding calls. Reads active provider config
 ```php
 class AiService
 {
-    public function chat(string $prompt, array $history = [], string $locale = 'ms'): string {}
+    public function chat(string $prompt, array $history = [], string $systemPrompt = '', string $locale = 'ms'): string {}
 
     public function grammarCheck(string $text, string $locale): string {}
 
@@ -192,6 +193,12 @@ class AiService
     public function embed(string $text): array {}
 
     public function isAvailable(): bool {}  // returns false if API key not configured
+
+    /**
+     * Returns usage data from the last chat() call.
+     * @return object{promptTokens: ?int, completionTokens: ?int, durationMs: int}|null
+     */
+    public function getLastUsage(): ?object {}
 }
 ```
 
@@ -212,7 +219,8 @@ private function generate(string $systemPrompt, string $userPrompt, string $oper
         ->withPrompt($userPrompt)
         ->asText();
 
-    $this->logUsage($operation, $locale, $startTime, $provider, $model, $response);
+    // source: 'admin_editor' — all admin content operations route through generate()
+    $this->logUsage($operation, $locale, $startTime, $provider, $model, $response, source: 'admin_editor');
     return $response->text;
 }
 ```
@@ -316,7 +324,7 @@ CREATE INDEX idx_content_embeddings_vector
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `$messages` | `array` | Session conversation history (not persisted to DB) |
+| `$messages` | `array` | Conversation history (persisted to `ai_chat_messages` table) |
 | `$input` | `string` | Current user input |
 | `$isThinking` | `bool` | True while awaiting LLM response |
 
@@ -341,6 +349,54 @@ CREATE INDEX idx_content_embeddings_vector
 **Welcome message:** The first bot message displayed when the chat window opens (before the user types). Read from `ai_chatbot_welcome_{locale}`.
 
 **Privacy disclaimer:** Session modal on first open; content from `ai_chatbot_disclaimer_{locale}` setting (falls back to `lang/{locale}/ai.php` default). Acceptance stored in session, never persisted.
+
+---
+
+## Conversation Persistence
+
+Public chatbot conversations are persisted to the database for admin review, analytics, and auto-purge.
+
+### Database Table: `ai_chat_conversations`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | bigint | Primary key |
+| `session_id` | varchar(100) | Laravel session ID (indexed) |
+| `ip_address` | varchar(45) | Client IP (nullable) |
+| `title` | varchar(255) | Auto-generated title (nullable until 3rd exchange) |
+| `summary` | text | Conversation summary (nullable) |
+| `tags` | json | Category tags — auto-generated, admin-editable (nullable) |
+| `locale` | varchar(5) | Conversation locale (nullable) |
+| `message_count` | unsigned int | Total messages in conversation |
+| `total_prompt_tokens` | unsigned int | Aggregate prompt tokens |
+| `total_completion_tokens` | unsigned int | Aggregate completion tokens |
+| `started_at` | timestamp | Conversation start time |
+| `last_message_at` | timestamp | Most recent message (nullable) |
+| `ended_at` | timestamp | Conversation end time (nullable) |
+
+### Database Table: `ai_chat_messages`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | bigint | Primary key |
+| `conversation_id` | bigint (FK) | References `ai_chat_conversations.id` (cascade delete, indexed) |
+| `role` | varchar(20) | `user` or `assistant` |
+| `content` | text | Message body |
+| `prompt_tokens` | unsigned int | Tokens used for this message (nullable) |
+| `completion_tokens` | unsigned int | Tokens generated for this message (nullable) |
+| `duration_ms` | unsigned int | LLM response time (nullable) |
+| `created_at` | timestamp | Message timestamp |
+
+### Auto-Generated Titles and Tags
+
+After the **3rd exchange (6 messages)**, `GenerateConversationTitleJob` is dispatched (queued). The job:
+
+1. Reads the first 6 messages (truncated to 300 chars each)
+2. Sends a classification prompt to the configured LLM requesting JSON: `{"title": "...", "tags": [...]}`
+3. Updates `title` and `tags` on the conversation record
+4. Falls back to the first user message as title if JSON parsing fails
+
+**Tag vocabulary:** `soalan-umum`, `dasar`, `perkhidmatan`, `teknikal`, `aduan`, `maklumat`, `cadangan`. Tags are admin-editable via `AiChatConversationResource`.
 
 ---
 
@@ -405,15 +461,106 @@ Tracks all AI operations for cost monitoring. **Fully anonymised** — no user P
 |--------|------|-------------|
 | `id` | bigint | Primary key |
 | `operation` | varchar(50) | `grammar_check`, `translate`, `expand`, `summarise`, `tldr`, `generate`, `chat`, `embed` |
+| `source` | varchar(30) | Origin of the call: `admin_editor`, `public_chat`, `admin_embedding` (indexed) |
 | `locale` | varchar(5) | `ms` or `en` |
 | `duration_ms` | unsigned int | Request duration in milliseconds |
 | `prompt_tokens` | unsigned int | Input tokens (from Prism response) |
 | `completion_tokens` | unsigned int | Output tokens (from Prism response) |
 | `provider` | varchar(50) | Provider key (e.g. `anthropic`, `openai`) |
 | `model` | varchar(100) | Model ID (e.g. `claude-sonnet-4-6`) |
-| `created_at` | timestamp | Auto-set via `useCurrent()` |
+| `created_at` | timestamp | Auto-set via `useCurrent()` (indexed) |
 
 > No `user_id`, no `ip_address`, no `content` columns — PDPA-compliant by design.
+
+### Source Tracking
+
+Every `AiService` method logs its call with an explicit `source` value to distinguish where the request originated:
+
+| `AiService` method | `source` value | Context |
+|---------------------|---------------|---------|
+| `chat()` | `public_chat` | Public chatbot conversations |
+| `embed()` | `admin_embedding` | Embedding generation during RAG indexing |
+| `generate()` (private) | `admin_editor` | All admin editor operations: grammar check, translate, expand, summarise, TLDR, generate from prompt |
+
+The `source` column enables filtering in the `AiUsageDashboard` and in the auto-purge command, so admins can distinguish public chatbot cost from admin content editing cost.
+
+### Retrieving Usage Data
+
+`AiService::getLastUsage()` returns an object with `promptTokens`, `completionTokens`, and `durationMs` from the most recent `chat()` call. This is used by the `AiChat` Livewire component to update per-message and per-conversation token counters.
+
+---
+
+## Admin Monitoring Pages
+
+### `AiUsageDashboard` (Custom Filament Page)
+
+Located at `/admin/ai-usage-dashboard`. Provides a visual overview of all AI operations across the platform. Requires `manage_ai_settings` permission.
+
+**Filters (top bar, 3-column layout):**
+
+| Filter | Type | Notes |
+|--------|------|-------|
+| Date from | DatePicker | Start of date range |
+| Date until | DatePicker | End of date range |
+| Source | Select | `All sources`, `admin_editor`, `public_chat`, `admin_embedding` |
+
+**Widgets:**
+
+| Widget | Class | Description |
+|--------|-------|-------------|
+| Stats overview | `AiUsageStatsWidget` | 4 stat cards with sparklines: total requests, total prompt tokens, total completion tokens, average duration |
+| Token chart | `AiTokenUsageChartWidget` | Line chart showing prompt vs completion tokens over time (grouped by day) |
+
+Both widgets read the dashboard's filter state and update dynamically when filters change.
+
+### `AiChatConversationResource` (Filament Resource)
+
+Manages the `AiChatConversation` model. Navigation icon: `ChatBubbleLeftRight`. Requires `manage_ai_settings` permission.
+
+**Pages:**
+
+| Page | Route | Purpose |
+|------|-------|---------|
+| List | `/admin/ai-chat-conversations` | Searchable table of all conversations (title, locale, message count, tokens, dates, tags) |
+| View | `/admin/ai-chat-conversations/{id}` | Read-only infolist with conversation metadata + full message thread rendered via custom Blade view |
+| Edit | `/admin/ai-chat-conversations/{id}/edit` | Edit `title` and `tags` only (admin curation) |
+
+> Creation is disabled (`canCreate() = false`) — conversations are created automatically by the public chatbot.
+
+---
+
+## Auto-Purge
+
+### Artisan Command: `ai:purge-conversations`
+
+Deletes old chat conversations and usage logs based on a configurable retention period.
+
+```bash
+# Run purge
+php artisan ai:purge-conversations
+
+# Preview what would be deleted (no changes)
+php artisan ai:purge-conversations --dry-run
+```
+
+**Behaviour:**
+
+1. Reads `ai_chat_retention_days` from the `settings` table (default: **90 days**, minimum: **7 days**)
+2. Deletes `ai_chat_conversations` where `last_message_at < cutoff` (or `started_at < cutoff` if `last_message_at` is null). Cascade deletes associated `ai_chat_messages`.
+3. Deletes `ai_usage_logs` where `created_at < cutoff`
+4. `--dry-run` flag outputs counts without performing any deletions
+
+**Scheduled execution:** Registered in `routes/console.php`, runs daily at **02:00**:
+
+```php
+Schedule::command('ai:purge-conversations')->dailyAt('02:00');
+```
+
+**Retention setting:** Configurable via the admin panel (`ManageAiSettings` or directly in the `settings` table):
+
+| Settings key | Type | Default | Minimum |
+|-------------|------|---------|---------|
+| `ai_chat_retention_days` | integer | `90` | `7` |
 
 ---
 
@@ -430,8 +577,8 @@ Tracks all AI operations for cost monitoring. **Fully anonymised** — no user P
 ## PDPA Compliance Checklist
 
 - [x] `content_embeddings` rows contain only public content — no names, ICs, emails
-- [x] Chatbot session history not persisted to database
-- [x] AI usage logs (`ai_usage_logs`) contain no user PII — only operation type, duration, token count, provider used
+- [x] Chatbot conversations persisted to `ai_chat_conversations` / `ai_chat_messages` for admin review — auto-purged after configurable retention period (default 90 days) via `ai:purge-conversations`
+- [x] AI usage logs (`ai_usage_logs`) contain no user PII — only operation type, source, duration, token count, provider used; auto-purged with conversations
 - [x] Privacy disclaimer shown before first chat interaction
 - [x] API keys stored encrypted in `settings` table; never logged
 - [x] Admin can disable AI features completely via `ManageAiSettings`

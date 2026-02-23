@@ -32,7 +32,7 @@ class ActivityLogResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('filament.nav.settings');
+        return __('filament.nav.logs');
     }
 
     public static function getModelLabel(): string

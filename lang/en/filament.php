@@ -18,6 +18,7 @@ return [
         'content' => 'Content',
         'homepage' => 'Homepage',
         'user_management' => 'User Management',
+        'logs' => 'Logs',
     ],
 
     // ── Resource model labels ───────────────────────────────────────
@@ -39,6 +40,7 @@ return [
         'user' => 'User|Users',
         'role' => 'Role|Roles',
         'activity_log' => 'Activity Log|Activity Logs',
+        'ai_chat_conversation' => 'AI Chat Log|AI Chat Logs',
     ],
 
     // ── Shared labels (used across many files) ───────────────────────

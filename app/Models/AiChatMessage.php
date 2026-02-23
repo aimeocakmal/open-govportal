@@ -4,31 +4,37 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AiUsageLog extends Model
+class AiChatMessage extends Model
 {
     use HasFactory;
 
     public $timestamps = false;
 
     protected $fillable = [
-        'operation',
-        'source',
-        'locale',
-        'duration_ms',
+        'conversation_id',
+        'role',
+        'content',
         'prompt_tokens',
         'completion_tokens',
-        'provider',
-        'model',
+        'duration_ms',
+        'created_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'duration_ms' => 'integer',
             'prompt_tokens' => 'integer',
             'completion_tokens' => 'integer',
+            'duration_ms' => 'integer',
             'created_at' => 'datetime',
         ];
+    }
+
+    /** @return BelongsTo<AiChatConversation, $this> */
+    public function conversation(): BelongsTo
+    {
+        return $this->belongsTo(AiChatConversation::class, 'conversation_id');
     }
 }

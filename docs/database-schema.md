@@ -39,6 +39,12 @@ Site Configuration Tables:
 CMS Extensions (beyond Payload parity):
   static_pages        ← Admin-managed static content pages (slug-based)
   page_categories     ← Hierarchical categories for static pages
+
+AI Tables (Phase 6):
+  content_embeddings      ← pgvector embeddings for RAG pipeline
+  ai_usage_logs           ← Anonymised AI operation cost tracking
+  ai_chat_conversations   ← Public chatbot conversation sessions
+  ai_chat_messages        ← Individual messages within conversations
 ```
 
 ---
@@ -467,6 +473,74 @@ CREATE INDEX idx_ce_morphic ON content_embeddings (embeddable_type, embeddable_i
 - To use a different embedding model with different dimensions, set `PGVECTOR_DIMENSION` before migrations and re-run `php artisan govportal:reindex-embeddings`
 - `metadata.provider` and `metadata.model` record which provider/model generated this embedding (for audit and re-index detection)
 
+### `ai_usage_logs` (Phase 6 — AI)
+
+Tracks all AI operations for cost monitoring. **Fully anonymised** — no user PII.
+
+```sql
+CREATE TABLE ai_usage_logs (
+    id                  BIGSERIAL PRIMARY KEY,
+    operation           VARCHAR(50) NOT NULL,   -- grammar_check | translate | expand | summarise | tldr | generate | chat | embed
+    source              VARCHAR(30) DEFAULT 'admin_editor',
+                                                -- admin_editor | public_chatbot | system
+    locale              VARCHAR(5),             -- 'ms' or 'en'
+    duration_ms         UNSIGNED INT,           -- request duration in milliseconds
+    prompt_tokens       UNSIGNED INT,           -- input tokens (from Prism response)
+    completion_tokens   UNSIGNED INT,           -- output tokens (from Prism response)
+    provider            VARCHAR(50),            -- provider key (e.g. 'anthropic', 'openai')
+    model               VARCHAR(100),           -- model ID (e.g. 'claude-sonnet-4-6')
+    created_at          TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_ai_usage_logs_source ON ai_usage_logs (source);
+CREATE INDEX idx_ai_usage_logs_created_at ON ai_usage_logs (created_at);
+```
+
+> No `user_id`, no `ip_address`, no `content` columns — PDPA-compliant by design.
+
+### `ai_chat_conversations` (Phase 6 — AI)
+
+Stores public AI chatbot conversation sessions. One row per browser session that initiates a chat.
+
+```sql
+CREATE TABLE ai_chat_conversations (
+    id                      BIGSERIAL PRIMARY KEY,
+    session_id              VARCHAR(100) NOT NULL,  -- PHP session ID
+    ip_address              VARCHAR(45),            -- IPv6 max
+    title                   VARCHAR(255),           -- AI-generated
+    summary                 TEXT,                   -- AI-generated
+    tags                    JSON,                   -- category tags
+    locale                  VARCHAR(5),             -- 'ms' or 'en'
+    message_count           UNSIGNED INT DEFAULT 0,
+    total_prompt_tokens     UNSIGNED INT DEFAULT 0,
+    total_completion_tokens UNSIGNED INT DEFAULT 0,
+    started_at              TIMESTAMP DEFAULT NOW(),
+    last_message_at         TIMESTAMP,
+    ended_at                TIMESTAMP
+);
+
+CREATE INDEX idx_ai_chat_conversations_session ON ai_chat_conversations (session_id);
+```
+
+### `ai_chat_messages` (Phase 6 — AI)
+
+Individual messages within a chatbot conversation. Linked to `ai_chat_conversations` via foreign key with cascade delete.
+
+```sql
+CREATE TABLE ai_chat_messages (
+    id                  BIGSERIAL PRIMARY KEY,
+    conversation_id     BIGINT NOT NULL REFERENCES ai_chat_conversations(id) ON DELETE CASCADE,
+    role                VARCHAR(20) NOT NULL,   -- 'user' or 'assistant'
+    content             TEXT NOT NULL,
+    prompt_tokens       UNSIGNED INT,           -- input tokens (from Prism response)
+    completion_tokens   UNSIGNED INT,           -- output tokens (from Prism response)
+    duration_ms         UNSIGNED INT,           -- response generation time in milliseconds
+    created_at          TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_ai_chat_messages_conversation ON ai_chat_messages (conversation_id);
+```
+
 ### `menus`
 
 Registry of named menus. Replaces Payload Global: `Header` (previously `navigation_items`).
@@ -801,6 +875,10 @@ Run migrations in this order to respect foreign key constraints:
 21. `feedback_settings`
 22. `page_categories`
 23. `static_pages`
+24. `content_embeddings`
+25. `ai_usage_logs`
+26. `ai_chat_conversations`
+27. `ai_chat_messages` (FK → `ai_chat_conversations`)
 
 ---
 

@@ -13,6 +13,7 @@
         "laravel/framework": "^12.0",
         "laravel/octane": "^2.13",
         "laravel/tinker": "^2.10.1",
+        "malzariey/filament-daterangepicker-filter": "^4.0",
         "spatie/laravel-activitylog": "^4.12",
         "spatie/laravel-permission": "^7.2"
     },

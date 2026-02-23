@@ -112,6 +112,7 @@ class ManageAiSettings extends Page
             'ai_chatbot_enabled' => (bool) Setting::get('ai_chatbot_enabled', config('ai.chatbot_enabled', false)),
             'ai_admin_editor_enabled' => (bool) Setting::get('ai_admin_editor_enabled', config('ai.admin_editor_enabled', false)),
             'ai_chatbot_rate_limit' => (int) Setting::get('ai_chatbot_rate_limit', config('ai.chatbot_rate_limit', 10)),
+            'ai_chat_retention_days' => (int) Setting::get('ai_chat_retention_days', 90),
 
             // Chatbot settings
             'ai_chatbot_name_ms' => Setting::get('ai_chatbot_name_ms', ''),
@@ -253,6 +254,13 @@ class ManageAiSettings extends Page
                                 ->minValue(1)
                                 ->maxValue(1000)
                                 ->helperText(__('ai.chatbot_rate_limit_help')),
+                            TextInput::make('ai_chat_retention_days')
+                                ->label(__('ai.retention_days'))
+                                ->numeric()
+                                ->required()
+                                ->minValue(7)
+                                ->maxValue(3650)
+                                ->helperText(__('ai.retention_days_help')),
                         ])
                         ->columns(3),
 
@@ -451,6 +459,7 @@ class ManageAiSettings extends Page
             'ai_chatbot_enabled',
             'ai_admin_editor_enabled',
             'ai_chatbot_rate_limit',
+            'ai_chat_retention_days',
             'ai_chatbot_name_ms',
             'ai_chatbot_name_en',
             'ai_chatbot_avatar',

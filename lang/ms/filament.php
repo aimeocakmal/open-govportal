@@ -18,6 +18,7 @@ return [
         'content' => 'Kandungan',
         'homepage' => 'Laman Utama',
         'user_management' => 'Pengurusan Pengguna',
+        'logs' => 'Log',
     ],
 
     // ── Label model sumber ──────────────────────────────────────────
@@ -39,6 +40,7 @@ return [
         'user' => 'Pengguna|Pengguna',
         'role' => 'Peranan|Peranan',
         'activity_log' => 'Log Aktiviti|Log Aktiviti',
+        'ai_chat_conversation' => 'Log Chat AI|Log Chat AI',
     ],
 
     // ── Label dikongsi (digunakan di banyak fail) ────────────────────

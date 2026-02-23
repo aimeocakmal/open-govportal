@@ -31,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
         'homepage' => 'filament.nav.homepage',
         'user_management' => 'filament.nav.user_management',
         'settings' => 'filament.nav.settings',
+        'logs' => 'filament.nav.logs',
     ];
 
     /**
