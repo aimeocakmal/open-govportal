@@ -72,7 +72,7 @@
                 @endforeach
             </nav>
 
-            {{-- Right side: language switcher + theme switcher --}}
+            {{-- Right side: language switcher + accessibility + theme switcher --}}
             <div class="hidden md:flex items-center gap-4">
                 {{-- Language switcher --}}
                 <div class="flex items-center gap-1 text-body-sm font-medium">
@@ -90,6 +90,20 @@
                         aria-label="{{ __('common.language.en') }}"
                     >EN</a>
                 </div>
+
+                {{-- Accessibility --}}
+                <button
+                    @click="$dispatch('toggle-accessibility')"
+                    aria-controls="a11y-panel"
+                    class="p-1.5 rounded-md text-muted hover:text-primary hover:bg-bg-washed transition-colors duration-short"
+                    aria-label="{{ __('accessibility.open') }}"
+                    title="{{ __('accessibility.title') }}"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="4.5" r="2" fill="currentColor" stroke="none" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 0l-3 6m3-6l3 6M7 10h10" />
+                    </svg>
+                </button>
 
                 <x-layout.theme-switcher />
             </div>
@@ -154,13 +168,23 @@
             @endforeach
         </nav>
 
-        {{-- Mobile language + theme --}}
+        {{-- Mobile language + accessibility + theme --}}
         <div class="px-4 py-3 border-t border-border-light flex items-center gap-4">
             <div class="flex items-center gap-1 text-body-sm font-medium">
                 <a href="{{ $msUrl }}" class="{{ $locale === 'ms' ? 'text-primary font-semibold' : 'text-muted' }}">BM</a>
                 <span class="text-border">|</span>
                 <a href="{{ $enUrl }}" class="{{ $locale === 'en' ? 'text-primary font-semibold' : 'text-muted' }}">EN</a>
             </div>
+            <button
+                @click="$dispatch('toggle-accessibility')"
+                class="p-1.5 rounded-md text-muted hover:text-primary hover:bg-bg-washed transition-colors duration-short"
+                aria-label="{{ __('accessibility.open') }}"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="4.5" r="2" fill="currentColor" stroke="none" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 0l-3 6m3-6l3 6M7 10h10" />
+                </svg>
+            </button>
             <x-layout.theme-switcher />
         </div>
     </div>

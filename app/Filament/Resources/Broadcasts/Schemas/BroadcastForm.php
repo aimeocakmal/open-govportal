@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Broadcasts\Schemas;
 
+use App\Filament\Concerns\HasAiEditorActions;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -15,6 +16,8 @@ use Illuminate\Support\Str;
 
 class BroadcastForm
 {
+    use HasAiEditorActions;
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -67,11 +70,13 @@ class BroadcastForm
                                     }),
                                 RichEditor::make('content_ms')
                                     ->label(__('filament.common.content_bm'))
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->afterLabel(self::richEditorAiActions('ms', 'en', 'content_ms', 'content_en')),
                                 Textarea::make('excerpt_ms')
                                     ->label(__('filament.common.excerpt_bm'))
                                     ->maxLength(1000)
-                                    ->rows(3),
+                                    ->rows(3)
+                                    ->afterLabel(self::excerptAiActions('ms', 'en', 'excerpt_ms', 'excerpt_en')),
                             ]),
                         Tab::make(__('filament.common.english'))
                             ->schema([
@@ -80,11 +85,13 @@ class BroadcastForm
                                     ->maxLength(500),
                                 RichEditor::make('content_en')
                                     ->label(__('filament.common.content_en'))
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->afterLabel(self::richEditorAiActions('en', 'ms', 'content_en', 'content_ms')),
                                 Textarea::make('excerpt_en')
                                     ->label(__('filament.common.excerpt_en'))
                                     ->maxLength(1000)
-                                    ->rows(3),
+                                    ->rows(3)
+                                    ->afterLabel(self::excerptAiActions('en', 'ms', 'excerpt_en', 'excerpt_ms')),
                             ]),
                     ])
                     ->columnSpanFull(),

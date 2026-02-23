@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'generate_ai' => 'Generate AI',
+    'grammar_check' => 'Grammar Check',
+    'grammar_applied' => 'Grammar corrections applied.',
+    'translate' => 'Translate',
+    'translate_to_en' => 'Translate → EN',
+    'translate_to_ms' => 'Translate → BM',
+    'translated' => 'Translation complete.',
+    'expand' => 'Expand',
+    'expanded' => 'Text has been expanded.',
+    'summarise' => 'Summarise',
+    'summarised' => 'Text has been summarised.',
+    'tldr' => 'Generate TLDR',
+    'tldr_generated' => 'TL;DR prepended to content.',
+    'generate_from_prompt' => 'Generate from Prompt',
+    'enter_prompt' => 'Enter your prompt...',
+    'generate' => 'Generate',
+    'generated' => 'Content has been generated.',
+    'field_empty' => 'Field is empty — no text to process.',
+    'ai_error' => 'An AI error occurred. Please try again.',
+    'ai_not_configured' => 'AI is not configured.',
+    'processing' => 'Processing...',
+];

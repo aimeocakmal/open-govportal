@@ -71,6 +71,26 @@ return [
     'default_disclaimer' => 'This chatbot uses AI. Responses may not always be accurate. Do not share personal information.',
     'source' => 'Source',
 
+    // Chatbot UI
+    'chat_title' => 'AI Help',
+    'send' => 'Send',
+    'thinking' => 'Thinking...',
+    'rate_limited' => 'You have exceeded the message limit. Please try again later.',
+    'error' => 'Sorry, an error occurred. Please try again.',
+    'disclaimer_accept' => 'I understand',
+    'disclaimer_decline' => 'Close',
+    'close' => 'Close',
+    'new_chat' => 'New chat',
+    'language_toggle_ms' => 'BM',
+    'language_toggle_en' => 'EN',
+    'input_too_short' => 'Message too short.',
+    'input_too_long' => 'Message too long.',
+    'powered_by' => 'Powered by AI',
+    'language_instruction' => 'Answer in Bahasa Malaysia.',
+    'language_instruction_en' => 'Answer in English.',
+    'rag_instruction' => 'Answer the user\'s question using only the provided context. If the answer is not in the context, state that you do not have that information.',
+    'rag_context_header' => 'Context:',
+
     // Provider names
     'provider_anthropic' => 'Anthropic (Claude)',
     'provider_openai' => 'OpenAI',

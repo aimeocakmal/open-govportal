@@ -71,6 +71,26 @@ return [
     'default_disclaimer' => 'Chatbot ini menggunakan AI. Respons mungkin tidak sentiasa tepat. Jangan kongsi maklumat peribadi.',
     'source' => 'Sumber',
 
+    // Chatbot UI
+    'chat_title' => 'Bantuan AI',
+    'send' => 'Hantar',
+    'thinking' => 'Sedang berfikir...',
+    'rate_limited' => 'Anda telah melebihi had mesej. Sila cuba lagi nanti.',
+    'error' => 'Maaf, ralat berlaku. Sila cuba lagi.',
+    'disclaimer_accept' => 'Saya faham',
+    'disclaimer_decline' => 'Tutup',
+    'close' => 'Tutup',
+    'new_chat' => 'Perbualan baharu',
+    'language_toggle_ms' => 'BM',
+    'language_toggle_en' => 'EN',
+    'input_too_short' => 'Mesej terlalu pendek.',
+    'input_too_long' => 'Mesej terlalu panjang.',
+    'powered_by' => 'Dikuasakan oleh AI',
+    'language_instruction' => 'Jawab dalam Bahasa Malaysia.',
+    'language_instruction_en' => 'Answer in English.',
+    'rag_instruction' => 'Jawab soalan pengguna menggunakan konteks yang diberikan sahaja. Jika jawapan tiada dalam konteks, nyatakan anda tidak mempunyai maklumat tersebut.',
+    'rag_context_header' => 'Konteks:',
+
     // Provider names
     'provider_anthropic' => 'Anthropic (Claude)',
     'provider_openai' => 'OpenAI',

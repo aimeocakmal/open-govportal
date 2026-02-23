@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Achievements\Schemas;
 
+use App\Filament\Concerns\HasAiEditorActions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -16,6 +17,8 @@ use Illuminate\Support\Str;
 
 class AchievementForm
 {
+    use HasAiEditorActions;
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -63,7 +66,8 @@ class AchievementForm
                                 Textarea::make('description_ms')
                                     ->label(__('filament.common.description_bm'))
                                     ->rows(5)
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->afterLabel(self::textareaAiActions('ms', 'en', 'description_ms', 'description_en')),
                             ]),
                         Tab::make(__('filament.common.english'))
                             ->schema([
@@ -73,7 +77,8 @@ class AchievementForm
                                 Textarea::make('description_en')
                                     ->label(__('filament.common.description_en'))
                                     ->rows(5)
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->afterLabel(self::textareaAiActions('en', 'ms', 'description_en', 'description_ms')),
                             ]),
                     ])
                     ->columnSpanFull(),

@@ -185,7 +185,8 @@ class AiService
 
     public function generateFromPrompt(string $prompt, string $locale): string {}
 
-    public function generateFromImage(string $imageUrl, string $prompt, string $locale): string {}
+    // Deferred — Prism PHP multimodal support varies by provider
+    // public function generateFromImage(string $imageUrl, string $prompt, string $locale): string {}
 
     /** @return float[] — dimension depends on configured embedding model */
     public function embed(string $text): array {}
@@ -196,24 +197,23 @@ class AiService
 
 **Provider resolution (inside `AiService`):**
 
+All content operations (`grammarCheck`, `translate`, `expand`, `summarise`, `tldr`, `generateFromPrompt`) share a private `generate()` helper:
+
 ```php
-private function resolveLlm(): Text
+private function generate(string $systemPrompt, string $userPrompt, string $operation, string $locale): string
 {
-    $provider = Setting::get('ai_llm_provider', config('ai.llm_provider', 'anthropic'));
-    $model    = Setting::get('ai_llm_model',    config('ai.llm_model',    'claude-sonnet-4-6'));
-    $apiKey   = Crypt::decrypt(Setting::get('ai_llm_api_key', ''));
-    $baseUrl  = Setting::get('ai_llm_base_url', '');
+    $provider = $this->resolveLlmProvider();   // → Provider enum
+    $model    = $this->resolveLlmModel();       // → model string
+    $apiKey   = $this->decryptSetting('ai_llm_api_key', config('ai.llm_api_key', ''));
 
-    $prism = Prism::text()->using($provider, $model);
+    $response = $this->prism->text()
+        ->using($provider, $model, $this->buildProviderConfig($apiKey))
+        ->withSystemPrompt($systemPrompt)
+        ->withPrompt($userPrompt)
+        ->asText();
 
-    if ($apiKey) {
-        $prism = $prism->withClientOptions(['api_key' => $apiKey]);
-    }
-    if ($baseUrl && $provider === 'openai-compatible') {
-        $prism = $prism->withClientOptions(['base_url' => $baseUrl]);
-    }
-
-    return $prism;
+    $this->logUsage($operation, $locale, $startTime, $provider, $model, $response);
+    return $response->text;
 }
 ```
 
@@ -356,7 +356,7 @@ CREATE INDEX idx_content_embeddings_vector
 | `AiSummariseAction` | `AiSummariseAction.php` | Summarise field content |
 | `AiTldrAction` | `AiTldrAction.php` | TLDR → fills excerpt field |
 | `AiGenerateAction` | `AiGenerateAction.php` | Generate from text prompt (modal) |
-| `AiGenerateFromImageAction` | `AiGenerateFromImageAction.php` | Generate from image URL + prompt |
+| ~~`AiGenerateFromImageAction`~~ | — | **Deferred** — Prism PHP multimodal support varies by provider |
 
 **Available operations in the admin editor:**
 
@@ -370,9 +370,50 @@ CREATE INDEX idx_content_embeddings_vector
 | Ringkaskan | Summarise | Field content | Condensed version |
 | Jana TLDR | Auto TLDR | `content_{locale}` | 2-3 sentences → `excerpt_{locale}` |
 | Jana daripada Prompt | Generate from prompt | Modal: text prompt + locale | Draft content |
-| Jana daripada Imej | Generate from image | Modal: image URL/upload + prompt | Caption/content |
+| ~~Jana daripada Imej~~ | ~~Generate from image~~ | — | **Deferred** |
 
 **Graceful degradation:** If `ai_admin_editor_enabled = false` or no API key is configured, all AI action buttons are hidden from the Filament form. No errors, no broken UI.
+
+### Trait: `HasAiEditorActions` (`app/Filament/Concerns/`)
+
+Provides reusable helper methods that return pre-configured action arrays per field type:
+
+| Method | Actions included | Used on |
+|--------|-----------------|---------|
+| `richEditorAiActions()` | Grammar, Expand, Summarise, Translate, TLDR, Generate | RichEditor `content_{locale}` fields |
+| `textareaAiActions()` | Grammar, Expand, Summarise, Translate | Textarea `description_{locale}` fields |
+| `excerptAiActions()` | Grammar, Translate | Textarea `excerpt_{locale}` fields |
+
+### Form Schemas with AI Actions
+
+| Form Schema | Fields with AI actions |
+|-------------|----------------------|
+| `BroadcastForm` | `content_ms`, `content_en` (rich editor), `excerpt_ms`, `excerpt_en` (excerpt) |
+| `AchievementForm` | `description_ms`, `description_en` (textarea) |
+| `PolicyForm` | `description_ms`, `description_en` (textarea) |
+| `StaticPageForm` | `content_ms`, `content_en` (rich editor), `excerpt_ms`, `excerpt_en` (excerpt) |
+
+---
+
+## Usage Logging
+
+### Database Table: `ai_usage_logs`
+
+Tracks all AI operations for cost monitoring. **Fully anonymised** — no user PII.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | bigint | Primary key |
+| `operation` | varchar(50) | `grammar_check`, `translate`, `expand`, `summarise`, `tldr`, `generate`, `chat`, `embed` |
+| `locale` | varchar(5) | `ms` or `en` |
+| `duration_ms` | unsigned int | Request duration in milliseconds |
+| `prompt_tokens` | unsigned int | Input tokens (from Prism response) |
+| `completion_tokens` | unsigned int | Output tokens (from Prism response) |
+| `provider` | varchar(50) | Provider key (e.g. `anthropic`, `openai`) |
+| `model` | varchar(100) | Model ID (e.g. `claude-sonnet-4-6`) |
+| `created_at` | timestamp | Auto-set via `useCurrent()` |
+
+> No `user_id`, no `ip_address`, no `content` columns — PDPA-compliant by design.
 
 ---
 
@@ -388,12 +429,12 @@ CREATE INDEX idx_content_embeddings_vector
 
 ## PDPA Compliance Checklist
 
-- [ ] `content_embeddings` rows contain only public content — no names, ICs, emails
-- [ ] Chatbot session history not persisted to database
-- [ ] AI usage logs (`ai_usage_logs`) contain no user PII — only operation type, duration, token count, provider used
-- [ ] Privacy disclaimer shown before first chat interaction
-- [ ] API keys stored encrypted in `settings` table; never logged
-- [ ] Admin can disable AI features completely via `ManageAiSettings`
+- [x] `content_embeddings` rows contain only public content — no names, ICs, emails
+- [x] Chatbot session history not persisted to database
+- [x] AI usage logs (`ai_usage_logs`) contain no user PII — only operation type, duration, token count, provider used
+- [x] Privacy disclaimer shown before first chat interaction
+- [x] API keys stored encrypted in `settings` table; never logged
+- [x] Admin can disable AI features completely via `ManageAiSettings`
 
 ---
 

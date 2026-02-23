@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'generate_ai' => 'Jana AI',
+    'grammar_check' => 'Semak Tatabahasa',
+    'grammar_applied' => 'Tatabahasa telah diperbaiki.',
+    'translate' => 'Terjemah',
+    'translate_to_en' => 'Terjemah → EN',
+    'translate_to_ms' => 'Terjemah → BM',
+    'translated' => 'Terjemahan selesai.',
+    'expand' => 'Kembangkan',
+    'expanded' => 'Teks telah dikembangkan.',
+    'summarise' => 'Ringkaskan',
+    'summarised' => 'Teks telah diringkaskan.',
+    'tldr' => 'Jana TLDR',
+    'tldr_generated' => 'TL;DR telah ditambah di bahagian atas kandungan.',
+    'generate_from_prompt' => 'Jana daripada Prompt',
+    'enter_prompt' => 'Masukkan arahan anda...',
+    'generate' => 'Jana',
+    'generated' => 'Kandungan telah dijana.',
+    'field_empty' => 'Medan kosong — tiada teks untuk diproses.',
+    'ai_error' => 'Ralat AI berlaku. Sila cuba lagi.',
+    'ai_not_configured' => 'AI belum dikonfigurasi.',
+    'processing' => 'Sedang memproses...',
+];

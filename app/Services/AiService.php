@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AiUsageLog;
 use App\Models\Setting;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
@@ -37,7 +38,9 @@ class AiService
             $pendingRequest->withSystemPrompt($systemPrompt);
         }
 
-        // Build messages from conversation history
+        // Build messages from conversation history.
+        // withPrompt() and withMessages() are mutually exclusive in Prism PHP,
+        // so when history exists, append the current prompt as the last UserMessage.
         $messages = [];
         foreach ($history as $turn) {
             if (($turn['role'] ?? '') === 'user') {
@@ -48,10 +51,11 @@ class AiService
         }
 
         if (! empty($messages)) {
+            $messages[] = new UserMessage($prompt);
             $pendingRequest->withMessages($messages);
+        } else {
+            $pendingRequest->withPrompt($prompt);
         }
-
-        $pendingRequest->withPrompt($prompt);
 
         try {
             $response = $pendingRequest->asText();
@@ -122,59 +126,161 @@ class AiService
     }
 
     /**
-     * Grammar check — stub for Week 12.
+     * Check and fix grammar/spelling errors.
      */
     public function grammarCheck(string $text, string $locale): string
     {
-        throw new \BadMethodCallException('AiService::grammarCheck is not yet implemented (Week 12).');
+        $langName = $locale === 'ms' ? 'Bahasa Malaysia' : 'English';
+        $systemPrompt = "You are a professional grammar and spelling checker for {$langName}. "
+            .'Fix all grammar, spelling, and punctuation errors in the provided text. '
+            .'Return ONLY the corrected text without any explanations, comments, or markup. '
+            .'Preserve the original HTML tags if present. Do not change the meaning or tone.';
+
+        return $this->generate($systemPrompt, $text, 'grammar_check', $locale);
     }
 
     /**
-     * Translate — stub for Week 12.
+     * Translate text between locales.
      */
     public function translate(string $text, string $from, string $to): string
     {
-        throw new \BadMethodCallException('AiService::translate is not yet implemented (Week 12).');
+        $fromName = $from === 'ms' ? 'Bahasa Malaysia' : 'English';
+        $toName = $to === 'ms' ? 'Bahasa Malaysia' : 'English';
+        $systemPrompt = "You are a professional translator. Translate the following text from {$fromName} to {$toName}. "
+            .'Return ONLY the translated text without any explanations or comments. '
+            .'Preserve the original HTML tags and formatting if present. '
+            .'Use natural, fluent language appropriate for a government website.';
+
+        return $this->generate($systemPrompt, $text, 'translate', $to);
     }
 
     /**
-     * Expand — stub for Week 12.
+     * Expand/elaborate text with more detail.
      */
     public function expand(string $text, string $locale): string
     {
-        throw new \BadMethodCallException('AiService::expand is not yet implemented (Week 12).');
+        $langName = $locale === 'ms' ? 'Bahasa Malaysia' : 'English';
+        $systemPrompt = "You are a professional content writer for {$langName}. "
+            .'Expand and elaborate on the provided text with more detail, examples, and context. '
+            .'Maintain the original tone, style, and meaning. '
+            .'Return ONLY the expanded text without any explanations. '
+            .'Preserve HTML tags if present.';
+
+        return $this->generate($systemPrompt, $text, 'expand', $locale);
     }
 
     /**
-     * Summarise — stub for Week 12.
+     * Summarise field content.
      */
     public function summarise(string $text, string $locale): string
     {
-        throw new \BadMethodCallException('AiService::summarise is not yet implemented (Week 12).');
+        $langName = $locale === 'ms' ? 'Bahasa Malaysia' : 'English';
+        $systemPrompt = "You are a professional summariser for {$langName}. "
+            .'Condense the provided text while keeping all key points and important information. '
+            .'Return ONLY the summarised text without any explanations. '
+            .'Preserve HTML tags if present.';
+
+        return $this->generate($systemPrompt, $text, 'summarise', $locale);
     }
 
     /**
-     * TLDR — stub for Week 12.
+     * Generate a 2-3 sentence TLDR summary.
      */
     public function tldr(string $text, string $locale): string
     {
-        throw new \BadMethodCallException('AiService::tldr is not yet implemented (Week 12).');
+        $langName = $locale === 'ms' ? 'Bahasa Malaysia' : 'English';
+        $systemPrompt = "You are a TLDR generator for {$langName}. "
+            .'Write a concise 2-3 sentence summary of the provided content. '
+            .'Return ONLY plain text (no HTML). '
+            .'Focus on the most important takeaways.';
+
+        return $this->generate($systemPrompt, $text, 'tldr', $locale);
     }
 
     /**
-     * Generate from prompt — stub for Week 12.
+     * Generate content from a text prompt.
      */
     public function generateFromPrompt(string $prompt, string $locale): string
     {
-        throw new \BadMethodCallException('AiService::generateFromPrompt is not yet implemented (Week 12).');
+        $langName = $locale === 'ms' ? 'Bahasa Malaysia' : 'English';
+        $systemPrompt = "You are a professional content writer for a government website in {$langName}. "
+            .'Generate well-structured content based on the user\'s prompt. '
+            .'Use a formal but accessible tone appropriate for a government website. '
+            .'Return ONLY the generated content. You may use HTML formatting (paragraphs, lists, headings).';
+
+        return $this->generate($systemPrompt, $prompt, 'generate', $locale);
     }
 
     /**
-     * Generate from image — stub for Week 12.
+     * Generate from image — deferred (Prism PHP multimodal support varies by provider).
      */
     public function generateFromImage(string $imageUrl, string $prompt, string $locale): string
     {
-        throw new \BadMethodCallException('AiService::generateFromImage is not yet implemented (Week 12).');
+        throw new \BadMethodCallException('AiService::generateFromImage is deferred — Prism PHP multimodal support varies by provider.');
+    }
+
+    /**
+     * Generic text generation helper used by all content operations.
+     */
+    private function generate(string $systemPrompt, string $userPrompt, string $operation = 'generate', string $locale = 'ms'): string
+    {
+        $provider = $this->resolveLlmProvider();
+        $model = $this->resolveLlmModel();
+        $apiKey = $this->decryptSetting('ai_llm_api_key', config('ai.llm_api_key', ''));
+
+        if ($apiKey === '') {
+            Log::warning("AiService::{$operation} called but no LLM API key configured.");
+
+            return '';
+        }
+
+        $startTime = microtime(true);
+
+        try {
+            $response = $this->prism->text()
+                ->using($provider, $model, $this->buildProviderConfig($apiKey))
+                ->withSystemPrompt($systemPrompt)
+                ->withPrompt($userPrompt)
+                ->asText();
+
+            $this->logUsage(
+                operation: $operation,
+                locale: $locale,
+                startTime: $startTime,
+                provider: $provider,
+                model: $model,
+                response: $response,
+            );
+
+            return $response->text;
+        } catch (\Throwable $e) {
+            Log::error("AiService::{$operation} failed", [
+                'provider' => $provider->value,
+                'model' => $model,
+                'error' => $e->getMessage(),
+            ]);
+
+            return '';
+        }
+    }
+
+    private function logUsage(string $operation, string $locale, float $startTime, Provider $provider, string $model, mixed $response): void
+    {
+        try {
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+
+            AiUsageLog::create([
+                'operation' => $operation,
+                'locale' => $locale,
+                'duration_ms' => $durationMs,
+                'prompt_tokens' => $response->usage->promptTokens ?? null,
+                'completion_tokens' => $response->usage->completionTokens ?? null,
+                'provider' => $provider->value,
+                'model' => $model,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('AiService::logUsage failed', ['error' => $e->getMessage()]);
+        }
     }
 
     private function resolveLlmProvider(): Provider

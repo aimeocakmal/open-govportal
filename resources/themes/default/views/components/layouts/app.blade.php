@@ -56,6 +56,8 @@
 
     <x-layout.accessibility-menu />
 
+    <livewire:ai-chat />
+
     @livewireScripts
 </body>
 </html>

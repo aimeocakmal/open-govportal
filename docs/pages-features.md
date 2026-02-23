@@ -491,7 +491,7 @@ Level 1 — Main menu       (parent_id IS NULL in menu_items)
 
 ---
 
-### AI Chatbot — **Status: Planned** (Phase 4, Week 11)
+### AI Chatbot — **Status: Implemented** (AiChatTest — 25 tests)
 
 **Livewire component:** `App\Livewire\AiChat`
 **View:** `resources/views/livewire/ai-chat.blade.php`

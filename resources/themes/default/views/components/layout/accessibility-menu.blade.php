@@ -1,27 +1,10 @@
-{{-- Accessibility Menu — floating icon + settings panel --}}
+{{-- Accessibility Menu — slide-in settings panel (triggered from nav header) --}}
 <div
     x-data="accessibilityMenu"
     @keydown.window.ctrl.u.prevent="toggle()"
+    @toggle-accessibility.window="toggle()"
     x-cloak
 >
-    {{-- Floating trigger button --}}
-    <button
-        @click="toggle()"
-        :aria-expanded="open"
-        aria-controls="a11y-panel"
-        class="fixed bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full
-               bg-primary text-white shadow-card hover:bg-primary-dark
-               transition-colors duration-short focus-visible:outline focus-visible:outline-2
-               focus-visible:outline-offset-2 focus-visible:outline-fr-primary"
-        aria-label="{{ __('accessibility.open') }}"
-    >
-        {{-- Universal accessibility icon --}}
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="12" cy="4.5" r="2" fill="currentColor" stroke="none" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 0l-3 6m3-6l3 6M7 10h10" />
-        </svg>
-    </button>
-
     {{-- Settings panel --}}
     <div
         x-show="open"
