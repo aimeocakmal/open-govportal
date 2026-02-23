@@ -40,6 +40,7 @@ trait HasAiEditorActions
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
                 ->button()
+                ->outlined()
                 ->size('sm')
                 ->visible(fn (): bool => AiGrammarAction::isAiEditorEnabled()),
         ];
@@ -69,6 +70,7 @@ trait HasAiEditorActions
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
                 ->button()
+                ->outlined()
                 ->size('sm')
                 ->visible(fn (): bool => AiGrammarAction::isAiEditorEnabled()),
         ];
@@ -96,6 +98,7 @@ trait HasAiEditorActions
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
                 ->button()
+                ->outlined()
                 ->size('sm')
                 ->visible(fn (): bool => AiGrammarAction::isAiEditorEnabled()),
         ];
