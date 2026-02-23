@@ -16,6 +16,7 @@ use App\Models\QuickLink;
 use App\Models\StaffDirectory;
 use App\Models\StaticPage;
 use App\Observers\ContentRevisionObserver;
+use App\Observers\EmbeddingObserver;
 use App\Observers\PageCacheObserver;
 use App\Observers\SearchContentObserver;
 use App\Policies\ActivityLogPolicy;
@@ -49,6 +50,12 @@ class AppServiceProvider extends ServiceProvider
         $searchableModels = [Broadcast::class, Achievement::class, StaffDirectory::class, Policy::class];
         foreach ($searchableModels as $model) {
             $model::observe(SearchContentObserver::class);
+        }
+
+        // Register embedding observer for AI vector indexing
+        $embeddableModels = [Broadcast::class, Achievement::class, Policy::class, StaffDirectory::class];
+        foreach ($embeddableModels as $model) {
+            $model::observe(EmbeddingObserver::class);
         }
 
         // Register content revision observer for versioning

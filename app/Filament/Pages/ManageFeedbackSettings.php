@@ -45,7 +45,7 @@ class ManageFeedbackSettings extends Page
         return static::getNavigationLabel();
     }
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
     protected static ?int $navigationSort = 23;
 

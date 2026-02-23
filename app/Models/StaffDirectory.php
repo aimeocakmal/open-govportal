@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasEmbeddings;
 use App\Models\Concerns\HasSearchableContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +12,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class StaffDirectory extends Model
 {
+    use HasEmbeddings;
+
     /** @use HasFactory<\Database\Factories\StaffDirectoryFactory> */
     use HasFactory;
 
@@ -56,6 +59,14 @@ class StaffDirectory extends Model
             'url_ms' => '/ms/direktori',
             'url_en' => '/en/direktori',
             'priority' => 30,
+        ];
+    }
+
+    public function toEmbeddableContent(): array
+    {
+        return [
+            'fields' => ['name', 'position', 'department'],
+            'bilingual' => ['position', 'department'],
         ];
     }
 

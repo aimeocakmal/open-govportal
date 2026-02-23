@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasContentRevisions;
+use App\Models\Concerns\HasEmbeddings;
 use App\Models\Concerns\HasSearchableContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Achievement extends Model
 {
     use HasContentRevisions;
+    use HasEmbeddings;
 
     /** @use HasFactory<\Database\Factories\AchievementFactory> */
     use HasFactory;
@@ -68,6 +70,14 @@ class Achievement extends Model
             'url_ms' => '/ms/pencapaian/'.$this->slug,
             'url_en' => '/en/pencapaian/'.$this->slug,
             'priority' => 10,
+        ];
+    }
+
+    public function toEmbeddableContent(): array
+    {
+        return [
+            'fields' => ['title', 'description'],
+            'bilingual' => ['title', 'description'],
         ];
     }
 

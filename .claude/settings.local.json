@@ -49,7 +49,8 @@
       "WebFetch(domain:design.digital.gov.my)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:www.npmjs.com)",
-      "mcp__laravel-boost__browser-logs"
+      "mcp__laravel-boost__browser-logs",
+      "mcp__laravel-boost__get-config"
     ]
   }
 }

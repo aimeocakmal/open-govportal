@@ -23,7 +23,7 @@ class CelebrationResource extends Resource
 
     protected static ?string $model = Celebration::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSparkles;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
     protected static \UnitEnum|string|null $navigationGroup = null;
 

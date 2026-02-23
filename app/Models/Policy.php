@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasContentRevisions;
+use App\Models\Concerns\HasEmbeddings;
 use App\Models\Concerns\HasSearchableContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Policy extends Model
 {
     use HasContentRevisions;
+    use HasEmbeddings;
 
     /** @use HasFactory<\Database\Factories\PolicyFactory> */
     use HasFactory;
@@ -69,6 +71,14 @@ class Policy extends Model
             'url_ms' => '/ms/dasar',
             'url_en' => '/en/dasar',
             'priority' => 40,
+        ];
+    }
+
+    public function toEmbeddableContent(): array
+    {
+        return [
+            'fields' => ['title', 'description'],
+            'bilingual' => ['title', 'description'],
         ];
     }
 

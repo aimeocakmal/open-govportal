@@ -500,35 +500,38 @@ Recreate homepage sections from kd-portal's `home/` components:
 >
 > AI features are an **approved extension beyond kd-portal parity**. See [docs/ai.md](ai.md) and [docs/architecture.md → AI Services Layer](architecture.md) for full specification.
 
-#### Week 10: RAG Foundation
+#### Week 10: RAG Foundation ✅ COMPLETED 2026-02-23
 
 Set up the embedding pipeline so all content is vector-indexed before building the chatbot.
 
 **Tasks:**
-- [ ] Install `pgvector` PostgreSQL extension on local PostgreSQL; enable in migration
-- [ ] Create `content_embeddings` migration + `ContentEmbedding` model (morphic, chunk_index, locale, embedding `vector(1536)`, metadata JSON)
-- [ ] Install Prism PHP (`echolabsdev/prism`); configure providers in `config/prism.php`
-- [ ] Create `AiService` (`app/Services/AiService.php`) — single entry point for all LLM + embedding calls; reads active provider from `settings` table
-- [ ] Create `RagService` (`app/Services/RagService.php`) — embed query → pgvector cosine similarity search → context assembly
-- [ ] Create `EmbeddingObserver` (`app/Observers/EmbeddingObserver.php`) — fires `GenerateEmbeddingJob` on model `saved`/`deleted`
-- [ ] Create `GenerateEmbeddingJob` (`app/Jobs/GenerateEmbeddingJob.php`) — queued; chunks content, calls admin-configured embedding provider, upserts `content_embeddings`
-- [ ] Register `EmbeddingObserver` on embeddable models in `AppServiceProvider`: `Broadcast`, `Achievement`, `Policy`, `StaffDirectory`
-- [ ] Create `ManageAiSettings` Filament settings page with **3 sections**:
-  - **Provider Configuration** — LLM provider/model/key/base URL, embedding provider/model/key/dimension
+- [x] Install `pgvector` PostgreSQL extension on local PostgreSQL; enable in migration
+- [x] Create `content_embeddings` migration + `ContentEmbedding` model (morphic, chunk_index, locale, embedding `vector(1536)`, metadata JSON)
+- [x] Install Prism PHP (`echolabsdev/prism`); configure providers in `config/prism.php`
+- [x] Create `AiService` (`app/Services/AiService.php`) — single entry point for all LLM + embedding calls; reads active provider from `settings` table
+- [x] Create `RagService` (`app/Services/RagService.php`) — embed query → pgvector cosine similarity search → context assembly
+- [x] Create `EmbeddingObserver` (`app/Observers/EmbeddingObserver.php`) — fires `GenerateEmbeddingJob` on model `saved`/`deleted`
+- [x] Create `GenerateEmbeddingJob` (`app/Jobs/GenerateEmbeddingJob.php`) — queued; chunks content, calls admin-configured embedding provider, upserts `content_embeddings`
+- [x] Register `EmbeddingObserver` on embeddable models in `AppServiceProvider`: `Broadcast`, `Achievement`, `Policy`, `StaffDirectory`
+- [x] Create `ManageAiSettings` Filament settings page with **4 sections**:
+  - **Provider Configuration** — LLM provider/model (Select dropdown + custom)/key/base URL
+  - **Embedding Configuration** — embedding provider/model (Select dropdown + custom)/key/dimension
   - **Feature Flags** — chatbot enabled, admin editor enabled, chatbot rate limit (msg/hour/IP)
   - **Chatbot Settings** — bot identity and behavior, all admin-configurable:
-    - Bot name (ms/en) — displayed in chat header and greeting (e.g. "Aida", "Portal Assistant")
-    - Bot avatar — file upload; displayed next to bot messages; falls back to ministry logo if not set
-    - Bot persona (ms/en) — personality instruction appended to system prompt (e.g. "You are a friendly, formal government assistant")
-    - Language reply preference — `same_as_page` (default) | `always_ms` | `always_en` | `user_choice` (shows language toggle in chat)
-    - Bot restrictions (ms/en) — topics or content boundaries the bot must refuse (appended to system prompt as guardrails)
-    - Display location — `all_pages` (default) | `homepage_only` | `specific_pages` (shows multi-select of route names)
-    - Display pages (JSON) — route names for `specific_pages` mode (e.g. `["home", "siaran.index", "direktori.index"]`)
-    - Welcome message (ms/en) — first message shown when chat opens (before user types anything)
+    - Bot name (ms/en) — displayed in chat header and greeting
+    - Bot avatar — file upload; displayed next to bot messages
+    - Bot persona (ms/en) — personality instruction appended to system prompt
+    - Language reply preference — `same_as_page` (default) | `always_ms` | `always_en` | `user_choice` | `ms_en_only` (BM/EN only)
+    - Bot restrictions (ms/en) — topics the bot must refuse
+    - Display location — `all_pages` (default) | `homepage_only` | `specific_pages`
+    - Display pages — comma-separated route names for `specific_pages` mode
+    - Welcome message (ms/en) — first message shown when chat opens
     - Input placeholder (ms/en) — placeholder text in the message input field
-    - Disclaimer text (ms/en) — privacy disclaimer modal content (overrides default lang string)
-- [ ] Add AI env vars to `.env.example` (`AI_LLM_PROVIDER`, `AI_LLM_MODEL`, `AI_LLM_API_KEY`, `AI_EMBEDDING_PROVIDER`, etc.)
-- [ ] Write `GenerateEmbeddingJobTest` + `RagServiceTest`
+    - Disclaimer text (ms/en) — privacy disclaimer modal content
+- [x] Create `AiProviderValidator` service — hardcoded model lists per provider + API key validation via HTTP (cached 60s); model dropdown with "Other (custom)" option
+- [x] API key validation on save — invalid keys rejected (previous valid keys retained), other settings still saved; warning notification for invalid keys
+- [x] Add AI env vars to `.env.example` (`AI_LLM_PROVIDER`, `AI_LLM_MODEL`, `AI_LLM_API_KEY`, `AI_EMBEDDING_PROVIDER`, etc.)
+- [x] Write `GenerateEmbeddingJobTest` + `RagServiceTest` + `AiServiceTest` + `ManageAiSettingsTest` + `AiProviderValidatorTest`
 
 **Installation Commands:**
 
@@ -544,11 +547,14 @@ php artisan queue:work --queue=embeddings
 ```
 
 **Deliverables:**
-- `content_embeddings` table with pgvector column
+- `content_embeddings` table with pgvector column (SQLite fallback for tests)
 - Embedding pipeline working locally (seed → observe → queue → embed → store)
-- `ManageAiSettings` Filament page functional (provider config + feature flags + chatbot settings)
-- Chatbot settings saved and retrievable from `settings` table (name, avatar, persona, language pref, restrictions, display location, welcome message, placeholder, disclaimer)
-- `RagServiceTest` + `GenerateEmbeddingJobTest` pass
+- `ManageAiSettings` Filament page functional (4 sections: provider config, embedding config, feature flags, chatbot settings)
+- Model dropdowns with known models per provider + "Other (custom)" option
+- API key validation on save — invalid keys rejected, other settings still saved
+- Chatbot settings saved and retrievable from `settings` table (name, avatar, persona, language pref incl. `ms_en_only`, restrictions, display location, welcome message, placeholder, disclaimer)
+- 5 test files: `GenerateEmbeddingJobTest`, `RagServiceTest`, `AiServiceTest`, `ManageAiSettingsTest`, `AiProviderValidatorTest`
+- 558 total tests passing (1037 assertions)
 
 **Effort:** 32 hours
 
@@ -839,7 +845,7 @@ class QuickLink extends Model {
 | 4 | 2 | ✅ Directory, Files & Site Config | 5 content models + 4 site config tables + 7 settings pages + 87 tests passing — 2026-02-21 |
 | 5 | 2 | ✅ CMS Complete | All 12 collections + 16 policies + MyProfile + MediaDiskService + Menu/MenuItem + ManageHomepage + FTS + Image optimization + Content preview + Content versioning — 230 tests passing — 2026-02-22 |
 | 9 | 3 | ✅ All Pages Complete | All 10 public pages functional in ms/en — 456 tests, 840 assertions |
-| 10 | 4 | RAG Foundation | pgvector + embeddings + AiService + RagService + ManageAiSettings |
+| 10 | 4 | ✅ RAG Foundation | pgvector + embeddings + AiService + RagService + ManageAiSettings + AiProviderValidator + model dropdowns + API key validation — 558 tests, 1037 assertions — 2026-02-23 |
 | 11 | 4 | AI Chatbot | AiChat Livewire component working with RAG, rate-limited |
 | 12 | 4 | AI Editor + AI QA | Admin AI actions, PDPA compliance, all AI tests passing |
 | 13 | 4 | Performance & Dark Mode | Cache invalidation (incl. AI bypass), dark mode, scheduled publishing, Lighthouse ≥ 90 |

@@ -14,8 +14,8 @@ class ApplyTheme
 
     public function handle(Request $request, Closure $next): Response
     {
-        // Admin routes are never themed — use default and skip view path manipulation
-        if ($request->is('admin/*')) {
+        // Admin and Livewire update routes are never themed — skip view path manipulation
+        if ($request->is('admin/*', 'livewire/*', 'livewire-*/update')) {
             view()->share('currentTheme', 'default');
             view()->share('themeViteEntries', $this->themeService->getViteEntries('default'));
 
@@ -52,6 +52,9 @@ class ApplyTheme
 
         // Default theme views as fallback
         $finder->addLocation($this->themeService->getViewsPath('default'));
+
+        // Standard Laravel views as final fallback (Filament pages, vendor views, etc.)
+        $finder->addLocation(resource_path('views'));
 
         // Share theme data with all views
         view()->share('currentTheme', $theme);

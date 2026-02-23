@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "echolabsdev/prism": "^0.99.19",
         "filament/filament": "^5.0",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",

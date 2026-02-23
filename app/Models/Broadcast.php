@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasContentRevisions;
+use App\Models\Concerns\HasEmbeddings;
 use App\Models\Concerns\HasSearchableContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Broadcast extends Model
 {
     use HasContentRevisions;
+    use HasEmbeddings;
 
     /** @use HasFactory<\Database\Factories\BroadcastFactory> */
     use HasFactory;
@@ -70,6 +72,14 @@ class Broadcast extends Model
             'url_ms' => '/ms/siaran/'.$this->slug,
             'url_en' => '/en/siaran/'.$this->slug,
             'priority' => 20,
+        ];
+    }
+
+    public function toEmbeddableContent(): array
+    {
+        return [
+            'fields' => ['title', 'content', 'excerpt'],
+            'bilingual' => ['title', 'content', 'excerpt'],
         ];
     }
 
