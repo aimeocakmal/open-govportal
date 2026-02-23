@@ -86,6 +86,40 @@ A dedicated Filament settings page at `/admin/ai-settings` allows admins to conf
 | Admin Editor Enabled | `ai_admin_editor_enabled` | boolean | `false` |
 | Chatbot Rate Limit | `ai_chatbot_rate_limit` | integer (msg/hour/IP) | `10` |
 
+**Chatbot Settings (identity, behavior, display):**
+
+| Field | Settings key | Type | Default |
+|-------|-------------|------|---------|
+| Bot Name (BM) | `ai_chatbot_name_ms` | text | `Pembantu Digital` |
+| Bot Name (EN) | `ai_chatbot_name_en` | text | `Digital Assistant` |
+| Bot Avatar | `ai_chatbot_avatar` | file upload (image) | — (falls back to site logo) |
+| Bot Persona (BM) | `ai_chatbot_persona_ms` | textarea | `Anda adalah pembantu AI rasmi Kementerian Digital Malaysia. Jawab dengan sopan dan formal.` |
+| Bot Persona (EN) | `ai_chatbot_persona_en` | textarea | `You are the official AI assistant for the Ministry of Digital, Malaysia. Respond politely and formally.` |
+| Language Preference | `ai_chatbot_language_preference` | select | `same_as_page` |
+| Bot Restrictions (BM) | `ai_chatbot_restrictions_ms` | textarea | — |
+| Bot Restrictions (EN) | `ai_chatbot_restrictions_en` | textarea | — |
+| Display Location | `ai_chatbot_display_location` | select | `all_pages` |
+| Display Pages | `ai_chatbot_display_pages` | JSON (route names) | `[]` (used when `specific_pages`) |
+| Welcome Message (BM) | `ai_chatbot_welcome_ms` | textarea | `Selamat datang! Saya boleh membantu anda dengan maklumat mengenai Kementerian Digital.` |
+| Welcome Message (EN) | `ai_chatbot_welcome_en` | textarea | `Welcome! I can help you with information about the Ministry of Digital.` |
+| Input Placeholder (BM) | `ai_chatbot_placeholder_ms` | text | `Taip soalan anda...` |
+| Input Placeholder (EN) | `ai_chatbot_placeholder_en` | text | `Type your question...` |
+| Disclaimer Text (BM) | `ai_chatbot_disclaimer_ms` | textarea | — (falls back to `lang/ms/ai.php` default) |
+| Disclaimer Text (EN) | `ai_chatbot_disclaimer_en` | textarea | — (falls back to `lang/en/ai.php` default) |
+
+> **Language preference options:**
+> - `same_as_page` — bot replies in the current page locale (default)
+> - `always_ms` — bot always replies in Bahasa Malaysia
+> - `always_en` — bot always replies in English
+> - `user_choice` — shows a language toggle inside the chat widget; user picks their preferred response language
+>
+> **Display location options:**
+> - `all_pages` — chat widget appears on every public page (default)
+> - `homepage_only` — only on `/{locale}` homepage
+> - `specific_pages` — only on routes listed in `ai_chatbot_display_pages` (matched via `Route::currentRouteName()`)
+>
+> **Bot persona + restrictions** are appended to the LLM system prompt. Persona sets the tone and identity; restrictions define guardrails (e.g. "Do not discuss political opinions", "Only answer questions related to the Ministry").
+
 > API keys are stored **encrypted** using Laravel's `Crypt::encrypt()` / `Crypt::decrypt()`. The `type` column in the `settings` table is set to `'encrypted'` for these keys.
 
 ### OpenAI-Compatible Providers (Qwen, Moonshot, etc.)
@@ -286,13 +320,27 @@ CREATE INDEX idx_content_embeddings_vector
 | `$input` | `string` | Current user input |
 | `$isThinking` | `bool` | True while awaiting LLM response |
 
-**Rate limiting:** 10 messages/hour/IP (configurable via `ai_chatbot_rate_limit` setting).
+**Rate limiting:** Configurable via `ai_chatbot_rate_limit` setting (default 10 messages/hour/IP).
 
 **Graceful degradation:** If `ai_chatbot_enabled = false` or the API key is not configured, the chat widget is hidden entirely — no error shown to public users.
 
-**Bilingual:** System prompt adapts to `app()->getLocale()`. Response language matches the current page locale.
+**Bot identity:** Name, avatar, and persona are read from chatbot settings (see `ManageAiSettings → Chatbot Settings`). The persona text is appended to the LLM system prompt to shape the bot's tone and personality. The bot name and avatar are displayed in the chat header and next to bot messages.
 
-**Privacy disclaimer:** Session modal on first open; acceptance stored in session, never persisted.
+**Language preference:** Controlled by `ai_chatbot_language_preference`:
+- `same_as_page` (default) — response locale matches `app()->getLocale()`
+- `always_ms` / `always_en` — forces a specific response language regardless of page locale
+- `user_choice` — renders a language toggle inside the chat widget; user selects preferred language
+
+**Restrictions/guardrails:** Admin-defined restriction text (`ai_chatbot_restrictions_{locale}`) is appended to the system prompt. The LLM is instructed to refuse queries outside these boundaries.
+
+**Display location:** Controlled by `ai_chatbot_display_location`:
+- `all_pages` (default) — widget renders on every public page
+- `homepage_only` — only on `/{locale}` homepage route
+- `specific_pages` — only on routes listed in `ai_chatbot_display_pages` (matched via `Route::currentRouteName()`)
+
+**Welcome message:** The first bot message displayed when the chat window opens (before the user types). Read from `ai_chatbot_welcome_{locale}`.
+
+**Privacy disclaimer:** Session modal on first open; content from `ai_chatbot_disclaimer_{locale}` setting (falls back to `lang/{locale}/ai.php` default). Acceptance stored in session, never persisted.
 
 ---
 

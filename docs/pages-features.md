@@ -491,37 +491,40 @@ Level 1 — Main menu       (parent_id IS NULL in menu_items)
 
 ---
 
-### AI Chatbot — **Status: Planned** (Phase 6)
+### AI Chatbot — **Status: Planned** (Phase 4, Week 11)
 
 **Livewire component:** `App\Livewire\AiChat`
 **View:** `resources/views/livewire/ai-chat.blade.php`
 
-Floating chat widget rendered on all public pages via the base layout (`<livewire:ai-chat />`). Answers questions using RAG retrieval from embedded content.
+Floating chat widget rendered on public pages via the base layout (`<livewire:ai-chat />`). Answers questions using RAG retrieval from embedded content. All identity and behavior configured by admin via `ManageAiSettings → Chatbot Settings`.
 
 **User-facing behaviour:**
-- Floating "Chat with us" button (bottom-right) — Alpine.js toggle for open/close
+- Floating button (bottom-right) showing admin-configured **bot name** — Alpine.js toggle for open/close
+- Chat header displays **bot name** and **bot avatar** (from settings; falls back to site logo)
+- **Welcome message** shown as first bot message when chat opens (before user types)
 - Chat window shows conversation history (session-only — not persisted)
-- User message submitted via Livewire `wire:submit`
-- Response streams from the **admin-configured LLM provider** via Prism PHP (Livewire streaming)
-- Bilingual: responds in the same locale as the current page (`app()->getLocale()`)
+- User message submitted via Livewire `wire:submit`; **input placeholder** from settings
+- Response streams from the admin-configured LLM provider via Prism PHP (Livewire streaming)
+- **Language preference**: `same_as_page` (default), `always_ms`, `always_en`, or `user_choice` (in-chat language toggle)
+- **Display location**: `all_pages` (default), `homepage_only`, or `specific_pages` (route name list) — widget hidden on excluded pages
 
 **RAG pipeline (per message):**
 1. Embed user message via admin-configured embedding provider (via `AiService::embed()`)
 2. pgvector similarity search on `content_embeddings` — top 5 chunks, filtered by locale
-3. Build system prompt: "You are the AI assistant for Kementerian Digital Malaysia. Answer using only the provided context."
+3. Build system prompt: admin-configured **persona** + **restrictions** (guardrails) + "Answer using only the provided context."
 4. Call admin-configured LLM via `AiService::chat()` (Prism PHP) + conversation history (last 10 turns)
 5. Return response; append to session history
 
-**Rate limiting:** 10 messages/hour per IP via Redis rate limiter (Laravel `RateLimiter` facade).
+**Rate limiting:** Configurable via `ai_chatbot_rate_limit` setting (default 10 messages/hour/IP).
 
-**Privacy disclaimer:** First-time chatbot open shows a modal: "Your messages may be processed by an AI provider. Do not share personal information." Acceptance stored in session.
+**Privacy disclaimer:** First-time chatbot open shows a modal with admin-configured **disclaimer text** (falls back to `lang/{locale}/ai.php` default). Acceptance stored in session.
 
 **Cache:** No cache — responses are dynamic per user query.
 
 **Blade layout placement:**
 ```blade
 {{-- resources/views/components/layouts/app.blade.php --}}
-<livewire:ai-chat />  {{-- renders floating chat widget on all public pages --}}
+<livewire:ai-chat />  {{-- renders floating chat widget; self-hides based on display location setting --}}
 ```
 
 ---
@@ -564,7 +567,7 @@ Replaces Payload CMS admin at `/admin`.
 | `ManageAddresses` | Addresses | Ministry office addresses with phone/fax/email/Google Maps URL | Planned |
 | `ManageFeedbackSettings` | FeedbackSettings | Enable/disable feedback widget, recipient email, success message (ms/en) | Planned |
 | `ManageMediaSettings` | — (CMS extension) | Storage driver (local/s3/r2/gcs/azure); AWS S3 key/secret/region/bucket/URL; Cloudflare R2 account ID/keys/bucket/public URL; GCP project/bucket/service-account JSON; Azure account/key/container/URL | Planned |
-| `ManageAiSettings` | — (Phase 6) | LLM provider/model/API key (encrypted)/base URL, system prompt (ms/en), embedding provider/model/key (encrypted)/dimension, chatbot rate limit, feature flags | Planned |
+| `ManageAiSettings` | — (Phase 4, Week 10) | **3 sections:** (1) Provider config — LLM provider/model/API key (encrypted)/base URL, embedding provider/model/key (encrypted)/dimension; (2) Feature flags — chatbot enabled, admin editor enabled, rate limit; (3) Chatbot settings — bot name (ms/en), avatar, persona (ms/en), language preference, restrictions (ms/en), display location, display pages (JSON), welcome message (ms/en), placeholder (ms/en), disclaimer (ms/en) | Planned |
 
 > **Note:** `ManageHeader` is **not built** — the `MenuResource` Filament resource handles all menu management (public and admin navigation) through the `menus` + `menu_items` tables, providing richer nesting and role control than a settings page would allow.
 

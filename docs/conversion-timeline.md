@@ -513,7 +513,20 @@ Set up the embedding pipeline so all content is vector-indexed before building t
 - [ ] Create `EmbeddingObserver` (`app/Observers/EmbeddingObserver.php`) — fires `GenerateEmbeddingJob` on model `saved`/`deleted`
 - [ ] Create `GenerateEmbeddingJob` (`app/Jobs/GenerateEmbeddingJob.php`) — queued; chunks content, calls admin-configured embedding provider, upserts `content_embeddings`
 - [ ] Register `EmbeddingObserver` on embeddable models in `AppServiceProvider`: `Broadcast`, `Achievement`, `Policy`, `StaffDirectory`
-- [ ] Create `ManageAiSettings` Filament settings page — LLM provider/model/key, embedding provider/model/key/dimension, feature flags (chatbot enabled, admin editor enabled, rate limit)
+- [ ] Create `ManageAiSettings` Filament settings page with **3 sections**:
+  - **Provider Configuration** — LLM provider/model/key/base URL, embedding provider/model/key/dimension
+  - **Feature Flags** — chatbot enabled, admin editor enabled, chatbot rate limit (msg/hour/IP)
+  - **Chatbot Settings** — bot identity and behavior, all admin-configurable:
+    - Bot name (ms/en) — displayed in chat header and greeting (e.g. "Aida", "Portal Assistant")
+    - Bot avatar — file upload; displayed next to bot messages; falls back to ministry logo if not set
+    - Bot persona (ms/en) — personality instruction appended to system prompt (e.g. "You are a friendly, formal government assistant")
+    - Language reply preference — `same_as_page` (default) | `always_ms` | `always_en` | `user_choice` (shows language toggle in chat)
+    - Bot restrictions (ms/en) — topics or content boundaries the bot must refuse (appended to system prompt as guardrails)
+    - Display location — `all_pages` (default) | `homepage_only` | `specific_pages` (shows multi-select of route names)
+    - Display pages (JSON) — route names for `specific_pages` mode (e.g. `["home", "siaran.index", "direktori.index"]`)
+    - Welcome message (ms/en) — first message shown when chat opens (before user types anything)
+    - Input placeholder (ms/en) — placeholder text in the message input field
+    - Disclaimer text (ms/en) — privacy disclaimer modal content (overrides default lang string)
 - [ ] Add AI env vars to `.env.example` (`AI_LLM_PROVIDER`, `AI_LLM_MODEL`, `AI_LLM_API_KEY`, `AI_EMBEDDING_PROVIDER`, etc.)
 - [ ] Write `GenerateEmbeddingJobTest` + `RagServiceTest`
 
@@ -533,7 +546,8 @@ php artisan queue:work --queue=embeddings
 **Deliverables:**
 - `content_embeddings` table with pgvector column
 - Embedding pipeline working locally (seed → observe → queue → embed → store)
-- `ManageAiSettings` Filament page functional (provider config + feature flags)
+- `ManageAiSettings` Filament page functional (provider config + feature flags + chatbot settings)
+- Chatbot settings saved and retrievable from `settings` table (name, avatar, persona, language pref, restrictions, display location, welcome message, placeholder, disclaimer)
 - `RagServiceTest` + `GenerateEmbeddingJobTest` pass
 
 **Effort:** 32 hours
@@ -550,20 +564,33 @@ Build the `AiChat` Livewire component and integrate it into the public layout.
   - Method `send()`: validates input, embeds query via `RagService`, builds prompt, calls LLM via `AiService`, appends response to `$messages`
   - Rate limiting: configurable per IP via `RateLimiter::attempt()` (default 10/hour, setting `ai_chatbot_rate_limit`)
   - Session-only history: store in PHP session, not DB; never log PII
-- [ ] Create privacy disclaimer modal (Alpine.js) — shown on first open; acceptance stored in session
+- [ ] Apply chatbot settings from `ManageAiSettings` (configured in Week 10):
+  - Bot name + avatar displayed in chat header and next to bot messages
+  - Bot persona + restrictions injected into LLM system prompt
+  - Language preference controls response locale (`same_as_page` | `always_ms` | `always_en` | `user_choice` with in-chat toggle)
+  - Welcome message shown as first bot message when chat opens
+  - Input placeholder text from settings
+  - Display location logic — component renders only on allowed pages (`all_pages` | `homepage_only` | `specific_pages` with route name check via `Route::currentRouteName()`)
+- [ ] Create privacy disclaimer modal (Alpine.js) — content from `ai_chatbot_disclaimer_ms`/`_en` setting (falls back to `lang/ai.php` default); shown on first open; acceptance stored in session
 - [ ] Add `<livewire:ai-chat />` to `resources/views/components/layouts/app.blade.php`
 - [ ] Style floating chat button + chat window with Tailwind (MyDS tokens)
-- [ ] Bilingual support: system prompt adapts to `app()->getLocale()`
-- [ ] Add `lang/ms/ai.php` + `lang/en/ai.php` for all AI-related UI strings
-- [ ] Write `AiChatTest` (mock `AiService` + `RagService`)
-- [ ] Add rate limit test: 11th message in same hour returns error response
+- [ ] Add `lang/ms/ai.php` + `lang/en/ai.php` for all AI-related UI strings (used as fallbacks when settings not configured)
+- [ ] Write `AiChatTest` (mock `AiService` + `RagService`) — include tests for:
+  - Bot name/avatar rendering
+  - Display location filtering (hidden on excluded pages)
+  - Language preference modes
+  - Welcome message display
+  - Rate limit enforcement (11th message returns error)
 
 **Deliverables:**
-- Chat widget visible on `/ms` and `/en` pages (hidden if not configured)
+- Chat widget visible on allowed pages only (per display location setting); hidden if not configured
+- Bot identity (name, avatar, persona) rendered from admin settings
+- Language preference applied to responses
+- Welcome message shown on first open
 - Sends question → receives contextually accurate RAG response
 - Rate limiting enforced (configurable)
-- Privacy disclaimer shown on first open
-- `AiChatTest` passes (all happy paths + rate limit)
+- Privacy disclaimer with admin-customisable text
+- `AiChatTest` passes (all happy paths + settings + rate limit)
 
 **Effort:** 32 hours
 
