@@ -37,16 +37,14 @@ class AiTldrAction extends Action
     {
         parent::setUp();
 
-        $locale = $this->aiLocale;
-        $source = $this->sourceFieldName;
-
         $this
             ->label(__('ai_admin.tldr'))
             ->icon('heroicon-o-bolt')
             ->color('gray')
             ->size('sm')
             ->visible(fn (): bool => AiGrammarAction::isAiEditorEnabled())
-            ->action(function (Get $schemaGet, Set $schemaSet) use ($locale, $source): void {
+            ->action(function (Get $schemaGet, Set $schemaSet): void {
+                $source = $this->sourceFieldName;
                 $fieldName = $source !== '' ? $source : $this->getSchemaComponent()?->getName();
 
                 if ($fieldName === null) {
@@ -62,7 +60,7 @@ class AiTldrAction extends Action
                     return;
                 }
 
-                $result = app(AiService::class)->tldr(strip_tags($text), $locale);
+                $result = app(AiService::class)->tldr(strip_tags($text), $this->aiLocale);
 
                 if ($result === '') {
                     Notification::make()->danger()

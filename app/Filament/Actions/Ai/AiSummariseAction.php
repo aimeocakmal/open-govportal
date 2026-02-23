@@ -28,15 +28,13 @@ class AiSummariseAction extends Action
     {
         parent::setUp();
 
-        $locale = $this->aiLocale;
-
         $this
             ->label(__('ai_admin.summarise'))
             ->icon('heroicon-o-document-minus')
             ->color('gray')
             ->size('sm')
             ->visible(fn (): bool => AiGrammarAction::isAiEditorEnabled())
-            ->action(function (Get $schemaGet, Set $schemaSet) use ($locale): void {
+            ->action(function (Get $schemaGet, Set $schemaSet): void {
                 $fieldName = $this->getSchemaComponent()?->getName();
 
                 if ($fieldName === null) {
@@ -52,7 +50,7 @@ class AiSummariseAction extends Action
                     return;
                 }
 
-                $result = app(AiService::class)->summarise($text, $locale);
+                $result = app(AiService::class)->summarise($text, $this->aiLocale);
 
                 if ($result === '') {
                     Notification::make()->danger()

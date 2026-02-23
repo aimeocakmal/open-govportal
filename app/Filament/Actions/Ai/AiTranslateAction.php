@@ -44,9 +44,6 @@ class AiTranslateAction extends Action
     {
         parent::setUp();
 
-        $currentLocale = $this->currentLocale;
-        $localeFields = $this->localeFieldMap;
-
         $this
             ->label(__('ai_admin.translate'))
             ->icon('heroicon-o-language')
@@ -62,10 +59,10 @@ class AiTranslateAction extends Action
                     ])
                     ->required(),
             ])
-            ->action(function (array $data, Get $schemaGet, Set $schemaSet) use ($currentLocale, $localeFields): void {
+            ->action(function (array $data, Get $schemaGet, Set $schemaSet): void {
                 $targetLocale = $data['target_locale'];
-                $sourceField = $localeFields[$currentLocale] ?? $this->getSchemaComponent()?->getName();
-                $targetField = $localeFields[$targetLocale] ?? $sourceField;
+                $sourceField = $this->localeFieldMap[$this->currentLocale] ?? $this->getSchemaComponent()?->getName();
+                $targetField = $this->localeFieldMap[$targetLocale] ?? $sourceField;
 
                 if ($sourceField === null) {
                     return;
@@ -80,7 +77,7 @@ class AiTranslateAction extends Action
                     return;
                 }
 
-                $result = app(AiService::class)->translate($text, $currentLocale, $targetLocale);
+                $result = app(AiService::class)->translate($text, $this->currentLocale, $targetLocale);
 
                 if ($result === '') {
                     Notification::make()->danger()

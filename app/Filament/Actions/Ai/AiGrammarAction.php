@@ -29,15 +29,13 @@ class AiGrammarAction extends Action
     {
         parent::setUp();
 
-        $locale = $this->aiLocale;
-
         $this
             ->label(__('ai_admin.grammar_check'))
             ->icon('heroicon-o-check-badge')
             ->color('gray')
             ->size('sm')
             ->visible(fn (): bool => self::isAiEditorEnabled())
-            ->action(function (Get $schemaGet, Set $schemaSet) use ($locale): void {
+            ->action(function (Get $schemaGet, Set $schemaSet): void {
                 $fieldName = $this->getSchemaComponent()?->getName();
 
                 if ($fieldName === null) {
@@ -53,7 +51,7 @@ class AiGrammarAction extends Action
                     return;
                 }
 
-                $result = app(AiService::class)->grammarCheck($text, $locale);
+                $result = app(AiService::class)->grammarCheck($text, $this->aiLocale);
 
                 if ($result === '') {
                     Notification::make()->danger()

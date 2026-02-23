@@ -40,24 +40,23 @@ class AiWriteExcerptAction extends Action
     {
         parent::setUp();
 
-        $locale = $this->aiLocale;
-        $contentField = $this->contentFieldName;
-
         $this
             ->label(__('ai_admin.write_excerpt'))
             ->icon('heroicon-o-pencil-square')
             ->color('gray')
             ->size('sm')
             ->visible(fn (): bool => AiGrammarAction::isAiEditorEnabled())
-            ->action(function (Get $schemaGet, Set $schemaSet) use ($locale, $contentField): void {
+            ->action(function (Get $schemaGet, Set $schemaSet): void {
                 $excerptField = $this->getSchemaComponent()?->getName();
 
                 if ($excerptField === null) {
                     return;
                 }
 
-                $sourceField = $contentField !== '' ? $contentField : $excerptField;
-                $text = $schemaGet($sourceField);
+                $contentField = $this->contentFieldName;
+                $text = $contentField !== ''
+                    ? $schemaGet($contentField)
+                    : $schemaGet($excerptField);
 
                 if (blank($text)) {
                     Notification::make()->warning()
@@ -66,7 +65,7 @@ class AiWriteExcerptAction extends Action
                     return;
                 }
 
-                $result = app(AiService::class)->writeExcerpt(strip_tags($text), $locale);
+                $result = app(AiService::class)->writeExcerpt(strip_tags($text), $this->aiLocale);
 
                 if ($result === '') {
                     Notification::make()->danger()

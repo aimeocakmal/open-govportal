@@ -28,8 +28,6 @@ class AiGenerateAction extends Action
     {
         parent::setUp();
 
-        $locale = $this->aiLocale;
-
         $this
             ->label(__('ai_admin.generate_from_prompt'))
             ->icon('heroicon-o-sparkles')
@@ -44,8 +42,8 @@ class AiGenerateAction extends Action
             ])
             ->modalHeading(__('ai_admin.generate_from_prompt'))
             ->modalSubmitActionLabel(__('ai_admin.generate'))
-            ->action(function (array $data, Set $schemaSet) use ($locale): void {
-                $result = app(AiService::class)->generateFromPrompt($data['prompt'], $locale);
+            ->action(function (array $data, Set $schemaSet): void {
+                $result = app(AiService::class)->generateFromPrompt($data['prompt'], $this->aiLocale);
 
                 if ($result === '') {
                     Notification::make()->danger()
