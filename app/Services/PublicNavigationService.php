@@ -16,10 +16,10 @@ class PublicNavigationService
     /**
      * Get header navigation items from the public_header menu.
      *
-     * Each item: ['label_ms' => ..., 'label_en' => ..., 'url' => 'siaran']
+     * Each item: ['label_ms' => ..., 'label_en' => ..., 'url' => 'siaran', 'children' => [...]]
      * The url is the path segment without locale prefix (e.g. 'siaran', not '/ms/siaran').
      *
-     * @return list<array{label_ms: string, label_en: string, url: string}>
+     * @return list<array{label_ms: string, label_en: string, url: string, children: list<array{label_ms: string, label_en: string, url: string}>}>
      */
     public function getHeaderItems(): array
     {
@@ -34,17 +34,22 @@ class PublicNavigationService
                 return $this->fallbackHeaderItems();
             }
 
-            $items = $menu->rootItems()->active()->get();
+            $activeChildren = fn ($q) => $q->active()->orderBy('sort_order');
+
+            $items = $menu->rootItems()
+                ->active()
+                ->with([
+                    'children' => $activeChildren,
+                    'children.children' => $activeChildren,
+                    'children.children.children' => $activeChildren,
+                ])
+                ->get();
 
             if ($items->isEmpty()) {
                 return $this->fallbackHeaderItems();
             }
 
-            return $items->map(fn ($item): array => [
-                'label_ms' => $item->label_ms,
-                'label_en' => $item->label_en,
-                'url' => $this->stripLocalePrefix($item->url),
-            ])->values()->all();
+            return $items->map(fn ($item): array => $this->mapMenuItem($item))->values()->all();
         });
     }
 
@@ -134,6 +139,21 @@ class PublicNavigationService
     }
 
     /**
+     * Recursively map a MenuItem to an array with nested children.
+     *
+     * @return array{label_ms: string, label_en: string, url: string, children: list<array>}
+     */
+    private function mapMenuItem(MenuItem $item): array
+    {
+        return [
+            'label_ms' => $item->label_ms,
+            'label_en' => $item->label_en,
+            'url' => $this->stripLocalePrefix($item->url),
+            'children' => $item->children->map(fn ($child): array => $this->mapMenuItem($child))->values()->all(),
+        ];
+    }
+
+    /**
      * Strip locale prefix from a stored URL (e.g. '/ms/siaran' → 'siaran').
      */
     private function stripLocalePrefix(?string $url): string
@@ -146,18 +166,18 @@ class PublicNavigationService
     }
 
     /**
-     * @return list<array{label_ms: string, label_en: string, url: string}>
+     * @return list<array{label_ms: string, label_en: string, url: string, children: list<array{label_ms: string, label_en: string, url: string}>}>
      */
     private function fallbackHeaderItems(): array
     {
         return [
-            ['label_ms' => 'Siaran', 'label_en' => 'Broadcasts', 'url' => 'siaran'],
-            ['label_ms' => 'Pencapaian', 'label_en' => 'Achievements', 'url' => 'pencapaian'],
-            ['label_ms' => 'Statistik', 'label_en' => 'Statistics', 'url' => 'statistik'],
-            ['label_ms' => 'Direktori', 'label_en' => 'Directory', 'url' => 'direktori'],
-            ['label_ms' => 'Dasar', 'label_en' => 'Policy', 'url' => 'dasar'],
-            ['label_ms' => 'Profil Kementerian', 'label_en' => 'Ministry Profile', 'url' => 'profil-kementerian'],
-            ['label_ms' => 'Hubungi Kami', 'label_en' => 'Contact Us', 'url' => 'hubungi-kami'],
+            ['label_ms' => 'Siaran', 'label_en' => 'Broadcasts', 'url' => 'siaran', 'children' => []],
+            ['label_ms' => 'Pencapaian', 'label_en' => 'Achievements', 'url' => 'pencapaian', 'children' => []],
+            ['label_ms' => 'Statistik', 'label_en' => 'Statistics', 'url' => 'statistik', 'children' => []],
+            ['label_ms' => 'Direktori', 'label_en' => 'Directory', 'url' => 'direktori', 'children' => []],
+            ['label_ms' => 'Dasar', 'label_en' => 'Policy', 'url' => 'dasar', 'children' => []],
+            ['label_ms' => 'Profil Kementerian', 'label_en' => 'Ministry Profile', 'url' => 'profil-kementerian', 'children' => []],
+            ['label_ms' => 'Hubungi Kami', 'label_en' => 'Contact Us', 'url' => 'hubungi-kami', 'children' => []],
         ];
     }
 }

@@ -11,6 +11,7 @@
 
 <header
     x-data="{ open: false }"
+    @close-mobile-menu.window="open = false"
     class="bg-white border-b border-border shadow-button sticky top-0 z-50"
 >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,13 +27,48 @@
             {{-- Desktop nav --}}
             <nav class="hidden md:flex items-center gap-6" aria-label="{{ __('common.nav.home') }}">
                 @foreach ($navItems as $item)
-                    <a
-                        href="/{{ $locale }}/{{ $item['url'] }}"
-                        class="text-body-sm font-medium text-text-secondary hover:text-primary transition-colors duration-short
-                               {{ request()->is($locale . '/' . $item['url'] . '*') ? 'text-primary font-semibold' : '' }}"
-                    >
-                        {{ $item[$labelKey] ?? $item['label_ms'] }}
-                    </a>
+                    @if (!empty($item['children']))
+                        {{-- Dropdown for items with children --}}
+                        <div x-data="{ dropdownOpen: false }" class="relative"
+                             @mouseenter="dropdownOpen = true"
+                             @mouseleave="dropdownOpen = false">
+                            @if ($item['url'])
+                                <a href="/{{ $locale }}/{{ $item['url'] }}"
+                                   class="inline-flex items-center gap-1 text-body-sm font-medium text-text-secondary hover:text-primary transition-colors duration-short">
+                                    {{ $item[$labelKey] ?? $item['label_ms'] }}
+                                    <svg class="size-4 transition-transform duration-short" :class="dropdownOpen && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                </a>
+                            @else
+                                <button type="button"
+                                        @click="dropdownOpen = !dropdownOpen"
+                                        class="inline-flex items-center gap-1 text-body-sm font-medium text-text-secondary hover:text-primary transition-colors duration-short">
+                                    {{ $item[$labelKey] ?? $item['label_ms'] }}
+                                    <svg class="size-4 transition-transform duration-short" :class="dropdownOpen && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                            @endif
+
+                            <div x-show="dropdownOpen"
+                                 x-cloak
+                                 x-transition:enter="transition ease-out duration-short"
+                                 x-transition:enter-start="opacity-0 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-short"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 -translate-y-1"
+                                 class="absolute left-0 top-full mt-1 w-56 rounded-md bg-white border border-border shadow-context-menu py-1 z-50 overflow-visible">
+                                <x-layout.nav-desktop-submenu :items="$item['children']" :locale="$locale" :label-key="$labelKey" />
+                            </div>
+                        </div>
+                    @else
+                        {{-- Simple link --}}
+                        <a
+                            href="/{{ $locale }}/{{ $item['url'] }}"
+                            class="text-body-sm font-medium text-text-secondary hover:text-primary transition-colors duration-short
+                                   {{ request()->is($locale . '/' . $item['url'] . '*') ? 'text-primary font-semibold' : '' }}"
+                        >
+                            {{ $item[$labelKey] ?? $item['label_ms'] }}
+                        </a>
+                    @endif
                 @endforeach
             </nav>
 
@@ -92,14 +128,29 @@
     >
         <nav class="px-4 py-3 flex flex-col gap-1" aria-label="Mobile navigation">
             @foreach ($navItems as $item)
-                <a
-                    href="/{{ $locale }}/{{ $item['url'] }}"
-                    @click="open = false"
-                    class="block px-3 py-2 rounded-md text-body-sm font-medium text-gray-700 hover:bg-bg-washed hover:text-primary transition-colors duration-short
-                           {{ request()->is($locale . '/' . $item['url'] . '*') ? 'bg-primary-50 text-primary font-semibold' : '' }}"
-                >
-                    {{ $item[$labelKey] ?? $item['label_ms'] }}
-                </a>
+                @if (!empty($item['children']))
+                    {{-- Collapsible group for items with children --}}
+                    <div x-data="{ subOpen: false }">
+                        <button type="button"
+                                @click="subOpen = !subOpen"
+                                class="flex items-center justify-between w-full px-3 py-2 rounded-md text-body-sm font-medium text-gray-700 hover:bg-bg-washed hover:text-primary transition-colors duration-short">
+                            <span>{{ $item[$labelKey] ?? $item['label_ms'] }}</span>
+                            <svg class="size-4 transition-transform duration-short" :class="subOpen && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="subOpen" x-cloak x-collapse class="ml-4 flex flex-col gap-1">
+                            <x-layout.nav-mobile-submenu :items="$item['children']" :locale="$locale" :label-key="$labelKey" />
+                        </div>
+                    </div>
+                @else
+                    <a
+                        href="/{{ $locale }}/{{ $item['url'] }}"
+                        @click="open = false"
+                        class="block px-3 py-2 rounded-md text-body-sm font-medium text-gray-700 hover:bg-bg-washed hover:text-primary transition-colors duration-short
+                               {{ request()->is($locale . '/' . $item['url'] . '*') ? 'bg-primary-50 text-primary font-semibold' : '' }}"
+                    >
+                        {{ $item[$labelKey] ?? $item['label_ms'] }}
+                    </a>
+                @endif
             @endforeach
         </nav>
 
