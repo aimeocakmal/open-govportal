@@ -136,8 +136,12 @@ class PublicNavigationService
     /**
      * Strip locale prefix from a stored URL (e.g. '/ms/siaran' → 'siaran').
      */
-    private function stripLocalePrefix(string $url): string
+    private function stripLocalePrefix(?string $url): string
     {
+        if ($url === null || $url === '') {
+            return '';
+        }
+
         return preg_replace('#^/?(ms|en)/#', '', ltrim($url, '/'));
     }
 
