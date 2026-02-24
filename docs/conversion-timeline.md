@@ -189,7 +189,7 @@ php artisan boost:install
 # 5. Filament Blueprint (AI-powered model scaffolding)
 # Requires a Filament license — replace placeholders with your credentials
 composer config repositories.filament composer https://packages.filamentphp.com/composer
-composer config --auth http-basic.packages.filamentphp.com "akmalakhpah@gmail.com" "0e847ae6-1e02-4c63-8a96-6622d569ec8b"
+composer config --auth http-basic.packages.filamentphp.com "YOUR_EMAIL_ADDRESS" "YOUR_LICENSE_KEY"
 composer require filament/blueprint --dev
 ```
 
