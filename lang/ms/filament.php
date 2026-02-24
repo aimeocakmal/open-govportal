@@ -312,6 +312,8 @@ return [
             'type_fixed' => 'Diperbaiki',
             'type_removed' => 'Dibuang',
             'version_history' => 'Sejarah Versi',
+            'read_more' => 'Baca lagi',
+            'show_less' => 'Tunjuk kurang',
         ],
     ],
 

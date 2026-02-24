@@ -312,6 +312,8 @@ return [
             'type_fixed' => 'Fixed',
             'type_removed' => 'Removed',
             'version_history' => 'Version History',
+            'read_more' => 'Read more',
+            'show_less' => 'Show less',
         ],
     ],
 

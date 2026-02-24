@@ -40,9 +40,9 @@
                 {{ __('filament.settings.platform_version.version_history') }}
             </x-slot>
 
-            <div class="space-y-6">
+            <div class="space-y-10">
                 @foreach ($history as $release)
-                    <div>
+                    <div x-data="{ expanded: false }">
                         <div class="flex items-center gap-3">
                             <x-filament::badge size="lg" color="gray">
                                 v{{ $release['version'] }}
@@ -57,15 +57,28 @@
                         </div>
 
                         @if (count($release['changelog'] ?? []) > 0)
-                            <div class="mt-3">
-                                @include('filament.pages.partials.changelog-sections', ['sections' => $release['changelog']])
+                            <div class="mt-6 relative">
+                                <div :style="!expanded && 'max-height: 6rem; overflow: hidden'">
+                                    @include('filament.pages.partials.changelog-sections', ['sections' => $release['changelog']])
+                                </div>
+
+                                {{-- Fade overlay when collapsed --}}
+                                <div
+                                    x-show="!expanded"
+                                    class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white dark:from-gray-900 pointer-events-none"
+                                ></div>
+
+                                <button
+                                    type="button"
+                                    @click="expanded = !expanded"
+                                    class="mt-1 font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300" style="font-size: 0.75rem;"
+                                >
+                                    <span x-text="expanded ? '{{ __('filament.settings.platform_version.show_less') }}' : '{{ __('filament.settings.platform_version.read_more') }}'"></span>
+                                </button>
                             </div>
                         @endif
                     </div>
 
-                    @if (! $loop->last)
-                        <hr class="border-gray-200 dark:border-gray-700">
-                    @endif
                 @endforeach
             </div>
         </x-filament::section>

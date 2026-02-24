@@ -16,7 +16,7 @@
                 {{ __($typeKey) }}
             </x-filament::badge>
 
-            <ul class="mt-2 space-y-1 text-sm text-gray-700 dark:text-gray-300" style="list-style-type: disc; list-style-position: inside;">
+            <ul class="mt-2 space-y-1 text-gray-700 dark:text-gray-300" style="list-style-type: disc; list-style-position: inside; font-size: 0.8rem;">
                 @foreach ($section['items'] as $item)
                     <li style="display: list-item;">{{ $item }}</li>
                 @endforeach
