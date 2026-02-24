@@ -8,4 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('ai:purge-conversations')->dailyAt('02:00');
+Schedule::command('ai:purge-conversations')->monthlyOn(1, '02:00');
+Schedule::command('activity-log:purge')->monthlyOn(1, '02:30');

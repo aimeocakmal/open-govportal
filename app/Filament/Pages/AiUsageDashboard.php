@@ -5,7 +5,11 @@ namespace App\Filament\Pages;
 use App\Filament\Concerns\HasConfigurableNavigation;
 use App\Filament\Widgets\AiTokenUsageChartWidget;
 use App\Filament\Widgets\AiUsageStatsWidget;
+use App\Services\AiPurgeService;
+use App\Services\MediaDiskService;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -48,6 +52,59 @@ class AiUsageDashboard extends Page
     public static function canAccess(): bool
     {
         return Auth::user()?->can('manage_ai_settings') ?? false;
+    }
+
+    /**
+     * @return array<Action>
+     */
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getArchiveAction(),
+        ];
+    }
+
+    protected function getArchiveAction(): Action
+    {
+        $purgeService = app(AiPurgeService::class);
+        $counts = $purgeService->countEligible();
+        $retentionDays = $purgeService->getRetentionDays();
+
+        return Action::make('archive')
+            ->label(__('ai.archive_action'))
+            ->icon(Heroicon::OutlinedArchiveBox)
+            ->color('primary')
+            ->requiresConfirmation()
+            ->modalHeading(__('ai.archive_confirm_heading'))
+            ->modalDescription(__('ai.archive_confirm_description', [
+                'conversations' => $counts['conversations'],
+                'logs' => $counts['logs'],
+                'days' => $retentionDays,
+            ]))
+            ->modalSubmitActionLabel(__('ai.archive_confirm_button'))
+            ->action(function (): void {
+                $result = app(AiPurgeService::class)->archiveAndPurge(app(MediaDiskService::class));
+
+                if ($result['archive'] === null) {
+                    Notification::make()
+                        ->info()
+                        ->title(__('ai.purge_nothing'))
+                        ->send();
+
+                    return;
+                }
+
+                Notification::make()
+                    ->success()
+                    ->title(__('ai.archive_success'))
+                    ->body(__('ai.purge_completed', [
+                        'conversations' => $result['conversations'],
+                        'logs' => $result['logs'],
+                        'archive' => $result['archive'],
+                    ]))
+                    ->persistent()
+                    ->send();
+            });
     }
 
     public function filtersForm(Schema $schema): Schema

@@ -146,8 +146,14 @@ return [
     'role_assistant' => 'Assistant',
     'no_messages' => 'No messages in this conversation.',
 
-    // Auto-purge
+    // Auto-purge & archive
     'retention_days' => 'Retention Period (days)',
-    'retention_days_help' => 'Conversations and usage logs older than this will be automatically deleted. Minimum 7 days.',
-    'purge_completed' => ':conversations conversations and :logs usage logs deleted.',
+    'retention_days_help' => 'Conversations and usage logs older than this will be archived and deleted monthly (1st of each month). Minimum 30 days.',
+    'purge_completed' => ':conversations conversations and :logs usage logs archived to :archive and deleted.',
+    'purge_nothing' => 'No records to archive or delete.',
+    'archive_action' => 'Archive Old Data',
+    'archive_confirm_heading' => 'Archive & Purge Old Data',
+    'archive_confirm_description' => 'This will archive and delete :conversations conversations and :logs usage logs older than :days days. The archive will be saved as a ZIP file to the configured media storage.',
+    'archive_confirm_button' => 'Archive & Delete',
+    'archive_success' => 'Archive completed successfully.',
 ];

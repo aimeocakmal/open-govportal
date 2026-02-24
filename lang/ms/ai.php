@@ -146,8 +146,14 @@ return [
     'role_assistant' => 'Pembantu',
     'no_messages' => 'Tiada mesej dalam perbualan ini.',
 
-    // Auto-purge
+    // Auto-purge & archive
     'retention_days' => 'Tempoh Penyimpanan (hari)',
-    'retention_days_help' => 'Perbualan dan log penggunaan lebih lama daripada ini akan dipadam secara automatik. Minimum 7 hari.',
-    'purge_completed' => ':conversations perbualan dan :logs log penggunaan dipadam.',
+    'retention_days_help' => 'Perbualan dan log penggunaan lebih lama daripada ini akan diarkib dan dipadam setiap bulan (1hb setiap bulan). Minimum 30 hari.',
+    'purge_completed' => ':conversations perbualan dan :logs log penggunaan diarkib ke :archive dan dipadam.',
+    'purge_nothing' => 'Tiada rekod untuk diarkib atau dipadam.',
+    'archive_action' => 'Arkib Data Lama',
+    'archive_confirm_heading' => 'Arkib & Padam Data Lama',
+    'archive_confirm_description' => 'Ini akan mengarkib dan memadam :conversations perbualan dan :logs log penggunaan yang lebih lama daripada :days hari. Arkib akan disimpan sebagai fail ZIP ke storan media yang dikonfigurasikan.',
+    'archive_confirm_button' => 'Arkib & Padam',
+    'archive_success' => 'Pengarkiban berjaya diselesaikan.',
 ];

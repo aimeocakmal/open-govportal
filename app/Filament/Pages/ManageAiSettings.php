@@ -258,7 +258,7 @@ class ManageAiSettings extends Page
                                 ->label(__('ai.retention_days'))
                                 ->numeric()
                                 ->required()
-                                ->minValue(7)
+                                ->minValue(30)
                                 ->maxValue(3650)
                                 ->helperText(__('ai.retention_days_help')),
                         ])

@@ -82,6 +82,7 @@ class ManageSiteInfo extends Page
             'google_analytics_id' => Setting::get('google_analytics_id', ''),
             'custom_analytics_script' => Setting::get('custom_analytics_script', ''),
             'site_default_theme' => Setting::get('site_default_theme', 'default'),
+            'activity_log_retention_days' => (int) Setting::get('activity_log_retention_days', 365),
         ]);
     }
 
@@ -206,6 +207,18 @@ class ManageSiteInfo extends Page
                                 ->rows(6)
                                 ->maxLength(5000),
                         ]),
+
+                    Section::make(__('filament.settings.site_info.data_retention'))
+                        ->description(__('filament.settings.site_info.data_retention_desc'))
+                        ->schema([
+                            TextInput::make('activity_log_retention_days')
+                                ->label(__('filament.settings.site_info.activity_log_retention_days'))
+                                ->numeric()
+                                ->required()
+                                ->minValue(30)
+                                ->maxValue(3650)
+                                ->helperText(__('filament.settings.site_info.activity_log_retention_days_help')),
+                        ]),
                 ])
                     ->livewireSubmitHandler('save')
                     ->footer([
@@ -245,6 +258,7 @@ class ManageSiteInfo extends Page
             'google_analytics_id',
             'custom_analytics_script',
             'site_default_theme',
+            'activity_log_retention_days',
         ];
 
         foreach ($keys as $key) {
