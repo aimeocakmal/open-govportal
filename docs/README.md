@@ -21,14 +21,14 @@ This folder contains planning and technical reference documents for OpenGovPorta
 
 ## Project Phases
 
-| Phase | Weeks | Focus |
-|-------|-------|-------|
-| **1: Foundation** | 1–2 | Project bootstrap, tooling installation (Filament, Boost, Blueprint), design system, base infrastructure |
-| **2: Content Models & CMS** | 3–5 | All Filament resources, media, site config, search indexing, admin polish |
-| **3: Public Pages** | 6–9 | All 10 public pages, Livewire components, bilingual routes, SEO |
-| **4: Performance & Quality** | 10–11 | Redis caching, WCAG AA, PHPUnit coverage, security audit, load testing |
-| **5: Migration & Launch** | 12 | Content migration from MongoDB, DNS cutover, production deploy, monitoring |
-| **6: AI Features** | 13–16 | RAG pipeline (pgvector embeddings), public AI chatbot (`AiChat` Livewire), admin AI content editor (Filament) |
+| Phase                        | Weeks | Focus                                                                                                         |
+|------------------------------|-------|---------------------------------------------------------------------------------------------------------------|
+| **1: Foundation**            | 1–2   | Project bootstrap, tooling installation (Filament, Boost, Blueprint), design system, base infrastructure      |
+| **2: Content Models & CMS**  | 3–5   | All Filament resources, media, site config, search indexing, admin polish                                     |
+| **3: Public Pages**          | 6–9   | All 10 public pages, Livewire components, bilingual routes, SEO                                               |
+| **4: Performance & Quality** | 10–11 | Redis caching, WCAG AA, PHPUnit coverage, security audit, load testing                                        |
+| **5: Migration & Launch**    | 12    | Content migration from MongoDB, DNS cutover, production deploy, monitoring                                    |
+| **6: AI Features**           | 13–16 | RAG pipeline (pgvector embeddings), public AI chatbot (`AiChat` Livewire), admin AI content editor (Filament) |
 
 See [conversion-timeline.md](conversion-timeline.md) for detailed tasks, installation commands, and acceptance criteria per phase.
 
