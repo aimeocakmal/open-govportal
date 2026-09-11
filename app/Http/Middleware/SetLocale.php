@@ -15,7 +15,7 @@ class SetLocale
     {
         $locale = $request->route('locale', config('app.locale', 'ms'));
 
-        if (!in_array($locale, self::SUPPORTED, true)) {
+        if (! in_array($locale, self::SUPPORTED, true)) {
             abort(404);
         }
 
