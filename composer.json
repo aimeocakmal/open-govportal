@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "aimeocakmal/open-govportal",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "OpenGovPortal — a bilingual Laravel 12 + Filament government portal platform, recreating digital.gov.my on the TALL stack.",
+    "keywords": ["laravel", "filament", "livewire", "tall-stack", "government", "portal", "bilingual"],
     "license": "MIT",
     "require": {
         "php": "^8.2",
