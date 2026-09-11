@@ -16,6 +16,8 @@ This folder contains planning and technical reference documents for OpenGovPorta
 10. `docs/deployment.md` for Docker, Kubernetes, zero-downtime deployment, and backups.
 11. `docs/security.md` for OWASP coverage, security headers, RBAC, and PDPA compliance.
 12. `docs/ai.md` for AI chatbot architecture, RAG pipeline, embedding strategy, and admin AI editor.
+13. `docs/sample-content.md` for the fictional bilingual demo content that the seeders produce, demo logins, and lang-file branding strings.
+14. `docs/sample-images.md` for the image slot specification, the committed asset pack, and the photo request list.
 
 ## Project Phases
 
