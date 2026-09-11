@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" role="img" aria-label="OpenGovPortal">
+  <title>OpenGovPortal</title>
+  <g transform="scale(0.4166667)">
+    <rect width="96" height="96" rx="20" fill="#2563EB"/>
+    <path d="M28 72V44a20 20 0 0 1 40 0v28" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="58" cy="62" r="4" fill="#FFFFFF"/>
+  </g>
+  <text x="50" y="27" font-family="Poppins, Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="600" fill="#18181B" letter-spacing="-0.3">OpenGovPortal</text>
+</svg>

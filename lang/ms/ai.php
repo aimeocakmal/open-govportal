@@ -64,9 +64,9 @@ return [
     'tab_en' => 'English',
 
     // Chatbot UI defaults
-    'default_name' => 'Pembantu Digital',
-    'default_persona' => 'Anda adalah pembantu AI rasmi Kementerian Digital Malaysia. Jawab dengan sopan dan formal.',
-    'default_welcome' => 'Selamat datang! Saya boleh membantu anda dengan maklumat mengenai Kementerian Digital.',
+    'default_name' => 'Pembantu OpenGovPortal',
+    'default_persona' => 'Anda ialah pembantu AI rasmi OpenGovPortal. Jawab dengan sopan, jelas dan ringkas berdasarkan kandungan portal.',
+    'default_welcome' => 'Selamat datang! Saya boleh membantu anda mencari maklumat di OpenGovPortal.',
     'default_placeholder' => 'Taip soalan anda...',
     'default_disclaimer' => 'Chatbot ini menggunakan AI. Respons mungkin tidak sentiasa tepat. Jangan kongsi maklumat peribadi.',
     'source' => 'Sumber',

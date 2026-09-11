@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'site_name' => 'Kementerian Digital Malaysia',
-    'site_tagline' => 'Memimpin transformasi digital negara.',
+    'site_name' => 'OpenGovPortal',
+    'site_tagline' => 'Portal kerajaan sumber terbuka untuk perkhidmatan awam.',
 
     'nav' => [
         'home' => 'Laman Utama',

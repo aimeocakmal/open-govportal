@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="t">
+  <title id="t">Light blue background with a pair of arch outlines in the centre</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EFF6FF"/>
+      <stop offset="1" stop-color="#C2D5FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <path d="M490 760V460A140 140 0 0 1 770 460V760" fill="none" stroke="#2563EB" stroke-width="24" stroke-linejoin="round" stroke-linecap="round" opacity="0.18"/>
+  <path d="M830 760V460A140 140 0 0 1 1110 460V760" fill="none" stroke="#2563EB" stroke-width="24" stroke-linejoin="round" stroke-linecap="round" opacity="0.18"/>
+</svg>

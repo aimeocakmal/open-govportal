@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Direktori Kakitangan',
-    'description' => 'Direktori kakitangan Kementerian Digital Malaysia.',
+    'description' => 'Direktori kakitangan OpenGovPortal.',
 
     'search' => [
         'placeholder' => 'Cari mengikut nama, jawatan atau jabatan...',

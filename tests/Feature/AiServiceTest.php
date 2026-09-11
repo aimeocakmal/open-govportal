@@ -265,12 +265,12 @@ class AiServiceTest extends TestCase
     {
         $this->setUpApiKey();
         $fake = Prism::fake([
-            TextResponseFake::make()->withText('Kementerian Digital melancarkan inisiatif baharu.')->withUsage(new Usage(30, 12)),
+            TextResponseFake::make()->withText('OpenGovPortal melancarkan pembantu AI baharu.')->withUsage(new Usage(30, 12)),
         ]);
 
         $result = $this->app->make(AiService::class)->writeExcerpt('Long article about the ministry...', 'ms');
 
-        $this->assertEquals('Kementerian Digital melancarkan inisiatif baharu.', $result);
+        $this->assertEquals('OpenGovPortal melancarkan pembantu AI baharu.', $result);
         $fake->assertCallCount(1);
     }
 

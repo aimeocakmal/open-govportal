@@ -48,7 +48,7 @@ class DirektoriPageTest extends TestCase
         $response = $this->get('/ms/direktori');
 
         $response->assertOk();
-        $response->assertSee('Direktori kakitangan Kementerian Digital Malaysia.');
+        $response->assertSee('Direktori kakitangan OpenGovPortal.');
     }
 
     public function test_direktori_shows_description_in_en(): void
@@ -56,7 +56,7 @@ class DirektoriPageTest extends TestCase
         $response = $this->get('/en/direktori');
 
         $response->assertOk();
-        $response->assertSee('Staff directory of the Ministry of Digital Malaysia.');
+        $response->assertSee('Staff directory of OpenGovPortal.');
     }
 
     public function test_direktori_has_breadcrumb(): void
@@ -243,13 +243,13 @@ class DirektoriPageTest extends TestCase
     {
         StaffDirectory::factory()->create([
             'name' => 'Email Staff',
-            'email' => 'staff@digital.gov.my',
+            'email' => 'staff@opengovportal.example',
         ]);
 
         $response = $this->get('/ms/direktori');
 
         $response->assertOk();
-        $response->assertSee('staff@digital.gov.my');
+        $response->assertSee('staff@opengovportal.example');
     }
 
     public function test_direktori_shows_staff_phone(): void

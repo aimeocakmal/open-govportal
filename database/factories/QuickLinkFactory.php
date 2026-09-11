@@ -18,7 +18,7 @@ class QuickLinkFactory extends Factory
             'label_ms' => fake()->words(2, true),
             'label_en' => fake()->words(2, true),
             'url' => fake()->url(),
-            'icon' => fake()->randomElement(['globe', 'document', 'phone', 'mail', 'chart', 'users']),
+            'icon' => '/images/icons/quick-links/'.fake()->randomElement(['siaran', 'pencapaian', 'statistik', 'dasar', 'direktori', 'hubungi-kami']).'.svg',
             'sort_order' => fake()->numberBetween(0, 10),
             'is_active' => true,
         ];

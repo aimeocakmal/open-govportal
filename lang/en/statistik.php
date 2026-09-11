@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Statistics',
-    'description' => 'Statistics and key performance indicators (KPIs) of the Ministry of Digital Malaysia.',
+    'description' => 'Statistics and key performance indicators (KPIs) of OpenGovPortal.',
 
     'no_data' => 'No statistics data available at this time.',
     'chart_types' => [

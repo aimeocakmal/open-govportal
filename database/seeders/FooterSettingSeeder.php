@@ -7,32 +7,32 @@ use Illuminate\Database\Seeder;
 
 class FooterSettingSeeder extends Seeder
 {
+    public const REPOSITORY_URL = 'https://github.com/aimeocakmal/open-govportal';
+
     public function run(): void
     {
         FooterSetting::query()->delete();
 
-        // Footer link columns (About Us, Quick Links, Open Source) are managed
+        // Footer link columns (About, Quick Links, Open Source) are managed
         // via the public_footer Menu — see MenuSeeder.
         // FooterSetting manages the branding block (left column) and social icons.
 
-        // ── Branding block ─────────────────────────────────────────────
         $branding = [
-            ['type' => 'logo', 'label_ms' => 'Jata Negara', 'label_en' => 'National Coat of Arms', 'url' => '/images/jata-negara.png', 'sort_order' => 1],
-            ['type' => 'heading', 'label_ms' => 'Kementerian Digital', 'label_en' => 'Ministry of Digital', 'sort_order' => 2],
-            ['type' => 'text', 'label_ms' => "Aras 7, Menara PjH, No. 2,\nJalan Tun Abdul Razak, Presint 2,\n62100 Putrajaya, Malaysia", 'label_en' => "Level 7, Menara PjH, No. 2,\nJalan Tun Abdul Razak, Presint 2,\n62100 Putrajaya, Malaysia", 'sort_order' => 3],
-            ['type' => 'subheading', 'label_ms' => 'Ikuti Kami', 'label_en' => 'Follow Us', 'sort_order' => 4],
+            ['type' => 'logo', 'label_ms' => 'OpenGovPortal', 'label_en' => 'OpenGovPortal', 'url' => '/images/logo/opengovportal-footer.svg', 'sort_order' => 1],
+            ['type' => 'heading', 'label_ms' => 'Portal kerajaan sumber terbuka', 'label_en' => 'Open-source government portal', 'sort_order' => 2],
+            ['type' => 'text', 'label_ms' => "Aras 5, Menara Portal\nJalan Contoh 1\n50000 Bandar Contoh", 'label_en' => "Level 5, Menara Portal\nJalan Contoh 1\n50000 Bandar Contoh", 'sort_order' => 3],
+            ['type' => 'subheading', 'label_ms' => 'Ikuti kami', 'label_en' => 'Follow us', 'sort_order' => 4],
         ];
 
         foreach ($branding as $item) {
             FooterSetting::create(array_merge($item, ['section' => 'branding']));
         }
 
-        // ── Social links with icons ────────────────────────────────────
         $social = [
-            ['label_ms' => 'Facebook', 'label_en' => 'Facebook', 'url' => 'https://facebook.com/KementerianDigitalMalaysia', 'icon' => 'facebook', 'sort_order' => 1],
-            ['label_ms' => 'Instagram', 'label_en' => 'Instagram', 'url' => 'https://instagram.com/kemabordigital', 'icon' => 'instagram', 'sort_order' => 2],
-            ['label_ms' => 'X', 'label_en' => 'X', 'url' => 'https://x.com/KKDmalaysia', 'icon' => 'x-twitter', 'sort_order' => 3],
-            ['label_ms' => 'TikTok', 'label_en' => 'TikTok', 'url' => 'https://tiktok.com/@kementeriandigital', 'icon' => 'tiktok', 'sort_order' => 4],
+            ['label_ms' => 'GitHub', 'label_en' => 'GitHub', 'url' => self::REPOSITORY_URL, 'icon' => 'github', 'sort_order' => 1],
+            ['label_ms' => 'Facebook', 'label_en' => 'Facebook', 'url' => 'https://opengovportal.example/facebook', 'icon' => 'facebook', 'sort_order' => 2],
+            ['label_ms' => 'X', 'label_en' => 'X', 'url' => 'https://opengovportal.example/x', 'icon' => 'x-twitter', 'sort_order' => 3],
+            ['label_ms' => 'YouTube', 'label_en' => 'YouTube', 'url' => 'https://opengovportal.example/youtube', 'icon' => 'youtube', 'sort_order' => 4],
         ];
 
         foreach ($social as $item) {

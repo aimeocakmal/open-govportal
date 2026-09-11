@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Policy',
-    'description' => 'List of policies and guidelines of the Ministry of Digital Malaysia.',
+    'description' => 'List of policies and guidelines of OpenGovPortal.',
 
     'categories' => [
         'all' => 'All Categories',

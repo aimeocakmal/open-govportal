@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'site_name' => 'Ministry of Digital Malaysia',
-    'site_tagline' => 'Leading the nation\'s digital transformation.',
+    'site_name' => 'OpenGovPortal',
+    'site_tagline' => 'An open-source portal for public services.',
 
     'nav' => [
         'home' => 'Home',

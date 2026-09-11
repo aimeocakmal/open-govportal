@@ -101,7 +101,7 @@ class HomepageTest extends TestCase
         $response = $this->get('/ms');
 
         $response->assertOk();
-        $response->assertSee('Kementerian Digital Malaysia');
+        $response->assertSee('Selamat datang ke OpenGovPortal');
     }
 
     public function test_homepage_shows_cta_button_when_url_and_label_present(): void

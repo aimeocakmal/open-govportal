@@ -9,28 +9,41 @@ class AddressSeeder extends Seeder
 {
     public function run(): void
     {
-        Address::create([
-            'label_ms' => 'Ibu Pejabat',
-            'label_en' => 'Headquarters',
-            'address_ms' => "Aras 13, Menara MITI\nNo. 7, Jalan Sultan Haji Ahmad Shah\n50480 Kuala Lumpur",
-            'address_en' => "Level 13, MITI Tower\nNo. 7, Jalan Sultan Haji Ahmad Shah\n50480 Kuala Lumpur",
-            'phone' => '+603-8000 8000',
-            'fax' => '+603-8000 8001',
-            'email' => 'info@digital.gov.my',
-            'google_maps_url' => 'https://maps.google.com/?q=Menara+MITI+Kuala+Lumpur',
-            'sort_order' => 1,
-            'is_active' => true,
-        ]);
+        foreach ($this->rows() as $row) {
+            Address::query()->updateOrCreate(['label_ms' => $row['label_ms']], $row);
+        }
+    }
 
-        Address::create([
-            'label_ms' => 'Pejabat Putrajaya',
-            'label_en' => 'Putrajaya Office',
-            'address_ms' => "Blok C2, Parcel C\nPusat Pentadbiran Kerajaan Persekutuan\n62000 Putrajaya",
-            'address_en' => "Block C2, Parcel C\nFederal Government Administrative Centre\n62000 Putrajaya",
-            'phone' => '+603-8872 3000',
-            'email' => 'putrajaya@digital.gov.my',
-            'sort_order' => 2,
-            'is_active' => true,
-        ]);
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function rows(): array
+    {
+        return [
+            [
+                'label_ms' => 'Ibu Pejabat',
+                'label_en' => 'Headquarters',
+                'address_ms' => "Aras 5, Menara Portal\nJalan Contoh 1\n50000 Bandar Contoh",
+                'address_en' => "Level 5, Menara Portal\nJalan Contoh 1\n50000 Bandar Contoh",
+                'phone' => '+603-0000 1000',
+                'fax' => '+603-0000 1001',
+                'email' => 'hello@opengovportal.example',
+                'google_maps_url' => null,
+                'sort_order' => 1,
+                'is_active' => true,
+            ],
+            [
+                'label_ms' => 'Pusat Sokongan',
+                'label_en' => 'Support Centre',
+                'address_ms' => "Blok B, Kompleks Contoh\nJalan Contoh 2\n50100 Bandar Contoh",
+                'address_en' => "Block B, Kompleks Contoh\nJalan Contoh 2\n50100 Bandar Contoh",
+                'phone' => '+603-0000 2000',
+                'fax' => null,
+                'email' => 'sokongan@opengovportal.example',
+                'google_maps_url' => null,
+                'sort_order' => 2,
+                'is_active' => true,
+            ],
+        ];
     }
 }

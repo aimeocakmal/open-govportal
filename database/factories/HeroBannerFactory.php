@@ -19,7 +19,7 @@ class HeroBannerFactory extends Factory
             'title_en' => fake()->sentence(5),
             'subtitle_ms' => fake()->sentence(10),
             'subtitle_en' => fake()->sentence(10),
-            'image' => 'banners/placeholder-'.fake()->randomNumber(3).'.jpg',
+            'image' => '/images/hero/hero-0'.fake()->numberBetween(1, 4).'.svg',
             'image_alt_ms' => fake()->sentence(3),
             'image_alt_en' => fake()->sentence(3),
             'cta_label_ms' => 'Ketahui Lebih Lanjut',

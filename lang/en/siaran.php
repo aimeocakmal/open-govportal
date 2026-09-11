@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Broadcasts',
-    'description' => 'Press releases, announcements and latest news from the Ministry of Digital Malaysia.',
+    'description' => 'Press releases, announcements and latest news from OpenGovPortal.',
 
     'filter' => [
         'all' => 'All',

@@ -384,7 +384,7 @@ return [
             'external_url_help' => 'External or absolute URL',
             'route_name' => 'Route Name',
             'route_name_help' => 'Named Laravel route (alternative to URL)',
-            'icon_help' => 'Heroicon name',
+            'icon_help' => 'Icon image path, e.g. /images/icons/quick-links/siaran.svg',
             'same_window' => 'Same Window',
             'new_window' => 'New Window',
             'hierarchy' => 'Hierarchy & Display',

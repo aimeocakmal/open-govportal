@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Siaran',
-    'description' => 'Siaran media, pengumuman dan berita terkini dari Kementerian Digital Malaysia.',
+    'description' => 'Siaran media, pengumuman dan berita terkini daripada OpenGovPortal.',
 
     'filter' => [
         'all' => 'Semua',

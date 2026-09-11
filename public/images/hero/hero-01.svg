@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1120" viewBox="0 0 2400 1120" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="t">
+  <title id="t">Blue gradient background with three nested white arch outlines on the right</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1E3A8A"/>
+      <stop offset="0.55" stop-color="#1D4ED8"/>
+      <stop offset="1" stop-color="#3A75F6"/>
+    </linearGradient>
+  </defs>
+  <rect width="2400" height="1120" fill="url(#bg)"/>
+  <path d="M1210 1200V590A490 490 0 0 1 2190 590V1200" fill="none" stroke="#FFFFFF" stroke-width="24" stroke-linejoin="round" stroke-linecap="round" opacity="0.12"/>
+  <path d="M1360 1200V690A370 370 0 0 1 2100 690V1200" fill="none" stroke="#FFFFFF" stroke-width="24" stroke-linejoin="round" stroke-linecap="round" opacity="0.12"/>
+  <path d="M1510 1200V790A250 250 0 0 1 2010 790V1200" fill="none" stroke="#FFFFFF" stroke-width="24" stroke-linejoin="round" stroke-linecap="round" opacity="0.12"/>
+</svg>

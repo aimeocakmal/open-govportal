@@ -16,8 +16,8 @@ class MinisterProfileFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'title_ms' => 'Menteri Digital',
-            'title_en' => 'Minister of Digital',
+            'title_ms' => 'Ketua Pegawai Digital',
+            'title_en' => 'Chief Digital Officer',
             'bio_ms' => fake()->paragraphs(2, true),
             'bio_en' => fake()->paragraphs(2, true),
             'photo' => null,

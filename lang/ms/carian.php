@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Carian',
-    'description' => 'Cari maklumat di laman web Kementerian Digital Malaysia.',
+    'description' => 'Cari maklumat di portal OpenGovPortal.',
 
     'placeholder' => 'Cari...',
     'label' => 'Cari di laman web',

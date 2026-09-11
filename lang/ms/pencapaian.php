@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Pencapaian',
-    'description' => 'Pencapaian utama Kementerian Digital Malaysia.',
+    'description' => 'Detik penting dalam perjalanan OpenGovPortal.',
 
     'filter' => [
         'all_years' => 'Semua Tahun',

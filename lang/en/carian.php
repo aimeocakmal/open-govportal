@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Search',
-    'description' => 'Search for information on the Ministry of Digital Malaysia website.',
+    'description' => 'Search for information on the OpenGovPortal website.',
 
     'placeholder' => 'Search...',
     'label' => 'Search the website',
