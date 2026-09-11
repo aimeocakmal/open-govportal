@@ -310,7 +310,7 @@ Map all Payload CMS collections to Laravel models + Filament resources:
 
 **Tasks — Content Models (5 remaining):**
 - [x] `StaffDirectory` — model, migration (`staff_directories` table with GIN FTS index), factory, seeder, Filament resource with bilingual position/department fields
-- [x] `PolicyFile` — model (mapped from Payload `File`), migration (`files` table), factory, seeder, Filament resource; note: use `protected $table = 'files'` per CLAUDE.md naming (`File → PolicyFile`)
+- [x] `PolicyFile` — model (mapped from Payload `File`), migration (`files` table), factory, seeder, Filament resource; note: use `protected $table = 'files'` per `.ai/guidelines/30-naming.md` (`File → PolicyFile`)
 - [x] `Media` — model, migration (`media` table), factory, seeder, Filament resource with file upload
 - [x] `Feedback` — model, migration (`feedbacks` table), factory, seeder, Filament resource (read-only admin view); `ip_address` as `string(45)` for cross-DB compatibility
 - [x] `SearchOverride` — model, migration (`search_overrides` table), factory, seeder, Filament resource

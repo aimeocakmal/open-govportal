@@ -27,3 +27,12 @@ Thumbs.db
 frankenphp
 frankenphp-worker.php
 /database/database.sqlite
+
+# Laravel Boost — generated from .ai/guidelines/, regenerate with `php artisan boost:update`
+/CLAUDE.md
+/AGENTS.md
+/.mcp.json
+/boost.json
+
+# Claude Code local config (settings, skills, commands — all regenerable or per-developer)
+/.claude/
