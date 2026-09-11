@@ -1,36 +1,69 @@
 {
-    "version": "0.7.0",
-    "released_at": "2026-02-24",
+    "version": "0.8.0",
+    "released_at": "2026-09-11",
     "changelog": [
         {
             "type": "added",
             "items": [
-                "AI content editor actions for admin (improve, summarize, translate to specific language)",
-                "AI excerpt generation action for content resources",
-                "AI chatbot integration planning and timeline (Phase 4)"
+                "Sample content pack: docs/sample-content.md with bilingual demo content for every model",
+                "Sample image pack: docs/sample-images.md with per-slot image specs and a photo request list",
+                "Committed asset pack under public/images (icons, logo, hero and broadcast placeholders) and public/files/policies (sample PDFs)",
+                "Real favicon.ico (was an empty file)",
+                "Seeded vision, mission, about text and four statistics charts"
             ]
         },
         {
             "type": "changed",
             "items": [
-                "Improved footer settings management",
-                "Updated conversion timeline for AI chatbot and local vs server tasks"
+                "All seeders now produce fictional OpenGovPortal demo content instead of real-world organisation data",
+                "Seeders are idempotent: php artisan db:seed can be re-run without duplicates",
+                "Site name, taglines, page descriptions and AI assistant defaults in lang files now use OpenGovPortal",
+                "Profile page labels the person as head of organisation"
             ]
         },
         {
             "type": "fixed",
             "items": [
-                "AI editor action state management",
-                "Header submenu navigation",
-                "Empty URL bug when adding menu items",
-                "Footer color styling",
-                "Footer menu column layout",
-                "Cache invalidation issues",
-                "Catch-all route conflict resolution"
+                "Quick-link icons rendered as broken images (icon names stored where an image path was expected)",
+                "Hero CTA and quick-link URLs missing the locale prefix",
+                "Seeded image and file paths that pointed to files not present on disk"
             ]
         }
     ],
     "history": [
+        {
+            "version": "0.7.0",
+            "released_at": "2026-02-24",
+            "changelog": [
+                {
+                    "type": "added",
+                    "items": [
+                        "AI content editor actions for admin (improve, summarize, translate to specific language)",
+                        "AI excerpt generation action for content resources",
+                        "AI chatbot integration planning and timeline (Phase 4)"
+                    ]
+                },
+                {
+                    "type": "changed",
+                    "items": [
+                        "Improved footer settings management",
+                        "Updated conversion timeline for AI chatbot and local vs server tasks"
+                    ]
+                },
+                {
+                    "type": "fixed",
+                    "items": [
+                        "AI editor action state management",
+                        "Header submenu navigation",
+                        "Empty URL bug when adding menu items",
+                        "Footer color styling",
+                        "Footer menu column layout",
+                        "Cache invalidation issues",
+                        "Catch-all route conflict resolution"
+                    ]
+                }
+            ]
+        },
         {
             "version": "0.6.0",
             "released_at": "2026-02-23",

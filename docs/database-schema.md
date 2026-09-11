@@ -352,8 +352,8 @@ CREATE TABLE settings (
 
 -- Default values:
 INSERT INTO settings VALUES
-    ('site_name_ms', 'Kementerian Digital Malaysia', 'string', NOW()),
-    ('site_name_en', 'Ministry of Digital Malaysia', 'string', NOW()),
+    ('site_name_ms', 'OpenGovPortal', 'string', NOW()),
+    ('site_name_en', 'OpenGovPortal', 'string', NOW()),
     ('site_description_ms', '...', 'string', NOW()),
     ('site_description_en', '...', 'string', NOW()),
     ('google_analytics_id', '', 'string', NOW()),
@@ -367,8 +367,8 @@ INSERT INTO settings VALUES
     -- Site branding — managed via ManageSiteInfo
     ('site_logo',         '',                              'string',  NOW()),  -- S3 key or URL for header logo (light mode)
     ('site_logo_dark',    '',                              'string',  NOW()),  -- S3 key or URL for dark-mode logo (optional)
-    ('site_logo_alt_ms',  'Kementerian Digital Malaysia',  'string',  NOW()),  -- logo alt text BM
-    ('site_logo_alt_en',  'Ministry of Digital Malaysia',  'string',  NOW()),  -- logo alt text EN
+    ('site_logo_alt_ms',  'OpenGovPortal',                 'string',  NOW()),  -- logo alt text BM
+    ('site_logo_alt_en',  'OpenGovPortal',                 'string',  NOW()),  -- logo alt text EN
     ('site_favicon',      '',                              'string',  NOW()),  -- S3 key or URL for favicon (.ico or .png)
 
     -- Email / SMTP — managed via ManageEmailSettings
@@ -380,8 +380,8 @@ INSERT INTO settings VALUES
     ('mail_password',     '',                              'encrypted', NOW()),  -- SMTP password (encrypted via Crypt::encrypt())
     ('mail_encryption',   'tls',                           'string',    NOW()),  -- tls | ssl | null
     ('mail_from_address', '',                              'string',    NOW()),  -- sender email address
-    ('mail_from_name_ms', 'Kementerian Digital Malaysia',  'string',    NOW()),  -- sender display name BM
-    ('mail_from_name_en', 'Ministry of Digital Malaysia',  'string',    NOW()),  -- sender display name EN
+    ('mail_from_name_ms', 'OpenGovPortal',                 'string',    NOW()),  -- sender display name BM
+    ('mail_from_name_en', 'OpenGovPortal',                 'string',    NOW()),  -- sender display name EN
 
     -- Media / file storage — managed via ManageMediaSettings
     -- Fill credentials only for the active driver; others are ignored at runtime
@@ -433,8 +433,8 @@ INSERT INTO settings VALUES
     -- ai_chatbot_rate_limit: messages per hour per IP address
 
     -- AI persona / system prompt — bilingual; AiChat uses the locale-matching prompt as the LLM system message
-    ('ai_system_prompt_ms', 'Anda adalah pembantu AI rasmi Kementerian Digital Malaysia. Jawab soalan berdasarkan konteks yang disediakan sahaja. Jangan mendedahkan maklumat peribadi.', 'string', NOW()),
-    ('ai_system_prompt_en', 'You are the official AI assistant for the Ministry of Digital Malaysia. Answer questions using only the provided context. Do not disclose personal information.', 'string', NOW());
+    ('ai_system_prompt_ms', 'Anda ialah pembantu AI rasmi OpenGovPortal. Jawab soalan berdasarkan konteks yang disediakan sahaja. Jangan mendedahkan maklumat peribadi.', 'string', NOW()),
+    ('ai_system_prompt_en', 'You are the official AI assistant for OpenGovPortal. Answer questions using only the provided context. Do not disclose personal information.', 'string', NOW());
 ```
 
 > **Encrypted settings:** Keys with `type = 'encrypted'` are stored via `Crypt::encrypt()` and read via `Crypt::decrypt()`. The `Setting::get()` helper handles encryption/decryption transparently. Affected keys: cloud storage credentials (`media_s3_key`, `media_s3_secret`, `media_r2_access_key`, `media_r2_secret_key`, `media_gcs_key_json`, `media_azure_key`), email password (`mail_password`), and all AI API keys (`ai_llm_api_key`, `ai_embedding_api_key`).

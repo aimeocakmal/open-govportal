@@ -163,7 +163,7 @@ Get the full stack bootstrapped with all required packages before writing any ap
 - [x] Install Filament Blueprint (AI-powered scaffolding) (2.1.0)
 - [x] Set up PostgreSQL database (DBngin, 127.0.0.1:5432, db: govportal)
 - [x] Configure Laravel multi-language (`ms`, `en`) with locale URL prefix (`APP_LOCALE=ms`)
-- [x] Run initial migrations and seed super admin user (`admin@digital.gov.my`)
+- [x] Run initial migrations and seed super admin user (`admin@opengovportal.example`)
 
 **Installation Commands:**
 

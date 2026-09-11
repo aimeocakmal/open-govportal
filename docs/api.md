@@ -53,7 +53,7 @@ POST /api/v1/auth/token
 Content-Type: application/json
 
 {
-  "email": "editor@digital.gov.my",
+  "email": "editor@opengovportal.example",
   "password": "••••••••"
 }
 ```

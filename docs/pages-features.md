@@ -91,7 +91,7 @@ Locale detection order:
 | Hero Banner | `hero_banners` | `where is_active=true, order sort_order asc` | Alpine.js + Embla.js carousel |
 | Quick Links | `quick_links` | `where is_active=true, order sort_order asc` | Icon + label grid |
 | Latest Broadcasts | `broadcasts` | `where status=published, order published_at desc, limit 6` | Cards with image + excerpt |
-| Achievements Highlights | `achievements` | `where status=published AND type != not_achievement, order date desc, limit 7` | Card or timeline layout |
+| Achievements Highlights | `achievements` | `where status=published, order date desc, limit 7` | Card or timeline layout |
 | Feedback Widget | `feedback_settings` | key-value lookup | Optional; shown if `is_enabled=true` |
 
 **Cache:** Full-page Redis cache, tag `homepage`, TTL 1 hour. Invalidate on any `HeroBanner`, `QuickLink`, `Broadcast`, or `Achievement` save.
@@ -158,7 +158,6 @@ Locale detection order:
 **Listing page features:**
 - Year filter — Livewire `wire:model` on year select dropdown; filter applied server-side
 - Cards: icon, title, description, date
-- Excludes `achievements` where `type = not_achievement`
 
 **Implementation:**
 - `AchievementController@index` renders `pencapaian/index.blade.php` which embeds `<livewire:pencapaian-list />`
