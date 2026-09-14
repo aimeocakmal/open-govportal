@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Contact Us',
-    'description' => 'Contact the Ministry of Digital Malaysia for any enquiries.',
+    'description' => 'Contact OpenGovPortal for any enquiries.',
 
     'addresses_title' => 'Our Addresses',
     'phone' => 'Phone',

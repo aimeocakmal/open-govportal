@@ -75,8 +75,8 @@ class StaffDirectoryTest extends TestCase
 
     public function test_email_is_unique_per_record(): void
     {
-        $staff1 = StaffDirectory::factory()->create(['email' => 'test@digital.gov.my']);
-        $staff2 = StaffDirectory::factory()->create(['email' => 'other@digital.gov.my']);
+        $staff1 = StaffDirectory::factory()->create(['email' => 'test@opengovportal.example']);
+        $staff2 = StaffDirectory::factory()->create(['email' => 'other@opengovportal.example']);
 
         $this->assertNotEquals($staff1->email, $staff2->email);
     }

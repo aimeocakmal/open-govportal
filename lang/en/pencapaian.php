@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Achievements',
-    'description' => 'Key achievements of the Ministry of Digital Malaysia.',
+    'description' => 'Milestones in the OpenGovPortal journey.',
 
     'filter' => [
         'all_years' => 'All Years',

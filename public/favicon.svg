@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="OpenGovPortal">
+  <title>OpenGovPortal</title>
+  <rect width="96" height="96" rx="20" fill="#2563EB"/>
+  <path d="M28 72V44a20 20 0 0 1 40 0v28" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="58" cy="62" r="4" fill="#FFFFFF"/>
+</svg>

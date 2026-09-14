@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Statistik',
-    'description' => 'Statistik dan petunjuk prestasi utama (KPI) Kementerian Digital Malaysia.',
+    'description' => 'Statistik dan petunjuk prestasi utama (KPI) OpenGovPortal.',
 
     'no_data' => 'Tiada data statistik tersedia buat masa ini.',
     'chart_types' => [

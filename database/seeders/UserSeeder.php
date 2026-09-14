@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
+    public const SUPER_ADMIN_EMAIL = 'admin@opengovportal.example';
+
     public function run(): void
     {
         $users = [
             [
                 'name' => 'Super Admin',
-                'email' => 'admin@digital.gov.my',
+                'email' => self::SUPER_ADMIN_EMAIL,
                 'password' => Hash::make('password'),
                 'is_active' => true,
                 'preferred_locale' => 'ms',
@@ -22,9 +24,9 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Content Editor',
-                'email' => 'editor@digital.gov.my',
+                'email' => 'editor@opengovportal.example',
                 'password' => Hash::make('password'),
-                'department' => 'Bahagian Teknologi',
+                'department' => 'Kandungan & Editorial',
                 'is_active' => true,
                 'preferred_locale' => 'ms',
                 'email_verified_at' => now(),
@@ -32,7 +34,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Publisher',
-                'email' => 'publisher@digital.gov.my',
+                'email' => 'publisher@opengovportal.example',
                 'password' => Hash::make('password'),
                 'is_active' => true,
                 'preferred_locale' => 'ms',
@@ -41,7 +43,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Viewer',
-                'email' => 'viewer@digital.gov.my',
+                'email' => 'viewer@opengovportal.example',
                 'password' => Hash::make('password'),
                 'is_active' => true,
                 'preferred_locale' => 'en',

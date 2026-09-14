@@ -2,15 +2,15 @@
 
 return [
     'title' => 'Ministry Profile',
-    'description' => 'Profile of the Ministry of Digital Malaysia.',
+    'description' => 'Profile of the OpenGovPortal organisation.',
 
-    'minister' => 'Minister',
+    'minister' => 'Head of organisation',
     'appointed' => 'Appointed on',
     'bio' => 'Biography',
 
     'vision' => 'Vision',
     'mission' => 'Mission',
-    'about' => 'About the Ministry',
+    'about' => 'About OpenGovPortal',
 
-    'no_minister' => 'No minister profile available.',
+    'no_minister' => 'No leadership profile available yet.',
 ];

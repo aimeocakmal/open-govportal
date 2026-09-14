@@ -128,12 +128,12 @@ class StaticPageTest extends TestCase
     {
         StaticPage::factory()->published()->create([
             'slug' => 'penafian',
-            'meta_title_ms' => 'Penafian KKD',
+            'meta_title_ms' => 'Penafian OpenGovPortal',
             'meta_desc_ms' => 'Halaman penafian rasmi.',
         ]);
 
         $this->get('/ms/penafian')
-            ->assertSee('Penafian KKD')
+            ->assertSee('Penafian OpenGovPortal')
             ->assertSee('Halaman penafian rasmi.');
     }
 

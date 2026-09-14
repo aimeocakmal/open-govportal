@@ -9,9 +9,9 @@ class FeedbackSettingSeeder extends Seeder
 {
     public function run(): void
     {
-        FeedbackSetting::create(['key' => 'is_enabled', 'value' => 'true']);
-        FeedbackSetting::create(['key' => 'recipient_email', 'value' => '']);
-        FeedbackSetting::create(['key' => 'success_message_ms', 'value' => 'Terima kasih atas maklum balas anda.']);
-        FeedbackSetting::create(['key' => 'success_message_en', 'value' => 'Thank you for your feedback.']);
+        FeedbackSetting::set('is_enabled', 'true');
+        FeedbackSetting::set('recipient_email', 'maklumbalas@opengovportal.example');
+        FeedbackSetting::set('success_message_ms', 'Terima kasih. Maklum balas anda telah diterima dan akan dibalas dalam masa tiga hari bekerja.');
+        FeedbackSetting::set('success_message_en', 'Thank you. Your feedback has been received and will be answered within three working days.');
     }
 }

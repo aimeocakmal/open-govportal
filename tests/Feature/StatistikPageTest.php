@@ -47,7 +47,7 @@ class StatistikPageTest extends TestCase
         $response = $this->get('/ms/statistik');
 
         $response->assertOk();
-        $response->assertSee('Statistik dan petunjuk prestasi utama (KPI) Kementerian Digital Malaysia.');
+        $response->assertSee('Statistik dan petunjuk prestasi utama (KPI) OpenGovPortal.');
     }
 
     public function test_statistik_shows_description_in_en(): void
@@ -55,7 +55,7 @@ class StatistikPageTest extends TestCase
         $response = $this->get('/en/statistik');
 
         $response->assertOk();
-        $response->assertSee('Statistics and key performance indicators (KPIs) of the Ministry of Digital Malaysia.');
+        $response->assertSee('Statistics and key performance indicators (KPIs) of OpenGovPortal.');
     }
 
     public function test_statistik_has_breadcrumb(): void

@@ -64,9 +64,9 @@ return [
     'tab_en' => 'English',
 
     // Chatbot UI defaults
-    'default_name' => 'Digital Assistant',
-    'default_persona' => 'You are the official AI assistant for the Ministry of Digital, Malaysia. Respond politely and formally.',
-    'default_welcome' => 'Welcome! I can help you with information about the Ministry of Digital.',
+    'default_name' => 'OpenGovPortal Assistant',
+    'default_persona' => 'You are the official AI assistant for OpenGovPortal. Respond politely, clearly and concisely based on portal content.',
+    'default_welcome' => 'Welcome! I can help you find information on OpenGovPortal.',
     'default_placeholder' => 'Type your question...',
     'default_disclaimer' => 'This chatbot uses AI. Responses may not always be accurate. Do not share personal information.',
     'source' => 'Source',

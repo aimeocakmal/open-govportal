@@ -3,8 +3,8 @@
 return [
     'title' => 'Laman Utama',
     'hero' => [
-        'default_title' => 'Kementerian Digital Malaysia',
-        'default_subtitle' => 'Memimpin transformasi digital negara.',
+        'default_title' => 'Selamat datang ke OpenGovPortal',
+        'default_subtitle' => 'Portal kerajaan sumber terbuka yang dwibahasa, mudah diakses dan pantas.',
         'learn_more' => 'Ketahui Lebih Lanjut',
     ],
 
@@ -25,7 +25,7 @@ return [
 
     'achievements' => [
         'title' => 'Pencapaian',
-        'description' => 'Pencapaian utama Kementerian Digital Malaysia.',
+        'description' => 'Detik penting dalam perjalanan OpenGovPortal.',
         'view_all' => 'Lihat Semua Pencapaian',
         'no_achievements' => 'Tiada pencapaian buat masa ini.',
     ],

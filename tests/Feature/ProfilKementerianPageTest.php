@@ -34,11 +34,11 @@ class ProfilKementerianPageTest extends TestCase
     public function test_profil_page_shows_current_minister(): void
     {
         MinisterProfile::factory()->create([
-            'name' => 'Dato Sri Gobind Singh',
+            'name' => 'Nurul Hidayah binti Azman',
             'is_current' => true,
         ]);
 
-        $this->get('/ms/profil-kementerian')->assertSee('Dato Sri Gobind Singh');
+        $this->get('/ms/profil-kementerian')->assertSee('Nurul Hidayah binti Azman');
     }
 
     public function test_profil_page_hides_former_minister(): void
@@ -53,13 +53,13 @@ class ProfilKementerianPageTest extends TestCase
     public function test_profil_page_shows_minister_title_in_locale(): void
     {
         MinisterProfile::factory()->create([
-            'title_ms' => 'Menteri Digital',
-            'title_en' => 'Minister of Digital',
+            'title_ms' => 'Ketua Pegawai Digital',
+            'title_en' => 'Chief Digital Officer',
             'is_current' => true,
         ]);
 
-        $this->get('/ms/profil-kementerian')->assertSee('Menteri Digital');
-        $this->get('/en/profil-kementerian')->assertSee('Minister of Digital');
+        $this->get('/ms/profil-kementerian')->assertSee('Ketua Pegawai Digital');
+        $this->get('/en/profil-kementerian')->assertSee('Chief Digital Officer');
     }
 
     public function test_profil_page_shows_vision(): void
@@ -78,7 +78,7 @@ class ProfilKementerianPageTest extends TestCase
 
     public function test_profil_page_shows_no_minister_message(): void
     {
-        $this->get('/ms/profil-kementerian')->assertSee('Tiada profil menteri');
+        $this->get('/ms/profil-kementerian')->assertSee('Tiada profil ketua organisasi');
     }
 
     public function test_profil_page_has_breadcrumb(): void

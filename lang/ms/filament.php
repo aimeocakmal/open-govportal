@@ -384,7 +384,7 @@ return [
             'external_url_help' => 'URL luaran atau mutlak',
             'route_name' => 'Nama Laluan',
             'route_name_help' => 'Laluan Laravel bernama (alternatif kepada URL)',
-            'icon_help' => 'Nama Heroicon',
+            'icon_help' => 'Laluan imej ikon, contohnya /images/icons/quick-links/siaran.svg',
             'same_window' => 'Tetingkap Sama',
             'new_window' => 'Tetingkap Baharu',
             'hierarchy' => 'Hierarki & Paparan',

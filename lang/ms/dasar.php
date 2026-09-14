@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Dasar',
-    'description' => 'Senarai dasar dan garis panduan Kementerian Digital Malaysia.',
+    'description' => 'Senarai dasar dan garis panduan OpenGovPortal.',
 
     'categories' => [
         'all' => 'Semua Kategori',

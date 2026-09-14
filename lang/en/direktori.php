@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Staff Directory',
-    'description' => 'Staff directory of the Ministry of Digital Malaysia.',
+    'description' => 'Staff directory of OpenGovPortal.',
 
     'search' => [
         'placeholder' => 'Search by name, position or department...',

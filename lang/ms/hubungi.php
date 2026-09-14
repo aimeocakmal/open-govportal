@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Hubungi Kami',
-    'description' => 'Hubungi Kementerian Digital Malaysia untuk sebarang pertanyaan.',
+    'description' => 'Hubungi OpenGovPortal untuk sebarang pertanyaan.',
 
     'addresses_title' => 'Alamat Kami',
     'phone' => 'Telefon',

@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', function () {
     $browser = request()->getPreferredLanguage(['ms', 'en']);
-    $locale  = $browser === 'en' ? 'en' : 'ms';
+    $locale = $browser === 'en' ? 'en' : 'ms';
+
     return redirect("/{$locale}");
 });
 

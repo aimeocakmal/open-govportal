@@ -3,8 +3,8 @@
 return [
     'title' => 'Home',
     'hero' => [
-        'default_title' => 'Ministry of Digital Malaysia',
-        'default_subtitle' => 'Leading the nation\'s digital transformation.',
+        'default_title' => 'Welcome to OpenGovPortal',
+        'default_subtitle' => 'An open-source government portal that is bilingual, accessible and fast.',
         'learn_more' => 'Learn More',
     ],
 
@@ -25,7 +25,7 @@ return [
 
     'achievements' => [
         'title' => 'Achievements',
-        'description' => 'Key achievements of the Ministry of Digital Malaysia.',
+        'description' => 'Milestones in the OpenGovPortal journey.',
         'view_all' => 'View All Achievements',
         'no_achievements' => 'No achievements at this time.',
     ],

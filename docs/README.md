@@ -16,17 +16,19 @@ This folder contains planning and technical reference documents for OpenGovPorta
 10. `docs/deployment.md` for Docker, Kubernetes, zero-downtime deployment, and backups.
 11. `docs/security.md` for OWASP coverage, security headers, RBAC, and PDPA compliance.
 12. `docs/ai.md` for AI chatbot architecture, RAG pipeline, embedding strategy, and admin AI editor.
+13. `docs/sample-content.md` for the fictional bilingual demo content that the seeders produce, demo logins, and lang-file branding strings.
+14. `docs/sample-images.md` for the image slot specification, the committed asset pack, and the photo request list.
 
 ## Project Phases
 
-| Phase | Weeks | Focus |
-|-------|-------|-------|
-| **1: Foundation** | 1–2 | Project bootstrap, tooling installation (Filament, Boost, Blueprint), design system, base infrastructure |
-| **2: Content Models & CMS** | 3–5 | All Filament resources, media, site config, search indexing, admin polish |
-| **3: Public Pages** | 6–9 | All 10 public pages, Livewire components, bilingual routes, SEO |
-| **4: Performance & Quality** | 10–11 | Redis caching, WCAG AA, PHPUnit coverage, security audit, load testing |
-| **5: Migration & Launch** | 12 | Content migration from MongoDB, DNS cutover, production deploy, monitoring |
-| **6: AI Features** | 13–16 | RAG pipeline (pgvector embeddings), public AI chatbot (`AiChat` Livewire), admin AI content editor (Filament) |
+| Phase                        | Weeks | Focus                                                                                                         |
+|------------------------------|-------|---------------------------------------------------------------------------------------------------------------|
+| **1: Foundation**            | 1–2   | Project bootstrap, tooling installation (Filament, Boost, Blueprint), design system, base infrastructure      |
+| **2: Content Models & CMS**  | 3–5   | All Filament resources, media, site config, search indexing, admin polish                                     |
+| **3: Public Pages**          | 6–9   | All 10 public pages, Livewire components, bilingual routes, SEO                                               |
+| **4: Performance & Quality** | 10–11 | Redis caching, WCAG AA, PHPUnit coverage, security audit, load testing                                        |
+| **5: Migration & Launch**    | 12    | Content migration from MongoDB, DNS cutover, production deploy, monitoring                                    |
+| **6: AI Features**           | 13–16 | RAG pipeline (pgvector embeddings), public AI chatbot (`AiChat` Livewire), admin AI content editor (Filament) |
 
 See [conversion-timeline.md](conversion-timeline.md) for detailed tasks, installation commands, and acceptance criteria per phase.
 
